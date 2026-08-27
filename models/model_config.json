@@ -1,0 +1,110 @@
+{
+    "best_model_name": "Extra Trees (tuned)",
+    "model_params": "{'bootstrap': False, 'ccp_alpha': 0.0, 'criterion': 'squared_error', 'max_depth': 6, 'max_features': 'sqrt', 'max_leaf_nodes': None, 'max_samples': None, 'min_impurity_decrease': 0.0, 'min_samples_leaf': 4, 'min_samples_split': 2, 'min_weight_fraction_leaf': 0.0, 'monotonic_cst': None, 'n_estimators': 150, 'n_jobs': None, 'oob_score': False, 'random_state': 42, 'verbose': 0, 'warm_start': False}",
+    "all_metrics": [
+        {
+            "Model": "Linear Regression",
+            "Train_MAE": 0.5281,
+            "Train_RMSE": 0.7303,
+            "Train_R2": 0.5069,
+            "Val_MAE": 0.5152,
+            "Val_RMSE": 0.6185,
+            "Val_R2": 0.4497,
+            "Test_MAE": 0.4805,
+            "Test_RMSE": 0.588,
+            "Test_R2": 0.1301,
+            "Overfit_R2_Gap": 0.0572
+        },
+        {
+            "Model": "Ridge Regression (alpha=10)",
+            "Train_MAE": 0.5414,
+            "Train_RMSE": 0.745,
+            "Train_R2": 0.4868,
+            "Val_MAE": 0.528,
+            "Val_RMSE": 0.6384,
+            "Val_R2": 0.4137,
+            "Test_MAE": 0.4279,
+            "Test_RMSE": 0.5199,
+            "Test_R2": 0.32,
+            "Overfit_R2_Gap": 0.0731
+        },
+        {
+            "Model": "Lasso Regression",
+            "Train_MAE": 0.5767,
+            "Train_RMSE": 0.7871,
+            "Train_R2": 0.4272,
+            "Val_MAE": 0.543,
+            "Val_RMSE": 0.674,
+            "Val_R2": 0.3465,
+            "Test_MAE": 0.395,
+            "Test_RMSE": 0.4845,
+            "Test_R2": 0.4094,
+            "Overfit_R2_Gap": 0.0807
+        },
+        {
+            "Model": "ElasticNet",
+            "Train_MAE": 0.5537,
+            "Train_RMSE": 0.7608,
+            "Train_R2": 0.4648,
+            "Val_MAE": 0.5367,
+            "Val_RMSE": 0.6552,
+            "Val_R2": 0.3824,
+            "Test_MAE": 0.4057,
+            "Test_RMSE": 0.4856,
+            "Test_R2": 0.4067,
+            "Overfit_R2_Gap": 0.0824
+        },
+        {
+            "Model": "Random Forest (tuned)",
+            "Train_MAE": 0.4827,
+            "Train_RMSE": 0.6654,
+            "Train_R2": 0.5906,
+            "Val_MAE": 0.4981,
+            "Val_RMSE": 0.6015,
+            "Val_R2": 0.4795,
+            "Test_MAE": 0.2853,
+            "Test_RMSE": 0.3754,
+            "Test_R2": 0.6455,
+            "Overfit_R2_Gap": 0.1111
+        },
+        {
+            "Model": "Gradient Boosting (tuned)",
+            "Train_MAE": 0.4688,
+            "Train_RMSE": 0.645,
+            "Train_R2": 0.6153,
+            "Val_MAE": 0.5002,
+            "Val_RMSE": 0.6034,
+            "Val_R2": 0.4763,
+            "Test_MAE": 0.2997,
+            "Test_RMSE": 0.3821,
+            "Test_R2": 0.6327,
+            "Overfit_R2_Gap": 0.139
+        },
+        {
+            "Model": "Extra Trees (tuned)",
+            "Train_MAE": 0.5688,
+            "Train_RMSE": 0.7694,
+            "Train_R2": 0.4527,
+            "Val_MAE": 0.4768,
+            "Val_RMSE": 0.5941,
+            "Val_R2": 0.4923,
+            "Test_MAE": 0.2666,
+            "Test_RMSE": 0.3662,
+            "Test_R2": 0.6626,
+            "Overfit_R2_Gap": -0.0396
+        },
+        {
+            "Model": "Hist Gradient Boosting (tuned)",
+            "Train_MAE": 0.295,
+            "Train_RMSE": 0.4341,
+            "Train_R2": 0.8258,
+            "Val_MAE": 0.5881,
+            "Val_RMSE": 0.7058,
+            "Val_R2": 0.2834,
+            "Test_MAE": 0.4527,
+            "Test_RMSE": 0.5486,
+            "Test_R2": 0.2429,
+            "Overfit_R2_Gap": 0.5424
+        }
+    ]
+}

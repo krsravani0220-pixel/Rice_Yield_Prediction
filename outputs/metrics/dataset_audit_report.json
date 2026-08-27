@@ -1,0 +1,672 @@
+{
+    "sheet_names": [
+        "ML_Dataset"
+    ],
+    "num_rows": 810,
+    "num_columns": 26,
+    "exact_column_names": [
+        "District",
+        "Year",
+        "Kharif Temperature",
+        "Kharif Rainfall",
+        "Kharif Humidity",
+        "Kharif Wind_Speed",
+        "Kharif Soil_Moisture",
+        "Rabi Temperature",
+        "Rabi Rainfall",
+        "Rabi Humidity",
+        "Rabi Wind_Speed",
+        "Rabi Soil_Moisture",
+        "Zaid Temperature",
+        "Zaid Rainfall",
+        "Zaid Humidity",
+        "Zaid Wind_Speed",
+        "Zaid Soil_Moisture",
+        "Soil_PH",
+        "Soil_Type",
+        "N",
+        "P",
+        "K",
+        "Fertilizer",
+        "Pesticide",
+        "Area",
+        "Yield"
+    ],
+    "data_types": {
+        "District": "str",
+        "Year": "int64",
+        "Kharif Temperature": "float64",
+        "Kharif Rainfall": "float64",
+        "Kharif Humidity": "float64",
+        "Kharif Wind_Speed": "float64",
+        "Kharif Soil_Moisture": "float64",
+        "Rabi Temperature": "float64",
+        "Rabi Rainfall": "float64",
+        "Rabi Humidity": "float64",
+        "Rabi Wind_Speed": "float64",
+        "Rabi Soil_Moisture": "float64",
+        "Zaid Temperature": "float64",
+        "Zaid Rainfall": "float64",
+        "Zaid Humidity": "float64",
+        "Zaid Wind_Speed": "float64",
+        "Zaid Soil_Moisture": "float64",
+        "Soil_PH": "float64",
+        "Soil_Type": "str",
+        "N": "int64",
+        "P": "int64",
+        "K": "int64",
+        "Fertilizer": "int64",
+        "Pesticide": "float64",
+        "Area": "float64",
+        "Yield": "float64"
+    },
+    "missing_values_per_column": {
+        "District": 0,
+        "Year": 0,
+        "Kharif Temperature": 15,
+        "Kharif Rainfall": 0,
+        "Kharif Humidity": 15,
+        "Kharif Wind_Speed": 15,
+        "Kharif Soil_Moisture": 15,
+        "Rabi Temperature": 11,
+        "Rabi Rainfall": 0,
+        "Rabi Humidity": 11,
+        "Rabi Wind_Speed": 11,
+        "Rabi Soil_Moisture": 11,
+        "Zaid Temperature": 15,
+        "Zaid Rainfall": 0,
+        "Zaid Humidity": 15,
+        "Zaid Wind_Speed": 12,
+        "Zaid Soil_Moisture": 15,
+        "Soil_PH": 0,
+        "Soil_Type": 0,
+        "N": 0,
+        "P": 0,
+        "K": 0,
+        "Fertilizer": 0,
+        "Pesticide": 0,
+        "Area": 23,
+        "Yield": 25
+    },
+    "missing_percentage_per_column": {
+        "District": 0.0,
+        "Year": 0.0,
+        "Kharif Temperature": 1.85,
+        "Kharif Rainfall": 0.0,
+        "Kharif Humidity": 1.85,
+        "Kharif Wind_Speed": 1.85,
+        "Kharif Soil_Moisture": 1.85,
+        "Rabi Temperature": 1.36,
+        "Rabi Rainfall": 0.0,
+        "Rabi Humidity": 1.36,
+        "Rabi Wind_Speed": 1.36,
+        "Rabi Soil_Moisture": 1.36,
+        "Zaid Temperature": 1.85,
+        "Zaid Rainfall": 0.0,
+        "Zaid Humidity": 1.85,
+        "Zaid Wind_Speed": 1.48,
+        "Zaid Soil_Moisture": 1.85,
+        "Soil_PH": 0.0,
+        "Soil_Type": 0.0,
+        "N": 0.0,
+        "P": 0.0,
+        "K": 0.0,
+        "Fertilizer": 0.0,
+        "Pesticide": 0.0,
+        "Area": 2.84,
+        "Yield": 3.09
+    },
+    "duplicate_rows": 0,
+    "unique_districts": [
+        "Chennai",
+        "Coimbatore",
+        "Cuddalore",
+        "Dharmapuri",
+        "Dindigul",
+        "Erode",
+        "Kancheepuram",
+        "Kanyakumari",
+        "Karur",
+        "Krishnagiri",
+        "Madurai",
+        "Nagapattinam",
+        "Namakkal",
+        "Perambalur",
+        "Pudukkottai",
+        "Ramanathapuram",
+        "Salem",
+        "Sivagangai",
+        "Thanjavur",
+        "The Nilgiris",
+        "Theni",
+        "Thiruvallur",
+        "Thiruvannamalai",
+        "Thiruvarur",
+        "Thoothukudi",
+        "Tiruchirappalli",
+        "Tirunelveli",
+        "Vellore",
+        "Villupuram",
+        "Virudhunagar"
+    ],
+    "num_unique_districts": 30,
+    "records_per_district": {
+        "Chennai": 27,
+        "Coimbatore": 27,
+        "Cuddalore": 27,
+        "Dharmapuri": 27,
+        "Dindigul": 27,
+        "Erode": 27,
+        "Kancheepuram": 27,
+        "Kanyakumari": 27,
+        "Karur": 27,
+        "Krishnagiri": 27,
+        "Madurai": 27,
+        "Nagapattinam": 27,
+        "Namakkal": 27,
+        "Perambalur": 27,
+        "Pudukkottai": 27,
+        "Ramanathapuram": 27,
+        "Salem": 27,
+        "Sivagangai": 27,
+        "Thanjavur": 27,
+        "The Nilgiris": 27,
+        "Theni": 27,
+        "Thiruvallur": 27,
+        "Thiruvannamalai": 27,
+        "Thiruvarur": 27,
+        "Thoothukudi": 27,
+        "Tiruchirappalli": 27,
+        "Tirunelveli": 27,
+        "Vellore": 27,
+        "Villupuram": 27,
+        "Virudhunagar": 27
+    },
+    "year_range": {
+        "min": 1997,
+        "max": 2023
+    },
+    "num_years": 27,
+    "records_per_year": {
+        "1997": 30,
+        "1998": 30,
+        "1999": 30,
+        "2000": 30,
+        "2001": 30,
+        "2002": 30,
+        "2003": 30,
+        "2004": 30,
+        "2005": 30,
+        "2006": 30,
+        "2007": 30,
+        "2008": 30,
+        "2009": 30,
+        "2010": 30,
+        "2011": 30,
+        "2012": 30,
+        "2013": 30,
+        "2014": 30,
+        "2015": 30,
+        "2016": 30,
+        "2017": 30,
+        "2018": 30,
+        "2019": 30,
+        "2020": 30,
+        "2021": 30,
+        "2022": 30,
+        "2023": 30
+    },
+    "categorical_columns": [
+        "District",
+        "Soil_Type"
+    ],
+    "unique_values_categorical": {
+        "District": [
+            "Chennai",
+            "Coimbatore",
+            "Cuddalore",
+            "Dharmapuri",
+            "Dindigul",
+            "Erode",
+            "Kancheepuram",
+            "Kanyakumari",
+            "Karur",
+            "Krishnagiri",
+            "Madurai",
+            "Nagapattinam",
+            "Namakkal",
+            "Perambalur",
+            "Pudukkottai",
+            "Ramanathapuram",
+            "Salem",
+            "Sivagangai",
+            "Thanjavur",
+            "The Nilgiris",
+            "Theni",
+            "Thiruvallur",
+            "Thiruvannamalai",
+            "Thiruvarur",
+            "Thoothukudi",
+            "Tiruchirappalli",
+            "Tirunelveli",
+            "Vellore",
+            "Villupuram",
+            "Virudhunagar"
+        ],
+        "Soil_Type": [
+            "coastal alluvium",
+            "black soil",
+            "red sandy soil",
+            "red soil",
+            "red loamy soil",
+            "laterite soil",
+            "coastal alluviam",
+            "red sandy loam soil",
+            "sandy soil",
+            "alluvial soil",
+            "coastal sandy soil"
+        ]
+    },
+    "numerical_descriptive_stats": {
+        "Year": {
+            "count": 810.0,
+            "mean": 2010.0,
+            "std": 7.793693371302454,
+            "min": 1997.0,
+            "25%": 2003.0,
+            "50%": 2010.0,
+            "75%": 2017.0,
+            "max": 2023.0
+        },
+        "Kharif Temperature": {
+            "count": 795.0,
+            "mean": 27.831829559748424,
+            "std": 1.9874737921549945,
+            "min": 22.4375,
+            "25%": 26.84375,
+            "50%": 28.54,
+            "75%": 29.35,
+            "max": 30.65
+        },
+        "Kharif Rainfall": {
+            "count": 810.0,
+            "mean": 93.75704938271603,
+            "std": 38.69552217965151,
+            "min": 17.02,
+            "25%": 67.74125000000001,
+            "50%": 87.2175,
+            "75%": 112.30375000000001,
+            "max": 296.4375
+        },
+        "Kharif Humidity": {
+            "count": 795.0,
+            "mean": 155.47005660377363,
+            "std": 2376.8164361530307,
+            "min": 58.21,
+            "25%": 65.86625000000001,
+            "50%": 69.885,
+            "75%": 74.91125,
+            "max": 67087.0
+        },
+        "Kharif Wind_Speed": {
+            "count": 795.0,
+            "mean": 3.3132723270440256,
+            "std": 0.7280052659447722,
+            "min": 1.8475,
+            "25%": 2.80875,
+            "50%": 3.1625,
+            "75%": 3.71,
+            "max": 5.815
+        },
+        "Kharif Soil_Moisture": {
+            "count": 795.0,
+            "mean": 0.5541937106918239,
+            "std": 0.0958088078842616,
+            "min": 0.295,
+            "25%": 0.48,
+            "50%": 0.555,
+            "75%": 0.62,
+            "max": 0.865
+        },
+        "Rabi Temperature": {
+            "count": 799.0,
+            "mean": 24.82207008760951,
+            "std": 1.3972354964985523,
+            "min": 20.806,
+            "25%": 24.092,
+            "50%": 25.096,
+            "75%": 25.719,
+            "max": 27.408
+        },
+        "Rabi Rainfall": {
+            "count": 810.0,
+            "mean": 101.10442716049383,
+            "std": 43.222518664963786,
+            "min": 19.29,
+            "25%": 72.003,
+            "50%": 93.40700000000001,
+            "75%": 121.21,
+            "max": 282.43
+        },
+        "Rabi Humidity": {
+            "count": 799.0,
+            "mean": 77.4834843554443,
+            "std": 3.8152611809862904,
+            "min": 61.788,
+            "25%": 75.375,
+            "50%": 78.08,
+            "75%": 79.934,
+            "max": 87.56
+        },
+        "Rabi Wind_Speed": {
+            "count": 799.0,
+            "mean": 2.4217046307884855,
+            "std": 0.7534613679203824,
+            "min": 1.05,
+            "25%": 1.951,
+            "50%": 2.29,
+            "75%": 2.784,
+            "max": 5.07
+        },
+        "Rabi Soil_Moisture": {
+            "count": 799.0,
+            "mean": 0.6446958698372965,
+            "std": 0.08855739608562768,
+            "min": 0.388,
+            "25%": 0.58,
+            "50%": 0.646,
+            "75%": 0.7,
+            "max": 0.864
+        },
+        "Zaid Temperature": {
+            "count": 795.0,
+            "mean": 29.49835522008386,
+            "std": 1.3567323056439462,
+            "min": 23.91,
+            "25%": 28.915,
+            "50%": 29.77,
+            "75%": 30.4085,
+            "max": 32.2533
+        },
+        "Zaid Rainfall": {
+            "count": 810.0,
+            "mean": 51.03555035802469,
+            "std": 28.55543508667186,
+            "min": 4.7867,
+            "25%": 30.87,
+            "50%": 44.55,
+            "75%": 64.5716725,
+            "max": 199.52
+        },
+        "Zaid Humidity": {
+            "count": 795.0,
+            "mean": 62.42498716943396,
+            "std": 6.878189156216379,
+            "min": 46.66,
+            "25%": 57.65665,
+            "50%": 62.09,
+            "75%": 66.60665,
+            "max": 82.843
+        },
+        "Zaid Wind_Speed": {
+            "count": 798.0,
+            "mean": 2.520864118621554,
+            "std": 0.6580926040721466,
+            "min": 0.64,
+            "25%": 2.1325,
+            "50%": 2.41,
+            "75%": 2.84,
+            "max": 4.55
+        },
+        "Zaid Soil_Moisture": {
+            "count": 795.0,
+            "mean": 0.45707375267127887,
+            "std": 0.09473341245977031,
+            "min": 0.236666666666667,
+            "25%": 0.3785,
+            "50%": 0.48,
+            "75%": 0.5367,
+            "max": 0.687
+        },
+        "Soil_PH": {
+            "count": 810.0,
+            "mean": 7.5200000000000005,
+            "std": 0.40882719896745473,
+            "min": 6.5,
+            "25%": 7.2,
+            "50%": 7.5,
+            "75%": 7.8,
+            "max": 8.3
+        },
+        "N": {
+            "count": 810.0,
+            "mean": 301.4938271604938,
+            "std": 30.97094753185264,
+            "min": 240.0,
+            "25%": 290.0,
+            "50%": 300.0,
+            "75%": 310.0,
+            "max": 380.0
+        },
+        "P": {
+            "count": 810.0,
+            "mean": 19.7,
+            "std": 3.2490561527630097,
+            "min": 14.0,
+            "25%": 18.0,
+            "50%": 19.5,
+            "75%": 21.0,
+            "max": 28.0
+        },
+        "K": {
+            "count": 810.0,
+            "mean": 205.5,
+            "std": 17.10588344561258,
+            "min": 170.0,
+            "25%": 195.0,
+            "50%": 205.0,
+            "75%": 220.0,
+            "max": 240.0
+        },
+        "Fertilizer": {
+            "count": 810.0,
+            "mean": 160.0,
+            "std": 18.808776848231677,
+            "min": 120.0,
+            "25%": 150.0,
+            "50%": 160.0,
+            "75%": 170.0,
+            "max": 200.0
+        },
+        "Pesticide": {
+            "count": 810.0,
+            "mean": 2.19,
+            "std": 0.3997047736228081,
+            "min": 1.2,
+            "25%": 2.0,
+            "50%": 2.2,
+            "75%": 2.4,
+            "max": 3.0
+        },
+        "Area": {
+            "count": 787.0,
+            "mean": 65140.392630241426,
+            "std": 53403.303272283134,
+            "min": 32.0,
+            "25%": 16480.0,
+            "50%": 58571.0,
+            "75%": 97020.5,
+            "max": 225837.0
+        },
+        "Yield": {
+            "count": 785.0,
+            "mean": 3.5728407643312106,
+            "std": 1.005216473979928,
+            "min": 0.0,
+            "25%": 3.12,
+            "50%": 3.62,
+            "75%": 4.16,
+            "max": 9.89
+        }
+    },
+    "yield_statistics": {
+        "count": 785.0,
+        "mean": 3.5728407643312106,
+        "std": 1.005216473979928,
+        "min": 0.0,
+        "25%": 3.12,
+        "50%": 3.62,
+        "75%": 4.16,
+        "max": 9.89,
+        "null_count": 25
+    },
+    "potential_outliers_iqr": {
+        "Year": {
+            "iqr_lower_bound": 1982.0,
+            "iqr_upper_bound": 2038.0,
+            "count_outliers": 0
+        },
+        "Kharif Temperature": {
+            "iqr_lower_bound": 23.084374999999998,
+            "iqr_upper_bound": 33.109375,
+            "count_outliers": 16
+        },
+        "Kharif Rainfall": {
+            "iqr_lower_bound": 0.897500000000008,
+            "iqr_upper_bound": 179.1475,
+            "count_outliers": 25
+        },
+        "Kharif Humidity": {
+            "iqr_lower_bound": 52.29875000000003,
+            "iqr_upper_bound": 88.47874999999998,
+            "count_outliers": 8
+        },
+        "Kharif Wind_Speed": {
+            "iqr_lower_bound": 1.4568749999999997,
+            "iqr_upper_bound": 5.061875000000001,
+            "count_outliers": 25
+        },
+        "Kharif Soil_Moisture": {
+            "iqr_lower_bound": 0.26999999999999996,
+            "iqr_upper_bound": 0.8300000000000001,
+            "count_outliers": 1
+        },
+        "Rabi Temperature": {
+            "iqr_lower_bound": 21.651499999999995,
+            "iqr_upper_bound": 28.159500000000005,
+            "count_outliers": 20
+        },
+        "Rabi Rainfall": {
+            "iqr_lower_bound": -1.8074999999999903,
+            "iqr_upper_bound": 195.02049999999997,
+            "count_outliers": 31
+        },
+        "Rabi Humidity": {
+            "iqr_lower_bound": 68.5365,
+            "iqr_upper_bound": 86.7725,
+            "count_outliers": 18
+        },
+        "Rabi Wind_Speed": {
+            "iqr_lower_bound": 0.7015000000000005,
+            "iqr_upper_bound": 4.033499999999999,
+            "count_outliers": 45
+        },
+        "Rabi Soil_Moisture": {
+            "iqr_lower_bound": 0.39999999999999997,
+            "iqr_upper_bound": 0.8799999999999999,
+            "count_outliers": 1
+        },
+        "Zaid Temperature": {
+            "iqr_lower_bound": 26.674749999999996,
+            "iqr_upper_bound": 32.64875,
+            "count_outliers": 42
+        },
+        "Zaid Rainfall": {
+            "iqr_lower_bound": -19.68250875,
+            "iqr_upper_bound": 115.12418125,
+            "count_outliers": 26
+        },
+        "Zaid Humidity": {
+            "iqr_lower_bound": 44.231649999999995,
+            "iqr_upper_bound": 80.03165000000001,
+            "count_outliers": 2
+        },
+        "Zaid Wind_Speed": {
+            "iqr_lower_bound": 1.0712499999999998,
+            "iqr_upper_bound": 3.90125,
+            "count_outliers": 26
+        },
+        "Zaid Soil_Moisture": {
+            "iqr_lower_bound": 0.14120000000000008,
+            "iqr_upper_bound": 0.7739999999999999,
+            "count_outliers": 0
+        },
+        "Soil_PH": {
+            "iqr_lower_bound": 6.300000000000001,
+            "iqr_upper_bound": 8.7,
+            "count_outliers": 0
+        },
+        "N": {
+            "iqr_lower_bound": 260.0,
+            "iqr_upper_bound": 340.0,
+            "count_outliers": 135
+        },
+        "P": {
+            "iqr_lower_bound": 13.5,
+            "iqr_upper_bound": 25.5,
+            "count_outliers": 81
+        },
+        "K": {
+            "iqr_lower_bound": 157.5,
+            "iqr_upper_bound": 257.5,
+            "count_outliers": 0
+        },
+        "Fertilizer": {
+            "iqr_lower_bound": 120.0,
+            "iqr_upper_bound": 200.0,
+            "count_outliers": 0
+        },
+        "Pesticide": {
+            "iqr_lower_bound": 1.4000000000000001,
+            "iqr_upper_bound": 3.0,
+            "count_outliers": 27
+        },
+        "Area": {
+            "iqr_lower_bound": -104330.75,
+            "iqr_upper_bound": 217831.25,
+            "count_outliers": 3
+        },
+        "Yield": {
+            "iqr_lower_bound": 1.56,
+            "iqr_upper_bound": 5.720000000000001,
+            "count_outliers": 36
+        }
+    },
+    "invalid_negative_values": {},
+    "correlation_with_yield": {
+        "Yield": 1.0,
+        "Pesticide": 0.24676308589222534,
+        "Year": 0.22186856493166018,
+        "K": 0.2171011109700088,
+        "Kharif Soil_Moisture": 0.21108522247144076,
+        "Fertilizer": 0.20292173877340444,
+        "Zaid Soil_Moisture": 0.10672382847245376,
+        "N": 0.10580158998142346,
+        "P": 0.1007444678460346,
+        "Kharif Rainfall": 0.07892319419941159,
+        "Zaid Rainfall": 0.04416562597799022,
+        "Kharif Humidity": 0.01503349509810176,
+        "Rabi Soil_Moisture": -0.07292434247038529,
+        "Kharif Wind_Speed": -0.0770030853828962,
+        "Zaid Humidity": -0.12400244004556187,
+        "Soil_PH": -0.14958159002059937,
+        "Zaid Temperature": -0.16359721632643065,
+        "Rabi Temperature": -0.17918648558522837,
+        "Rabi Humidity": -0.18415522927195374,
+        "Rabi Rainfall": -0.1855263171226973,
+        "Zaid Wind_Speed": -0.23178768319244603,
+        "Rabi Wind_Speed": -0.23897026240521124,
+        "Kharif Temperature": -0.24254825556811796,
+        "Area": -0.3498810975679552
+    }
+}

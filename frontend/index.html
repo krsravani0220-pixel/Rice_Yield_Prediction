@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamil Nadu Rice Yield Decision Support System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Mobile Header Bar -->
+        <div class="mobile-header">
+            <div class="brand-logo-small">🌾 RiceYield AI</div>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="app-sidebar" class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">🌾</div>
+                <div class="brand-text">
+                    <h2>RiceYield AI</h2>
+                    <span>Tamil Nadu Agri DSS</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <button id="nav-dashboard" class="nav-item active" onclick="switchTab('dashboard')">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text" data-en="Dashboard" data-ta="முகப்பு">Dashboard</span>
+                </button>
+                <button id="nav-manual" class="nav-item" onclick="switchTab('manual')">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text" data-en="Manual Prediction" data-ta="நேரடி கணக்கீடு">Manual Prediction</span>
+                </button>
+                <button id="nav-forecast" class="nav-item" onclick="switchTab('forecast')">
+                    <span class="nav-icon">🔮</span>
+                    <span class="nav-text" data-en="Forecast Mode" data-ta="முன்கணிப்பு முறை">Forecast Mode</span>
+                </button>
+                <button id="nav-health" class="nav-item" onclick="switchTab('health')">
+                    <span class="nav-icon">🍃</span>
+                    <span class="nav-text" data-en="Crop Health Advisor" data-ta="பயிர் ஆலோசகர்">Crop Health Advisor</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="lang-selector">
+                    <span class="lang-label" data-en="Language" data-ta="மொழி">Language:</span>
+                    <div class="lang-pills">
+                        <button id="lang-en" class="lang-pill active" onclick="setLanguage('en')">English</button>
+                        <button id="lang-ta" class="lang-pill" onclick="setLanguage('ta')">தமிழ்</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileMenu()"></div>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-wrapper">
+            <!-- Top Navbar Header -->
+            <header class="top-header">
+                <div class="header-title">
+                    <h1 id="page-title">Dashboard</h1>
+                    <p id="page-subtitle">Explainable Agricultural Decision Support & Forecasting</p>
+                </div>
+                <div class="header-status">
+                    <span class="status-indicator"></span>
+                    <span class="status-text">System Status: <strong>Operational</strong></span>
+                </div>
+            </header>
+
+            <!-- Validation Message Banner -->
+            <div id="validation-banner" class="validation-banner hidden">
+                <span class="banner-icon">⚠️</span>
+                <span id="val-msg-text" data-en="Please enter all required values before predicting." data-ta="தயவுசெய்து கணிப்பதற்கு முன் தேவையான அனைத்து மதிப்புகளையும் உள்ளிடவும்.">Please enter all required values before predicting.</span>
+            </div>
+
+            <!-- Main Content Panels Container -->
+            <main class="content-body">
+
+                <!-- SECTION 1: DASHBOARD / HOME PAGE -->
+                <div id="panel-dashboard" class="panel active">
+                    <!-- Hero Section -->
+                    <div class="hero-banner">
+                        <div class="hero-overlay"></div>
+                        <div class="hero-content">
+                            <span class="hero-tag">🌾 AGRICULTURAL DSS FOR TAMIL NADU</span>
+                            <h1>Tamil Nadu Rice Yield<br><span class="highlight-text">Decision Support System</span></h1>
+                            <p class="hero-subtitle-text" data-en="Explainable Agricultural Decision Support & Forecasting" data-ta="விளக்கக்கூடிய விவசாய முடிவு ஆதரவு மற்றும் முன்கணிப்பு">Explainable Agricultural Decision Support & Forecasting</p>
+                            <p class="hero-desc" data-en="Use historical agricultural data, seasonal forecasting and explainable insights to support rice yield decisions." data-ta="வரலாற்று விவசாயத் தரவுகள் மற்றும் பருவகால முன்கணிப்புகளைப் பயன்படுத்தி நெல் மகசூல் முடிவுகளை மேம்படுத்துங்கள்.">Use historical agricultural data, seasonal forecasting and explainable insights to support rice yield decisions.</p>
+                            <div class="hero-actions">
+                                <button class="btn-primary" onclick="switchTab('manual')">
+                                    <span>Get Started</span>
+                                    <span class="btn-arrow">→</span>
+                                </button>
+                                <button class="btn-secondary-light" onclick="switchTab('forecast')">
+                                    <span>Explore Forecast (2026/27)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3 Feature Cards -->
+                    <div class="dashboard-features-grid">
+                        <div class="feature-card" onclick="switchTab('manual')">
+                            <div class="feature-icon-wrapper green-bg">🌾</div>
+                            <h3>Yield Prediction</h3>
+                            <p>Predict rice yield using observed agricultural and environmental inputs.</p>
+                            <span class="card-link">Start Prediction →</span>
+                        </div>
+                        <div class="feature-card" onclick="switchTab('forecast')">
+                            <div class="feature-icon-wrapper teal-bg">🔮</div>
+                            <h3>Forecast Mode</h3>
+                            <p>Forecast 2026 and 2027 environmental conditions and estimate yield.</p>
+                            <span class="card-link">View Forecasts →</span>
+                        </div>
+                        <div class="feature-card" onclick="switchTab('health')">
+                            <div class="feature-icon-wrapper sage-bg">🍃</div>
+                            <h3>Crop Health Advisor</h3>
+                            <p>Receive rule-based crop condition and agricultural guidance.</p>
+                            <span class="card-link">Get Guidance →</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: MANUAL PREDICTION PAGE -->
+                <div id="panel-manual" class="panel">
+                    <div class="form-container-card">
+                        <div class="card-header-block">
+                            <h2 data-en="Rice Yield Prediction" data-ta="நெல் மகசூல் கணக்கீடு">Rice Yield Prediction</h2>
+                            <p data-en="Enter observed agricultural and environmental conditions to estimate annual rice yield." data-ta="ஆண்டு நெல் மகசூலைக் கணக்கிட அவதானிக்கப்பட்ட சூழ்நிலைகளை உள்ளிடவும்.">Enter observed agricultural and environmental conditions to estimate annual rice yield.</p>
+                        </div>
+
+                        <form id="predict-form" onsubmit="handleManualSubmit(event)">
+                            <!-- Location & Target Year -->
+                            <div class="form-section">
+                                <h3 class="section-heading">📍 Location & Target Year</h3>
+                                <div class="form-grid duo">
+                                    <div class="input-field">
+                                        <label data-en="District *" data-ta="மாவட்டம் *">District *</label>
+                                        <select id="input-district" required onchange="handleManualDistrictYearChange()">
+                                            <option value="" disabled selected>-- Select District --</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-field">
+                                        <label data-en="Target Year *" data-ta="ஆண்டு *">Target Year *</label>
+                                        <select id="input-year" required onchange="handleManualDistrictYearChange()">
+                                            <option value="" disabled selected>-- Select Target Year --</option>
+                                            <optgroup label="Future Years (2026–2027)">
+                                                <option value="2026">2026 (Forecasted Value)</option>
+                                                <option value="2027">2027 (Forecasted Value)</option>
+                                            </optgroup>
+                                            <optgroup label="Historical Years (1997–2023)">
+                                                <option value="2023">2023 (Dataset Value)</option>
+                                                <option value="2022">2022 (Dataset Value)</option>
+                                                <option value="2021">2021 (Dataset Value)</option>
+                                                <option value="2020">2020 (Dataset Value)</option>
+                                                <option value="2019">2019 (Dataset Value)</option>
+                                                <option value="2018">2018 (Dataset Value)</option>
+                                                <option value="2017">2017 (Dataset Value)</option>
+                                                <option value="2016">2016 (Dataset Value)</option>
+                                                <option value="2015">2015 (Dataset Value)</option>
+                                                <option value="2014">2014 (Dataset Value)</option>
+                                                <option value="2013">2013 (Dataset Value)</option>
+                                                <option value="2012">2012 (Dataset Value)</option>
+                                                <option value="2011">2011 (Dataset Value)</option>
+                                                <option value="2010">2010 (Dataset Value)</option>
+                                                <option value="2009">2009 (Dataset Value)</option>
+                                                <option value="2008">2008 (Dataset Value)</option>
+                                                <option value="2007">2007 (Dataset Value)</option>
+                                                <option value="2006">2006 (Dataset Value)</option>
+                                                <option value="2005">2005 (Dataset Value)</option>
+                                                <option value="2004">2004 (Dataset Value)</option>
+                                                <option value="2003">2003 (Dataset Value)</option>
+                                                <option value="2002">2002 (Dataset Value)</option>
+                                                <option value="2001">2001 (Dataset Value)</option>
+                                                <option value="2000">2000 (Dataset Value)</option>
+                                                <option value="1999">1999 (Dataset Value)</option>
+                                                <option value="1998">1998 (Dataset Value)</option>
+                                                <option value="1997">1997 (Dataset Value)</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seasonal Climate Inputs -->
+                            <div class="form-section">
+                                <h3 class="section-heading">🌦️ Seasonal Climate Parameters <span id="climate-source-badge" class="ref-badge" style="margin-left:10px; font-size:0.8rem">Auto-populated on selection</span></h3>
+                                <div class="seasons-grid">
+                                    <!-- Kharif -->
+                                    <div class="season-card">
+                                        <div class="season-title">🌧️ Kharif Season (Monsoon)</div>
+                                        <div class="season-inputs">
+                                            <div class="input-field">
+                                                <label>Temp (°C) * <span id="ref-Kharif Temperature" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Kharif Temperature" placeholder="e.g. 28.5" required oninput="validateManualInputs()">
+                                                <div id="msg-Kharif Temperature" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Rainfall (mm) * <span id="ref-Kharif Rainfall" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Kharif Rainfall" placeholder="e.g. 110.0" required oninput="validateManualInputs()">
+                                                <div id="msg-Kharif Rainfall" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Humidity (%) * <span id="ref-Kharif Humidity" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Kharif Humidity" placeholder="e.g. 72.0" required oninput="validateManualInputs()">
+                                                <div id="msg-Kharif Humidity" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Wind Speed (m/s) * <span id="ref-Kharif Wind_Speed" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Kharif Wind_Speed" placeholder="e.g. 3.2" required oninput="validateManualInputs()">
+                                                <div id="msg-Kharif Wind_Speed" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Soil Moisture * <span id="ref-Kharif Soil_Moisture" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Kharif Soil_Moisture" placeholder="e.g. 0.55" required oninput="validateManualInputs()">
+                                                <div id="msg-Kharif Soil_Moisture" class="input-validation-msg"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Rabi -->
+                                    <div class="season-card">
+                                        <div class="season-title">🌾 Rabi Season (Winter)</div>
+                                        <div class="season-inputs">
+                                            <div class="input-field">
+                                                <label>Temp (°C) * <span id="ref-Rabi Temperature" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Rabi Temperature" placeholder="e.g. 25.0" required oninput="validateManualInputs()">
+                                                <div id="msg-Rabi Temperature" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Rainfall (mm) * <span id="ref-Rabi Rainfall" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Rabi Rainfall" placeholder="e.g. 95.0" required oninput="validateManualInputs()">
+                                                <div id="msg-Rabi Rainfall" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Humidity (%) * <span id="ref-Rabi Humidity" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Rabi Humidity" placeholder="e.g. 78.0" required oninput="validateManualInputs()">
+                                                <div id="msg-Rabi Humidity" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Wind Speed (m/s) * <span id="ref-Rabi Wind_Speed" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Rabi Wind_Speed" placeholder="e.g. 2.4" required oninput="validateManualInputs()">
+                                                <div id="msg-Rabi Wind_Speed" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Soil Moisture * <span id="ref-Rabi Soil_Moisture" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Rabi Soil_Moisture" placeholder="e.g. 0.65" required oninput="validateManualInputs()">
+                                                <div id="msg-Rabi Soil_Moisture" class="input-validation-msg"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Zaid -->
+                                    <div class="season-card">
+                                        <div class="season-title">☀️ Zaid Season (Summer)</div>
+                                        <div class="season-inputs">
+                                            <div class="input-field">
+                                                <label>Temp (°C) * <span id="ref-Zaid Temperature" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Zaid Temperature" placeholder="e.g. 29.8" required oninput="validateManualInputs()">
+                                                <div id="msg-Zaid Temperature" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Rainfall (mm) * <span id="ref-Zaid Rainfall" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Zaid Rainfall" placeholder="e.g. 45.0" required oninput="validateManualInputs()">
+                                                <div id="msg-Zaid Rainfall" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Humidity (%) * <span id="ref-Zaid Humidity" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Zaid Humidity" placeholder="e.g. 62.0" required oninput="validateManualInputs()">
+                                                <div id="msg-Zaid Humidity" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Wind Speed (m/s) * <span id="ref-Zaid Wind_Speed" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Zaid Wind_Speed" placeholder="e.g. 2.5" required oninput="validateManualInputs()">
+                                                <div id="msg-Zaid Wind_Speed" class="input-validation-msg"></div>
+                                            </div>
+                                            <div class="input-field">
+                                                <label>Soil Moisture * <span id="ref-Zaid Soil_Moisture" class="ref-badge"></span></label>
+                                                <input type="number" step="any" id="Zaid Soil_Moisture" placeholder="e.g. 0.48" required oninput="validateManualInputs()">
+                                                <div id="msg-Zaid Soil_Moisture" class="input-validation-msg"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Soil & Farm Inputs -->
+                            <div class="form-section">
+                                <h3 class="section-heading">🌱 Soil & Farm Inputs</h3>
+                                <div class="form-grid quad">
+                                    <div class="input-field">
+                                        <label data-en="Soil Type *" data-ta="மண் வகை *">Soil Type *</label>
+                                        <select id="Soil_Type" required>
+                                            <option value="" disabled selected>-- Select Soil Type --</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-field">
+                                        <label>Soil pH * <span id="ref-Soil_PH" class="ref-badge"></span></label>
+                                        <input type="number" step="any" id="Soil_PH" placeholder="e.g. 7.2" required oninput="validateManualInputs()">
+                                        <div id="msg-Soil_PH" class="input-validation-msg"></div>
+                                    </div>
+                                    <div class="input-field">
+                                        <label>Nitrogen (N) * <span id="ref-N" class="ref-badge"></span></label>
+                                        <input type="number" step="any" id="N" placeholder="e.g. 300" required oninput="validateManualInputs()">
+                                        <div id="msg-N" class="input-validation-msg"></div>
+                                    </div>
+                                    <div class="input-field">
+                                        <label>Phosphorus (P) * <span id="ref-P" class="ref-badge"></span></label>
+                                        <input type="number" step="any" id="P" placeholder="e.g. 20" required oninput="validateManualInputs()">
+                                        <div id="msg-P" class="input-validation-msg"></div>
+                                    </div>
+                                    <div class="input-field">
+                                        <label>Potassium (K) * <span id="ref-K" class="ref-badge"></span></label>
+                                        <input type="number" step="any" id="K" placeholder="e.g. 200" required oninput="validateManualInputs()">
+                                        <div id="msg-K" class="input-validation-msg"></div>
+                                    </div>
+                                    <div class="input-field">
+                                        <label>Fertilizer (kg/ha) * <span id="ref-Fertilizer" class="ref-badge"></span></label>
+                                        <input type="number" step="any" id="Fertilizer" placeholder="e.g. 160" required oninput="validateManualInputs()">
+                                        <div id="msg-Fertilizer" class="input-validation-msg"></div>
+                                    </div>
+                                    <div class="input-field">
+                                        <label>Pesticide (kg/ha) * <span id="ref-Pesticide" class="ref-badge"></span></label>
+                                        <input type="number" step="any" id="Pesticide" placeholder="e.g. 2.2" required oninput="validateManualInputs()">
+                                        <div id="msg-Pesticide" class="input-validation-msg"></div>
+                                    </div>
+                                    <div class="input-field">
+                                        <label>Cultivated Area (ha) * <span id="ref-Area" class="ref-badge"></span></label>
+                                        <input type="number" step="any" id="Area" placeholder="e.g. 60000" required oninput="validateManualInputs()">
+                                        <div id="msg-Area" class="input-validation-msg"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-submit-row">
+                                <button type="submit" class="btn-primary btn-large">
+                                    <span>🌾 Predict Rice Yield</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Before Prediction Empty State -->
+                    <div id="manual-empty-state" class="empty-state-card">
+                        <div class="empty-icon">📝</div>
+                        <h3>Enter all required values to generate a prediction.</h3>
+                        <p>Fill in the district, target year, seasonal weather parameters, and soil inputs above, then click <strong>Predict Rice Yield</strong>.</p>
+                    </div>
+
+                    <!-- Manual Output Section (Shown ONLY after prediction) -->
+                    <div id="manual-yield-output-section" class="results-container hidden">
+                        <!-- Prominent Result Display Card -->
+                        <div class="result-hero-card">
+                            <div class="result-main-info">
+                                <span class="mode-tag">Manual Input Mode</span>
+                                <h3 data-en="Predicted Rice Yield" data-ta="கணக்கிடப்பட்ட நெல் மகசூல்">Predicted Rice Yield</h3>
+                                <div class="yield-big-display">
+                                    <span id="manual-res-yield" class="yield-num">--</span>
+                                    <span class="yield-unit">tonnes / ha</span>
+                                </div>
+                            </div>
+                            <div class="result-meta-strip">
+                                <div class="meta-item">
+                                    <span class="meta-label">District:</span>
+                                    <strong id="manual-res-district">--</strong>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Historical District Average:</span>
+                                    <strong><span id="manual-res-hist-avg">--</span> tonnes / ha</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- On-Demand Action Buttons -->
+                        <div class="action-buttons-toolbar">
+                            <button id="btn-manual-shap" class="btn-action" onclick="toggleShapView('manual')">
+                                🔍 <span data-en="Explain Prediction" data-ta="விளக்கம் பெறுக">Explain Prediction</span>
+                            </button>
+                            <button id="btn-manual-insights" class="btn-action" onclick="toggleHistoricalInsights('manual')">
+                                📊 <span data-en="View Historical Insights" data-ta="வரலாற்றுத் தரவுகள்">View Historical Insights</span>
+                            </button>
+                            <button class="btn-action btn-audio" onclick="speakTamilExplanation('manual')">
+                                🔊 <span data-en="Listen Explanation in Tamil" data-ta="தமிழில் கேட்க">Listen Explanation in Tamil (தமிழில் கேட்க)</span>
+                            </button>
+                        </div>
+
+                        <!-- SHAP Explanation Panel (On Demand) -->
+                        <div id="manual-shap-panel" class="collapsible-panel hidden">
+                            <div class="panel-inner-card">
+                                <h3>Why did the system estimate this yield?</h3>
+                                <p class="panel-desc">Feature contribution analysis quantifying agricultural and climate factors influencing predicted yield.</p>
+                                <div class="shap-cols-grid">
+                                    <div class="shap-card positive">
+                                        <h4>⬆️ Positive Contributors</h4>
+                                        <ul id="manual-shap-positive-list" class="shap-list"></ul>
+                                    </div>
+                                    <div class="shap-card negative">
+                                        <h4>⬇️ Negative Contributors</h4>
+                                        <ul id="manual-shap-negative-list" class="shap-list"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Historical Insights Panel (On Demand) -->
+                        <div id="manual-insights-panel" class="collapsible-panel hidden">
+                            <div class="panel-inner-card">
+                                <h3>📊 Historical Condition Comparison</h3>
+                                <div id="manual-insights-list" class="insights-cards-grid"></div>
+                            </div>
+                        </div>
+
+                        <!-- Actionable Farmer Suggestions -->
+                        <div id="manual-suggestions-card" class="suggestions-card hidden">
+                            <h3>💡 Concise Actionable Suggestions</h3>
+                            <ul id="manual-suggestions-list" class="suggestions-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: SEASONAL FORECAST PAGE -->
+                <div id="panel-forecast" class="panel">
+                    <div class="form-container-card">
+                        <div class="card-header-block">
+                            <h2 data-en="Forecast Mode" data-ta="முன்கணிப்பு முறை">Forecast Mode</h2>
+                            <p data-en="Estimate future environmental conditions and use them to predict rice yield." data-ta="எதிர்கால வானிலையைக் கணித்து நெல் மகசூலை மதிப்பிடவும்.">Estimate future environmental conditions and use them to predict rice yield.</p>
+                        </div>
+
+                        <form id="forecast-form" onsubmit="handleForecastSubmit(event)">
+                            <div class="form-grid trio">
+                                <div class="input-field">
+                                    <label data-en="Select District *" data-ta="மாவட்டம் *">Select District *</label>
+                                    <select id="forecast-district" required>
+                                        <option value="" disabled selected>-- Select District --</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label data-en="Target Future Year *" data-ta="எதிர்கால ஆண்டு *">Target Future Year *</label>
+                                    <select id="forecast-year" required>
+                                        <option value="" disabled selected>-- Select Year --</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label data-en="Forecasting Method *" data-ta="முன்கணிப்பு முறை *">Forecasting Method *</label>
+                                    <select id="forecast-method" required>
+                                        <option value="Exponential Smoothing" selected>Exponential Smoothing</option>
+                                        <option value="Moving Average">5-Year Moving Average</option>
+                                        <option value="Linear Trend">Linear Trend Model</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-submit-row">
+                                <button type="submit" class="btn-primary btn-large glow">
+                                    <span>🔮 Generate Forecast & Predict Yield</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Before Forecast Empty State -->
+                    <div id="forecast-empty-state" class="empty-state-card">
+                        <div class="empty-icon">🔮</div>
+                        <h3>Select a district and future year to generate a forecast.</h3>
+                        <p>Allowed future target years: <strong>2026</strong> and <strong>2027</strong>.</p>
+                    </div>
+
+                    <!-- Forecast Output Section -->
+                    <div id="forecast-yield-output-section" class="results-container hidden">
+                        <!-- Forecasted Environmental Conditions Table Card -->
+                        <div class="form-container-card" style="margin-bottom:24px">
+                            <h3>🔮 Forecasted Environmental Conditions</h3>
+                            <p class="panel-desc">Calculated independently from district historical trajectory data across Kharif, Rabi, and Zaid seasons. Highlighted card represents the selected method used for yield estimation.</p>
+                            <div id="forecast-methods-comparison-grid" class="methods-grid"></div>
+                        </div>
+
+                        <!-- Prominent Forecast Yield Display -->
+                        <div class="result-hero-card forecast-theme">
+                            <div class="result-main-info">
+                                <span class="mode-tag badge-forecast" id="forecast-res-badge">Forecast Mode</span>
+                                <h3 data-en="Forecasted Rice Yield" data-ta="கணக்கிடப்பட்ட நெல் மகசூல்">Forecasted Rice Yield</h3>
+                                <div class="yield-big-display">
+                                    <span id="forecast-res-yield" class="yield-num">--</span>
+                                    <span class="yield-unit">tonnes / ha</span>
+                                </div>
+                            </div>
+                            <div class="result-meta-strip">
+                                <div class="meta-item">
+                                    <span class="meta-label">District:</span>
+                                    <strong id="forecast-res-district">--</strong>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Historical District Average:</span>
+                                    <strong><span id="forecast-res-hist-avg">--</span> tonnes / ha</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- On-Demand Action Buttons -->
+                        <div class="action-buttons-toolbar">
+                            <button id="btn-forecast-shap" class="btn-action" onclick="toggleShapView('forecast')">
+                                🔍 <span data-en="Explain Forecast Prediction" data-ta="விளக்கம் பெறுக">Explain Forecast Prediction</span>
+                            </button>
+                            <button id="btn-forecast-insights" class="btn-action" onclick="toggleHistoricalInsights('forecast')">
+                                📊 <span data-en="View Historical Insights" data-ta="வரலாற்றுத் தரவுகள்">View Historical Insights</span>
+                            </button>
+                            <button class="btn-action btn-audio" onclick="speakTamilExplanation('forecast')">
+                                🔊 <span data-en="Listen Explanation in Tamil" data-ta="தமிழில் கேட்க">Listen Explanation in Tamil (தமிழில் கேட்க)</span>
+                            </button>
+                        </div>
+
+                        <!-- SHAP Panel -->
+                        <div id="forecast-shap-panel" class="collapsible-panel hidden">
+                            <div class="panel-inner-card">
+                                <h3>Why did the system estimate this yield?</h3>
+                                <div class="shap-cols-grid">
+                                    <div class="shap-card positive">
+                                        <h4>⬆️ Positive Contributors</h4>
+                                        <ul id="forecast-shap-positive-list" class="shap-list"></ul>
+                                    </div>
+                                    <div class="shap-card negative">
+                                        <h4>⬇️ Negative Contributors</h4>
+                                        <ul id="forecast-shap-negative-list" class="shap-list"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Insights Panel -->
+                        <div id="forecast-insights-panel" class="collapsible-panel hidden">
+                            <div class="panel-inner-card">
+                                <h3>📊 Historical Condition Comparison</h3>
+                                <div id="forecast-insights-list" class="insights-cards-grid"></div>
+                            </div>
+                        </div>
+
+                        <!-- Suggestions -->
+                        <div id="forecast-suggestions-card" class="suggestions-card hidden">
+                            <h3>💡 Concise Actionable Suggestions</h3>
+                            <ul id="forecast-suggestions-list" class="suggestions-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: CROP HEALTH ADVISOR PAGE -->
+                <div id="panel-health" class="panel">
+                    <div class="form-container-card">
+                        <div class="card-header-block">
+                            <h2 data-en="Crop Health & Pest Diagnostic Advisor" data-ta="பயிர் ஆரோக்கியம் மற்றும் பூச்சி நோயறிதல்">Crop Health & Pest Diagnostic Advisor</h2>
+                            <p data-en="Enter field observations to receive targeted agricultural guidance." data-ta="பூச்சி மற்றும் நோய் மேலாண்மை வழிகாட்டல் பெற உங்கள் வயல் நிலவரத்தை உள்ளிடவும்.">Enter field observations to receive targeted agricultural guidance.</p>
+                        </div>
+
+                        <form id="health-form" onsubmit="handleHealthSubmit(event)">
+                            <div class="form-grid duo">
+                                <div class="input-field">
+                                    <label data-en="Growth Stage" data-ta="பயிர் வளர்ச்சி நிலை">Growth Stage</label>
+                                    <select id="health-stage">
+                                        <option value="Vegetative">Vegetative (வளர்ச்சி நிலை)</option>
+                                        <option value="Tillering" selected>Tillering (தூர் கட்டும் நிலை)</option>
+                                        <option value="Panicle Initiation">Panicle Initiation (கதிர் உருவாகும் நிலை)</option>
+                                        <option value="Flowering">Flowering (பூக்கும் நிலை)</option>
+                                        <option value="Maturation">Maturation (முதிர்ச்சி நிலை)</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label data-en="Leaf Condition" data-ta="இலை நிலை">Leaf Condition</label>
+                                    <select id="health-leaf">
+                                        <option value="Normal">Normal Healthy Green (சாதாரண பச்சை)</option>
+                                        <option value="Yellowing">Yellowing / Chlorosis (மஞ்சள் நிறமாதல்)</option>
+                                        <option value="Browning">Browning / Tip Burn (பழுப்பு நிறமாதல்)</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label data-en="Water Availability" data-ta="நீர் நிலை">Water Availability</label>
+                                    <select id="health-water">
+                                        <option value="Adequate">Adequate Irrigation (போதும் நீர்)</option>
+                                        <option value="Drought Stress">Drought Stress (வறட்சி நிலை)</option>
+                                        <option value="Waterlogged">Excess Waterlogged (அதிக நீர் தேக்கம்)</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label data-en="Pest Observations" data-ta="பூச்சி தாக்குதல்">Pest Observations</label>
+                                    <select id="health-pest">
+                                        <option value="None">None (எதுவுமில்லை)</option>
+                                        <option value="Stem Borer">Stem Borer / Dead Heart (குருத்து பூச்சி)</option>
+                                        <option value="Leaf Folder">Leaf Folder (இலை சுருட்டுப் புழு)</option>
+                                        <option value="BPH (Brown Plant Hopper)">Brown Plant Hopper (புகையான் பூச்சி)</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label data-en="Disease Symptoms" data-ta="நோய் அறிகுறிகள்">Disease Symptoms</label>
+                                    <select id="health-disease">
+                                        <option value="None">None (எதுவுமில்லை)</option>
+                                        <option value="Blast">Rice Blast / Eye Spots (குலை நோய்)</option>
+                                        <option value="Sheath Blight">Sheath Blight (தண்டு அழுகல் நோய்)</option>
+                                        <option value="Bacterial Blight">Bacterial Leaf Blight (பாக்டீரியா கருகல்)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-submit-row">
+                                <button type="submit" class="btn-primary btn-large">
+                                    <span>🍃 Get Crop Health Guidance</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Dedicated Crop Health Advisory Box -->
+                    <div id="crop-health-advisory-box" class="advisory-container hidden">
+                        <div class="advisory-card">
+                            <h3 data-en="Recommended Agricultural Actions" data-ta="பரிந்துரைக்கப்பட்ட விவசாய நடவடிக்கைகள்">Recommended Agricultural Actions</h3>
+                            <ul id="health-advisory-list" class="suggestions-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

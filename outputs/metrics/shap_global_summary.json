@@ -1,0 +1,250 @@
+[
+    {
+        "feature": "Cultivated Area",
+        "mean_abs_shap": 0.0761
+    },
+    {
+        "feature": "Year",
+        "mean_abs_shap": 0.0595
+    },
+    {
+        "feature": "Pesticide Application",
+        "mean_abs_shap": 0.0411
+    },
+    {
+        "feature": "Soil Type: Red Loamy Soil",
+        "mean_abs_shap": 0.0368
+    },
+    {
+        "feature": "Fertilizer Application",
+        "mean_abs_shap": 0.0281
+    },
+    {
+        "feature": "District: Sivagangai",
+        "mean_abs_shap": 0.0269
+    },
+    {
+        "feature": "Soil Type: Red Sandy Soil",
+        "mean_abs_shap": 0.0252
+    },
+    {
+        "feature": "Nitrogen (N)",
+        "mean_abs_shap": 0.0246
+    },
+    {
+        "feature": "Potassium (K)",
+        "mean_abs_shap": 0.0239
+    },
+    {
+        "feature": "Soil Type: Sandy Soil",
+        "mean_abs_shap": 0.0236
+    },
+    {
+        "feature": "District: Ramanathapuram",
+        "mean_abs_shap": 0.0205
+    },
+    {
+        "feature": "Phosphorus (P)",
+        "mean_abs_shap": 0.0166
+    },
+    {
+        "feature": "District: Nagapattinam",
+        "mean_abs_shap": 0.0166
+    },
+    {
+        "feature": "Soil Type: Coastal Alluvium",
+        "mean_abs_shap": 0.0155
+    },
+    {
+        "feature": "District: Pudukkottai",
+        "mean_abs_shap": 0.015
+    },
+    {
+        "feature": "Rabi Soil Moisture",
+        "mean_abs_shap": 0.0131
+    },
+    {
+        "feature": "Soil Type: Red Sandy Loam Soil",
+        "mean_abs_shap": 0.0122
+    },
+    {
+        "feature": "Soil pH",
+        "mean_abs_shap": 0.0119
+    },
+    {
+        "feature": "District: Theni",
+        "mean_abs_shap": 0.0119
+    },
+    {
+        "feature": "Rabi Humidity",
+        "mean_abs_shap": 0.0089
+    },
+    {
+        "feature": "Kharif Temperature",
+        "mean_abs_shap": 0.0088
+    },
+    {
+        "feature": "Rabi Rainfall",
+        "mean_abs_shap": 0.0086
+    },
+    {
+        "feature": "District: Thiruvarur",
+        "mean_abs_shap": 0.007
+    },
+    {
+        "feature": "District: Thoothukudi",
+        "mean_abs_shap": 0.0069
+    },
+    {
+        "feature": "Rabi Wind Speed",
+        "mean_abs_shap": 0.0066
+    },
+    {
+        "feature": "Soil Type: Black Soil",
+        "mean_abs_shap": 0.0063
+    },
+    {
+        "feature": "Zaid Wind Speed",
+        "mean_abs_shap": 0.0055
+    },
+    {
+        "feature": "Soil Type: Coastal Sandy Soil",
+        "mean_abs_shap": 0.005
+    },
+    {
+        "feature": "Kharif Wind Speed",
+        "mean_abs_shap": 0.0048
+    },
+    {
+        "feature": "Rabi Temperature",
+        "mean_abs_shap": 0.0048
+    },
+    {
+        "feature": "Zaid Temperature",
+        "mean_abs_shap": 0.0048
+    },
+    {
+        "feature": "Kharif Soil Moisture",
+        "mean_abs_shap": 0.0038
+    },
+    {
+        "feature": "District: Tirunelveli",
+        "mean_abs_shap": 0.0036
+    },
+    {
+        "feature": "Soil Type: Red Soil",
+        "mean_abs_shap": 0.0036
+    },
+    {
+        "feature": "Zaid Soil Moisture",
+        "mean_abs_shap": 0.0035
+    },
+    {
+        "feature": "District: Dindigul",
+        "mean_abs_shap": 0.0033
+    },
+    {
+        "feature": "Soil Type: Laterite Soil",
+        "mean_abs_shap": 0.0033
+    },
+    {
+        "feature": "Kharif Humidity",
+        "mean_abs_shap": 0.0029
+    },
+    {
+        "feature": "District: Erode",
+        "mean_abs_shap": 0.0027
+    },
+    {
+        "feature": "Kharif Rainfall",
+        "mean_abs_shap": 0.0023
+    },
+    {
+        "feature": "Zaid Humidity",
+        "mean_abs_shap": 0.0021
+    },
+    {
+        "feature": "District: Virudhunagar",
+        "mean_abs_shap": 0.0018
+    },
+    {
+        "feature": "Soil Type: Alluvial Soil",
+        "mean_abs_shap": 0.0017
+    },
+    {
+        "feature": "Zaid Rainfall",
+        "mean_abs_shap": 0.0015
+    },
+    {
+        "feature": "District: Kanyakumari",
+        "mean_abs_shap": 0.0015
+    },
+    {
+        "feature": "District: Karur",
+        "mean_abs_shap": 0.0014
+    },
+    {
+        "feature": "District: Cuddalore",
+        "mean_abs_shap": 0.001
+    },
+    {
+        "feature": "District: Tiruchirappalli",
+        "mean_abs_shap": 0.001
+    },
+    {
+        "feature": "District: Dharmapuri",
+        "mean_abs_shap": 0.0009
+    },
+    {
+        "feature": "District: Thanjavur",
+        "mean_abs_shap": 0.0007
+    },
+    {
+        "feature": "District: Villupuram",
+        "mean_abs_shap": 0.0007
+    },
+    {
+        "feature": "District: Salem",
+        "mean_abs_shap": 0.0006
+    },
+    {
+        "feature": "District: The Nilgiris",
+        "mean_abs_shap": 0.0006
+    },
+    {
+        "feature": "District: Namakkal",
+        "mean_abs_shap": 0.0004
+    },
+    {
+        "feature": "District: Thiruvallur",
+        "mean_abs_shap": 0.0004
+    },
+    {
+        "feature": "District: Kancheepuram",
+        "mean_abs_shap": 0.0003
+    },
+    {
+        "feature": "District: Madurai",
+        "mean_abs_shap": 0.0003
+    },
+    {
+        "feature": "District: Perambalur",
+        "mean_abs_shap": 0.0003
+    },
+    {
+        "feature": "District: Thiruvannamalai",
+        "mean_abs_shap": 0.0003
+    },
+    {
+        "feature": "District: Krishnagiri",
+        "mean_abs_shap": 0.0002
+    },
+    {
+        "feature": "District: Coimbatore",
+        "mean_abs_shap": 0.0001
+    },
+    {
+        "feature": "District: Vellore",
+        "mean_abs_shap": 0.0001
+    }
+]

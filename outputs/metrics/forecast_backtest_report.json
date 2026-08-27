@@ -1,0 +1,17 @@
+{
+    "5-Year Moving Average": {
+        "MAE": 8.2426,
+        "RMSE": 20.1138,
+        "MAPE_pct": 18.03
+    },
+    "Linear Trend": {
+        "MAE": 8.56,
+        "RMSE": 21.3439,
+        "MAPE_pct": 19.03
+    },
+    "Exponential Smoothing (alpha=0.3)": {
+        "MAE": 7.9071,
+        "RMSE": 20.1042,
+        "MAPE_pct": 16.3
+    }
+}
