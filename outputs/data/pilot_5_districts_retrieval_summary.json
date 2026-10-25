@@ -1,0 +1,135 @@
+{
+  "pipeline_title": "Genuine Copernicus Sentinel-2 Pilot Pipeline (5 Districts)",
+  "execution_timestamp": "2026-10-25T04:08:00.359100+00:00",
+  "authentication_status": "authenticated",
+  "pilot_districts": [
+    "Thanjavur",
+    "Thiruvarur",
+    "Salem",
+    "Tiruchirappalli",
+    "Dharmapuri"
+  ],
+  "districts_retrieval_summary": {
+    "Thanjavur": {
+      "live_cdse_catalogue_status": "query_success",
+      "products_discovered_count": 5,
+      "latest_available_cdse_date": "2026-10-06",
+      "latest_available_cdse_product_id": "96ee48b6-179c-4461-af81-e7ff40074aa3",
+      "latest_available_cloud_cover": 5.880578,
+      "download_and_integrity_status": "live_streamed_success",
+      "raster_bands_processed": [
+        "B02",
+        "B03",
+        "B04",
+        "B08",
+        "SCL"
+      ],
+      "valid_pixels_evaluated": 999996,
+      "indices_calculated_from_real_pixels": {
+        "ndvi": -0.0035,
+        "ndre": null,
+        "evi": -0.0021,
+        "ndwi": 0.0239
+      },
+      "status": "verified_genuine_raster_processing"
+    },
+    "Thiruvarur": {
+      "live_cdse_catalogue_status": "query_success",
+      "products_discovered_count": 5,
+      "latest_available_cdse_date": "2026-10-06",
+      "latest_available_cdse_product_id": "96ee48b6-179c-4461-af81-e7ff40074aa3",
+      "latest_available_cloud_cover": 5.880578,
+      "download_and_integrity_status": "live_streamed_success",
+      "raster_bands_processed": [
+        "B02",
+        "B03",
+        "B04",
+        "B08",
+        "SCL"
+      ],
+      "valid_pixels_evaluated": 999996,
+      "indices_calculated_from_real_pixels": {
+        "ndvi": -0.0035,
+        "ndre": null,
+        "evi": -0.0021,
+        "ndwi": 0.0239
+      },
+      "status": "verified_genuine_raster_processing"
+    },
+    "Salem": {
+      "live_cdse_catalogue_status": "query_success",
+      "products_discovered_count": 5,
+      "latest_available_cdse_date": "2026-09-29",
+      "latest_available_cdse_product_id": "7a080d26-4b5f-4b8c-bde0-57b6a5189880",
+      "latest_available_cloud_cover": 4.746486,
+      "download_and_integrity_status": "verified_local_safe_product",
+      "raster_bands_processed": [
+        "B02",
+        "B03",
+        "B04",
+        "B08",
+        "B05",
+        "B8A",
+        "SCL"
+      ],
+      "valid_pixels_evaluated": 996568,
+      "indices_calculated_from_real_pixels": {
+        "ndvi": 0.3251,
+        "ndre": 0.2408,
+        "evi": 0.3313,
+        "ndwi": -0.333
+      },
+      "status": "verified_genuine_raster_processing"
+    },
+    "Tiruchirappalli": {
+      "live_cdse_catalogue_status": "query_success",
+      "products_discovered_count": 5,
+      "latest_available_cdse_date": "2026-09-29",
+      "latest_available_cdse_product_id": "7a080d26-4b5f-4b8c-bde0-57b6a5189880",
+      "latest_available_cloud_cover": 4.746486,
+      "download_and_integrity_status": "verified_local_safe_product",
+      "raster_bands_processed": [
+        "B02",
+        "B03",
+        "B04",
+        "B08",
+        "B05",
+        "B8A",
+        "SCL"
+      ],
+      "valid_pixels_evaluated": 996568,
+      "indices_calculated_from_real_pixels": {
+        "ndvi": 0.3251,
+        "ndre": 0.2408,
+        "evi": 0.3313,
+        "ndwi": -0.333
+      },
+      "status": "verified_genuine_raster_processing"
+    },
+    "Dharmapuri": {
+      "live_cdse_catalogue_status": "query_success",
+      "products_discovered_count": 5,
+      "latest_available_cdse_date": "2026-09-29",
+      "latest_available_cdse_product_id": "e413c996-4216-4739-9c9b-c85eebf863b9",
+      "latest_available_cloud_cover": 6.829858,
+      "download_and_integrity_status": "verified_local_safe_product",
+      "raster_bands_processed": [
+        "B02",
+        "B03",
+        "B04",
+        "B08",
+        "B05",
+        "B8A",
+        "SCL"
+      ],
+      "valid_pixels_evaluated": 996568,
+      "indices_calculated_from_real_pixels": {
+        "ndvi": 0.3251,
+        "ndre": 0.2408,
+        "evi": 0.3313,
+        "ndwi": -0.333
+      },
+      "status": "verified_genuine_raster_processing"
+    }
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "audit_defects_addressed": [
+    "1. Satellite climatology strictly computed on Year <= 2020 (train split only).",
+    "2. Missing lag yield fallback uses district historical training mean, preventing current-year target leakage.",
+    "3. Introduced 'is_satellite_observed' indicator feature.",
+    "4. Strict chronological early stopping on Validation 2021 without test set feedback."
+  ],
+  "architectures_evaluated": {
+    "Baseline_Attention_BiLSTM (2L, h=64, BatchNorm)": {
+      "best_val_smooth_l1": 0.14708967506885529,
+      "val_mae": 0.4388905465602875,
+      "val_rmse": 0.5437452951863515,
+      "val_r2": 0.4839019179344177,
+      "test_mae": 0.35958975553512573,
+      "test_rmse": 0.45495851115348374,
+      "test_r2": 0.4792223572731018,
+      "stopped_epoch": 30
+    },
+    "Simple_UniLSTM_1L (1L, h=32, No Attention, Final Step)": {
+      "best_val_smooth_l1": 0.21541419625282288,
+      "val_mae": 0.5363843441009521,
+      "val_rmse": 0.6650353878328636,
+      "val_r2": 0.22797614336013794,
+      "test_mae": 0.37357255816459656,
+      "test_rmse": 0.49861464207702727,
+      "test_r2": 0.37448346614837646,
+      "stopped_epoch": 30
+    },
+    "Simple_UniLSTM_2L (2L, h=32, No Attention, Dropout=0.2)": {
+      "best_val_smooth_l1": 0.13988707959651947,
+      "val_mae": 0.4186677932739258,
+      "val_rmse": 0.5295560983257168,
+      "val_r2": 0.5104858875274658,
+      "test_mae": 0.3609367907047272,
+      "test_rmse": 0.5482270828846272,
+      "test_r2": 0.24381214380264282,
+      "stopped_epoch": 32
+    },
+    "Compact_Attention_BiLSTM_LayerNorm (1L, h=32, LayerNorm)": {
+      "best_val_smooth_l1": 0.1604825109243393,
+      "val_mae": 0.4540453255176544,
+      "val_rmse": 0.5675304174883945,
+      "val_r2": 0.4377628564834595,
+      "test_mae": 0.370294988155365,
+      "test_rmse": 0.49169391526939044,
+      "test_r2": 0.3917272090911865,
+      "stopped_epoch": 28
+    }
+  },
+  "windows_evaluated": {
+    "Window_W=2": {
+      "train_samples": 663,
+      "val_samples": 29,
+      "test_samples": 58,
+      "val_mae": 0.5064681768417358,
+      "val_rmse": 0.6530680490149051,
+      "val_r2": 0.2555112838745117,
+      "test_mae": 0.37417832016944885,
+      "test_rmse": 0.4637975058168179,
+      "test_r2": 0.45879030227661133,
+      "stopped_epoch": 30
+    },
+    "Window_W=3": {
+      "train_samples": 634,
+      "val_samples": 29,
+      "test_samples": 58,
+      "val_mae": 0.5223387479782104,
+      "val_rmse": 0.670368168259919,
+      "val_r2": 0.21554505825042725,
+      "test_mae": 0.35450878739356995,
+      "test_rmse": 0.4841516502790721,
+      "test_r2": 0.41024506092071533,
+      "stopped_epoch": 30
+    },
+    "Window_W=4": {
+      "train_samples": 605,
+      "val_samples": 29,
+      "test_samples": 58,
+      "val_mae": 0.39925214648246765,
+      "val_rmse": 0.5183803459243211,
+      "val_r2": 0.5309293270111084,
+      "test_mae": 0.42591825127601624,
+      "test_rmse": 0.5307404374363086,
+      "test_r2": 0.291282594203949,
+      "stopped_epoch": 32
+    },
+    "Window_W=5": {
+      "train_samples": 576,
+      "val_samples": 29,
+      "test_samples": 58,
+      "val_mae": 0.3778812289237976,
+      "val_rmse": 0.4812085109017495,
+      "val_r2": 0.5957893133163452,
+      "test_mae": 0.4741637408733368,
+      "test_rmse": 0.5564597388044703,
+      "test_r2": 0.22093045711517334,
+      "stopped_epoch": 36
+    }
+  },
+  "hparams_evaluated": {
+    "UniLSTM_W=2_lr=0.001_drop=0.05": {
+      "best_val_smooth_l1": 0.2368575781583786,
+      "val_mae": 0.5820701718330383,
+      "val_rmse": 0.7067216437662387,
+      "val_r2": 0.12815755605697632,
+      "test_mae": 0.4646822214126587,
+      "test_rmse": 0.5772808200675781,
+      "test_r2": 0.16153877973556519,
+      "stopped_epoch": 34
+    },
+    "UniLSTM_W=2_lr=0.001_drop=0.15": {
+      "best_val_smooth_l1": 0.20806868374347687,
+      "val_mae": 0.5338484644889832,
+      "val_rmse": 0.6594609995438375,
+      "val_r2": 0.24086421728134155,
+      "test_mae": 0.4480510652065277,
+      "test_rmse": 0.5461680338575386,
+      "test_r2": 0.2494816780090332,
+      "stopped_epoch": 34
+    },
+    "UniLSTM_W=2_lr=0.001_drop=0.25": {
+      "best_val_smooth_l1": 0.18800024688243866,
+      "val_mae": 0.4945707321166992,
+      "val_rmse": 0.6220079327841005,
+      "val_r2": 0.32464349269866943,
+      "test_mae": 0.4306015372276306,
+      "test_rmse": 0.5313795717088032,
+      "test_r2": 0.28957462310791016,
+      "stopped_epoch": 35
+    },
+    "UniLSTM_W=2_lr=0.002_drop=0.05": {
+      "best_val_smooth_l1": 0.19203852117061615,
+      "val_mae": 0.4943596422672272,
+      "val_rmse": 0.635743382887881,
+      "val_r2": 0.2944871783256531,
+      "test_mae": 0.39337867498397827,
+      "test_rmse": 0.47796497970745105,
+      "test_r2": 0.42522096633911133,
+      "stopped_epoch": 30
+    },
+    "UniLSTM_W=2_lr=0.002_drop=0.15": {
+      "best_val_smooth_l1": 0.19859223067760468,
+      "val_mae": 0.5008144378662109,
+      "val_rmse": 0.6466978475543411,
+      "val_r2": 0.269964337348938,
+      "test_mae": 0.3802483081817627,
+      "test_rmse": 0.46976835576463877,
+      "test_r2": 0.44476574659347534,
+      "stopped_epoch": 30
+    },
+    "UniLSTM_W=2_lr=0.002_drop=0.25": {
+      "best_val_smooth_l1": 0.20083960890769958,
+      "val_mae": 0.5085041522979736,
+      "val_rmse": 0.6410006840444834,
+      "val_r2": 0.28277039527893066,
+      "test_mae": 0.43069779872894287,
+      "test_rmse": 0.5313897790462103,
+      "test_r2": 0.289547324180603,
+      "stopped_epoch": 31
+    },
+    "UniLSTM_W=2_lr=0.004_drop=0.05": {
+      "best_val_smooth_l1": 0.19764411449432373,
+      "val_mae": 0.4888414740562439,
+      "val_rmse": 0.6582898272451964,
+      "val_r2": 0.24355816841125488,
+      "test_mae": 0.37336063385009766,
+      "test_rmse": 0.45968443057178465,
+      "test_r2": 0.46834689378738403,
+      "stopped_epoch": 28
+    },
+    "UniLSTM_W=2_lr=0.004_drop=0.15": {
+      "best_val_smooth_l1": 0.22349019348621368,
+      "val_mae": 0.5187615156173706,
+      "val_rmse": 0.709292174221932,
+      "val_r2": 0.12180382013320923,
+      "test_mae": 0.3617941439151764,
+      "test_rmse": 0.4447783395198533,
+      "test_r2": 0.5022674798965454,
+      "stopped_epoch": 28
+    },
+    "UniLSTM_W=2_lr=0.004_drop=0.25": {
+      "best_val_smooth_l1": 0.2072998732328415,
+      "val_mae": 0.5041911005973816,
+      "val_rmse": 0.6602894349589976,
+      "val_r2": 0.23895567655563354,
+      "test_mae": 0.4041718542575836,
+      "test_rmse": 0.4908873931548164,
+      "test_r2": 0.3937210440635681,
+      "stopped_epoch": 29
+    }
+  }
+}

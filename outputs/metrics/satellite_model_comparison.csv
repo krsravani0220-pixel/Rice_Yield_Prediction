@@ -1,0 +1,5 @@
+Model,Category,Features_Used,Train_Samples,Test_Samples,Train_MAE,Train_RMSE,Train_R2,Test_MAE,Test_RMSE,Test_R2,Overfit_R2_Gap
+Simple Mean Baseline,Heuristic Benchmark,Historical Training Mean,204,59,0.7622,1.0609,0.0,0.4312,0.6542,-0.0673,0.0673
+Historical Baseline Extra Trees,Historical Tabular Baseline,"22 Tabular Features (Weather, Soil, Inputs)",204,59,0.4956,0.6774,0.5923,0.3529,0.4404,0.5163,0.076
+Sentinel-2 Satellite-Only Model,Satellite Spectral Model,"32 Copernicus S2 Seasonal Indices (NDVI, NDRE, EVI, NDWI)",204,59,0.6365,0.9054,0.2716,0.3882,0.5823,0.1545,0.1171
+Multimodal Fusion Model (Satellite + Tabular),Multimodal Hybrid Model,54 Features (Tabular Weather/Soil + S2 Spectral),204,59,0.4615,0.6352,0.6414,0.3553,0.4365,0.5248,0.1166

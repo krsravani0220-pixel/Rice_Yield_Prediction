@@ -1,5 +1,12 @@
+import sys
 import urllib.request
 import json
+
+if sys.stdout.encoding != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 def test_api_case(case_name, payload):
     print(f"\n--- Testing {case_name} ---")
@@ -26,6 +33,12 @@ def test_api_case(case_name, payload):
         print(f"FAILED: {e}")
         return False
 
+# Base full seasonal template
+base_seasonal = {
+    "Rabi Temperature": 25.1, "Rabi Rainfall": 95.0, "Rabi Humidity": 78.0, "Rabi Wind_Speed": 2.3, "Rabi Soil_Moisture": 0.65,
+    "Zaid Temperature": 29.8, "Zaid Rainfall": 45.0, "Zaid Humidity": 62.0, "Zaid Wind_Speed": 2.4, "Zaid Soil_Moisture": 0.48
+}
+
 # CASE 1: Standard Valid Input
 payload_case1 = {
     "District": "Thanjavur",
@@ -37,27 +50,25 @@ payload_case1 = {
     "Kharif Wind_Speed": 3.2,
     "Kharif Soil_Moisture": 0.55,
     "Soil_PH": 7.2,
-    "N": 300, "P": 20, "K": 200,
-    "Fertilizer": 160, "Pesticide": 2.2, "Area": 60000.0
+    "N": 300.0, "P": 20.0, "K": 200.0,
+    "Fertilizer": 160.0, "Pesticide": 2.2, "Area": 60000.0,
+    **base_seasonal
 }
 
 # CASE 2: Rainfall ABOVE Historical Range (920 mm)
 payload_case2 = {
-    "District": "Thanjavur",
-    "Year": 2024,
-    "Soil_Type": "alluvial soil",
+    **payload_case1,
     "Kharif Rainfall": 920.0,
     "Kharif Temperature": 32.5,
-    "Soil_PH": 7.2, "Area": 65000.0
+    "Area": 65000.0
 }
 
 # CASE 3: Rainfall BELOW Historical Range (12 mm)
 payload_case3 = {
-    "District": "Thanjavur",
-    "Year": 2024,
-    "Soil_Type": "alluvial soil",
+    **payload_case1,
     "Kharif Rainfall": 12.0,
-    "Soil_PH": 5.2, "Area": 65000.0
+    "Soil_PH": 5.2,
+    "Area": 65000.0
 }
 
 # CASE 4: Mixed Decimals & Integers (23, 23.3, 23.35)
@@ -67,10 +78,13 @@ payload_case4 = {
     "Soil_Type": "red soil",
     "Kharif Temperature": 28.356,
     "Kharif Rainfall": 85.12,
-    "Kharif Wind_Speed": 2,
+    "Kharif Humidity": 68.4,
+    "Kharif Wind_Speed": 2.0,
+    "Kharif Soil_Moisture": 0.52,
     "Soil_PH": 6.85,
-    "N": 295, "P": 18, "K": 210,
-    "Fertilizer": 155.5, "Pesticide": 2.15, "Area": 45000
+    "N": 295.0, "P": 18.0, "K": 210.0,
+    "Fertilizer": 155.5, "Pesticide": 2.15, "Area": 45000.0,
+    **base_seasonal
 }
 
 if __name__ == '__main__':
@@ -80,6 +94,6 @@ if __name__ == '__main__':
     c4 = test_api_case("CASE 4: Mixed Decimals & Integers", payload_case4)
     
     if all([c1, c2, c3, c4]):
-        print("\n🎉 ALL 4 PREDICTION TEST CASES PASSED SUCCESSFULLY!")
+        print("\nALL 4 PREDICTION TEST CASES PASSED SUCCESSFULLY!")
     else:
-        print("\n❌ SOME TEST CASES FAILED!")
+        print("\nSOME TEST CASES FAILED!")

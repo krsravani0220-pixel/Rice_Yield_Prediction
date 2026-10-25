@@ -1,0 +1,497 @@
+{
+  "created_at": "2026-10-24T19:58:21.293216",
+  "target_districts": 30,
+  "target_years": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023
+  ],
+  "districts": {
+    "Chennai": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 2,
+      "missing_labels": 7,
+      "catalogue_scenes_total": 171
+    },
+    "Coimbatore": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 580
+    },
+    "Cuddalore": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 222
+    },
+    "Dharmapuri": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 276
+    },
+    "Dindigul": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 244
+    },
+    "Erode": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 560
+    },
+    "Kancheepuram": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 199
+    },
+    "Kanyakumari": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 198
+    },
+    "Karur": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 188
+    },
+    "Krishnagiri": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 168
+    },
+    "Madurai": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 232
+    },
+    "Nagapattinam": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 211
+    },
+    "Namakkal": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 292
+    },
+    "Perambalur": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 180
+    },
+    "Pudukkottai": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 409
+    },
+    "Ramanathapuram": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 367
+    },
+    "Salem": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 292
+    },
+    "Sivagangai": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 261
+    },
+    "Thanjavur": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 211
+    },
+    "The Nilgiris": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 279
+    },
+    "Theni": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 198
+    },
+    "Thiruvallur": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 171
+    },
+    "Thiruvannamalai": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 202
+    },
+    "Thiruvarur": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 211
+    },
+    "Thoothukudi": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 198
+    },
+    "Tiruchirappalli": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 292
+    },
+    "Tirunelveli": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 198
+    },
+    "Vellore": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 199
+    },
+    "Villupuram": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 222
+    },
+    "Virudhunagar": {
+      "years_processed": [
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "valid_labeled_samples": 9,
+      "missing_labels": 0,
+      "catalogue_scenes_total": 198
+    }
+  }
+}

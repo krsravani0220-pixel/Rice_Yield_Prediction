@@ -1,0 +1,104 @@
+{
+  "evaluation_timestamp": "2026-10-24T19:58:24.600917",
+  "train_period": "2015-2021",
+  "test_period": "2022-2023",
+  "train_sample_count": 204,
+  "test_sample_count": 59,
+  "districts_evaluated": 30,
+  "chennai_edge_case": {
+    "status": "excluded_from_yield_loss",
+    "reason": "Urbanized non-agricultural tract; census lacks commercial rice yield records in 2015-2022.",
+    "total_chennai_scenes_processed": 171
+  },
+  "comparison": [
+    {
+      "Model": "Simple Mean Baseline",
+      "Category": "Heuristic Benchmark",
+      "Features_Used": "Historical Training Mean",
+      "Train_Samples": 204,
+      "Test_Samples": 59,
+      "Train_MAE": 0.7622,
+      "Train_RMSE": 1.0609,
+      "Train_R2": 0.0,
+      "Test_MAE": 0.4312,
+      "Test_RMSE": 0.6542,
+      "Test_R2": -0.0673,
+      "Overfit_R2_Gap": 0.0673
+    },
+    {
+      "Model": "Historical Baseline Extra Trees",
+      "Category": "Historical Tabular Baseline",
+      "Features_Used": "22 Tabular Features (Weather, Soil, Inputs)",
+      "Train_Samples": 204,
+      "Test_Samples": 59,
+      "Train_MAE": 0.4956,
+      "Train_RMSE": 0.6774,
+      "Train_R2": 0.5923,
+      "Test_MAE": 0.3529,
+      "Test_RMSE": 0.4404,
+      "Test_R2": 0.5163,
+      "Overfit_R2_Gap": 0.076
+    },
+    {
+      "Model": "Sentinel-2 Satellite-Only Model",
+      "Category": "Satellite Spectral Model",
+      "Features_Used": "32 Copernicus S2 Seasonal Indices (NDVI, NDRE, EVI, NDWI)",
+      "Train_Samples": 204,
+      "Test_Samples": 59,
+      "Train_MAE": 0.6365,
+      "Train_RMSE": 0.9054,
+      "Train_R2": 0.2716,
+      "Test_MAE": 0.3882,
+      "Test_RMSE": 0.5823,
+      "Test_R2": 0.1545,
+      "Overfit_R2_Gap": 0.1171
+    },
+    {
+      "Model": "Multimodal Fusion Model (Satellite + Tabular)",
+      "Category": "Multimodal Hybrid Model",
+      "Features_Used": "54 Features (Tabular Weather/Soil + S2 Spectral)",
+      "Train_Samples": 204,
+      "Test_Samples": 59,
+      "Train_MAE": 0.4615,
+      "Train_RMSE": 0.6352,
+      "Train_R2": 0.6414,
+      "Test_MAE": 0.3553,
+      "Test_RMSE": 0.4365,
+      "Test_R2": 0.5248,
+      "Overfit_R2_Gap": 0.1166
+    }
+  ],
+  "yearly_breakdown": {
+    "2022": {
+      "test_samples": 29,
+      "satellite_only": {
+        "MAE": 0.3961,
+        "RMSE": 0.5008,
+        "R2": 0.197
+      },
+      "multimodal_fusion": {
+        "MAE": 0.3714,
+        "RMSE": 0.4442,
+        "R2": 0.3682
+      }
+    },
+    "2023": {
+      "test_samples": 30,
+      "satellite_only": {
+        "MAE": 0.3806,
+        "RMSE": 0.6514,
+        "R2": 0.1282
+      },
+      "multimodal_fusion": {
+        "MAE": 0.3398,
+        "RMSE": 0.4289,
+        "R2": 0.622
+      }
+    }
+  },
+  "model_artifacts": {
+    "satellite_only_model": "models/satellite_yield_model.joblib",
+    "multimodal_fusion_model": "models/multimodal_fusion_model.joblib",
+    "pipeline_meta": "models/satellite_pipeline_meta.joblib"
+  }
+}

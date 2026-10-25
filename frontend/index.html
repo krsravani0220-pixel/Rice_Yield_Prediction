@@ -33,9 +33,13 @@
                     <span class="nav-icon">🏠</span>
                     <span class="nav-text" data-en="Dashboard" data-ta="முகப்பு">Dashboard</span>
                 </button>
+                <button id="nav-live" class="nav-item" onclick="switchTab('live')">
+                    <span class="nav-icon">🛰️</span>
+                    <span class="nav-text" data-en="Live Satellite & Weather" data-ta="நேரடி செயற்கைக்கோள் & வானிலை">Live Satellite & Weather</span>
+                </button>
                 <button id="nav-manual" class="nav-item" onclick="switchTab('manual')">
                     <span class="nav-icon">📝</span>
-                    <span class="nav-text" data-en="Manual Prediction" data-ta="நேரடி கணக்கீடு">Manual Prediction</span>
+                    <span class="nav-text" data-en="Custom Input Prediction" data-ta="தனிப்பயன் கணக்கீடு">Custom Input Prediction</span>
                 </button>
                 <button id="nav-forecast" class="nav-item" onclick="switchTab('forecast')">
                     <span class="nav-icon">🔮</span>
@@ -95,36 +99,348 @@
                             <p class="hero-subtitle-text" data-en="Explainable Agricultural Decision Support & Forecasting" data-ta="விளக்கக்கூடிய விவசாய முடிவு ஆதரவு மற்றும் முன்கணிப்பு">Explainable Agricultural Decision Support & Forecasting</p>
                             <p class="hero-desc" data-en="Use historical agricultural data, seasonal forecasting and explainable insights to support rice yield decisions." data-ta="வரலாற்று விவசாயத் தரவுகள் மற்றும் பருவகால முன்கணிப்புகளைப் பயன்படுத்தி நெல் மகசூல் முடிவுகளை மேம்படுத்துங்கள்.">Use historical agricultural data, seasonal forecasting and explainable insights to support rice yield decisions.</p>
                             <div class="hero-actions">
-                                <button class="btn-primary" onclick="switchTab('manual')">
-                                    <span>Get Started</span>
+                                <button class="btn-primary" onclick="switchTab('live')">
+                                    <span data-en="Live Satellite & Weather Prediction" data-ta="நேரடி செயற்கைக்கோள் & வானிலை கணிப்பு">Live Satellite & Weather Prediction</span>
                                     <span class="btn-arrow">→</span>
                                 </button>
                                 <button class="btn-secondary-light" onclick="switchTab('forecast')">
-                                    <span>Explore Forecast (2026/27)</span>
+                                    <span data-en="Explore Forecast (2026/27)" data-ta="முன்கணிப்பை அறிக (2026/27)">Explore Forecast (2026/27)</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 3 Feature Cards -->
+                    <!-- 5 Feature Cards Grid -->
                     <div class="dashboard-features-grid">
+                        <div class="feature-card" onclick="switchTab('live')">
+                            <div class="feature-icon-wrapper green-bg">🛰️</div>
+                            <h3 data-en="Live Satellite & Weather Yield" data-ta="நேரடி செயற்கைக்கோள் & வானிலை மகசூல்">Live Satellite & Weather Yield</h3>
+                            <p data-en="Select any of 30 Tamil Nadu districts to fetch live Sentinel-2 & Open-Meteo observations and predict yield." data-ta="30 தமிழக மாவட்டங்களில் ஒன்றைத் தேர்ந்தெடுத்து நேரடி சென்டினல்-2 மற்றும் வானிலை தரவுகளுடன் மகசூலைக் கணக்கிடுங்கள்.">Select any of 30 Tamil Nadu districts to fetch live Sentinel-2 & Open-Meteo observations and predict yield.</p>
+                            <span class="card-link" data-en="Predict with Live Data →" data-ta="நேரடி தரவுடன் கணக்கிடுங்கள் →">Predict with Live Data →</span>
+                        </div>
                         <div class="feature-card" onclick="switchTab('manual')">
-                            <div class="feature-icon-wrapper green-bg">🌾</div>
-                            <h3>Yield Prediction</h3>
-                            <p>Predict rice yield using observed agricultural and environmental inputs.</p>
-                            <span class="card-link">Start Prediction →</span>
+                            <div class="feature-icon-wrapper sage-bg">📝</div>
+                            <h3 data-en="Custom Input Prediction" data-ta="தனிப்பயன் கணக்கீடு">Custom Input Prediction</h3>
+                            <p data-en="Enter custom observed or tailored agricultural and weather parameters to test yield sensitivity." data-ta="மகசூல் உணர்திறனை சோதிக்க தனிப்பயன் விவசாய மற்றும் வானிலை அளவுருக்களை உள்ளிடவும்.">Enter custom observed or tailored agricultural and weather parameters to test yield sensitivity.</p>
+                            <span class="card-link" data-en="Custom Parameters →" data-ta="தனிப்பயன் அளவுருக்கள் →">Custom Parameters →</span>
                         </div>
                         <div class="feature-card" onclick="switchTab('forecast')">
                             <div class="feature-icon-wrapper teal-bg">🔮</div>
-                            <h3>Forecast Mode</h3>
-                            <p>Forecast 2026 and 2027 environmental conditions and estimate yield.</p>
-                            <span class="card-link">View Forecasts →</span>
+                            <h3 data-en="Forecast Mode" data-ta="முன்கணிப்பு முறை">Forecast Mode</h3>
+                            <p data-en="Forecast 2026 and 2027 environmental conditions and estimate future yield trajectories." data-ta="2026 மற்றும் 2027 ஆம் ஆண்டுக்கான வானிலையைக் கணித்து நெல் மகசூலை மதிப்பிடவும்.">Forecast 2026 and 2027 environmental conditions and estimate future yield trajectories.</p>
+                            <span class="card-link" data-en="View Forecasts →" data-ta="முன்கணிப்புகளைக் காண்க →">View Forecasts →</span>
                         </div>
                         <div class="feature-card" onclick="switchTab('health')">
                             <div class="feature-icon-wrapper sage-bg">🍃</div>
-                            <h3>Crop Health Advisor</h3>
-                            <p>Receive rule-based crop condition and agricultural guidance.</p>
-                            <span class="card-link">Get Guidance →</span>
+                            <h3 data-en="Crop Health Advisor" data-ta="பயிர் ஆலோசகர்">Crop Health Advisor</h3>
+                            <p data-en="Receive rule-based crop condition and agricultural guidance." data-ta="பயிர் நிலை மற்றும் விவசாய வழிகாட்டுதலைப் பெறுங்கள்.">Receive rule-based crop condition and agricultural guidance.</p>
+                            <span class="card-link" data-en="Get Guidance →" data-ta="வழிகாட்டல் பெறுக →">Get Guidance →</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: LIVE SATELLITE & WEATHER PREDICTION -->
+                <div id="panel-live" class="panel">
+                    <div class="form-container-card">
+                        <div class="card-header-block">
+                            <h2 data-en="Live Satellite & Weather Rice Yield Prediction" data-ta="நேரடி செயற்கைக்கோள் & வானிலை நெல் மகசூல் கணிப்பு">Live Satellite & Weather Rice Yield Prediction</h2>
+                            <p data-en="Select any of 30 Tamil Nadu districts to fetch live Sentinel-2 satellite passes from Copernicus and ECMWF ERA5-Land meteorological reanalysis from Open-Meteo across a 12-month lookback period to predict expected rice yield." data-ta="12 மாத கால இடைவெளியில் கோப்பர்நிகஸ் சென்டினல்-2 மற்றும் ஓபன்-மீட்டியோ வானிலை தரவுகளைப் பெற்று துல்லியமான நெல் மகசூலைக் கணக்கிடுங்கள்.">Select any of 30 Tamil Nadu districts to fetch live Sentinel-2 satellite passes from Copernicus and ECMWF ERA5-Land meteorological reanalysis from Open-Meteo across a 12-month lookback period to predict expected rice yield.</p>
+                        </div>
+
+                        <!-- District Selection Card -->
+                        <div class="form-section">
+                            <h3 class="section-heading">📍 District Selection & Observation Window</h3>
+                            <div class="form-grid trio">
+                                <div class="input-field">
+                                    <label data-en="Select Pilot District (5 Pilot Districts) *" data-ta="விமான சோதனை மாவட்டம் (5 மாவட்டங்கள்) *">Select Pilot District (5 Pilot Districts) *</label>
+                                    <select id="live-district-select" required onchange="handleLiveDistrictChange()">
+                                        <option value="" disabled selected>-- Select Pilot District --</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label data-en="Reference Date *" data-ta="குறிப்புத் தேதி *">Reference Date *</label>
+                                    <input type="date" id="live-ref-date" value="2026-10-24" onchange="handleLiveDistrictChange()">
+                                    <span class="input-helper-text" data-en="12-Month lookback period calculated relative to this date" data-ta="இந்த தேதியிலிருந்து 12 மாத கால இடைவெளி கணக்கிடப்படுகிறது">12-Month lookback period calculated relative to this date</span>
+                                </div>
+                                <div class="input-field" style="display: flex; flex-direction: column; justify-content: flex-end;">
+                                    <button id="btn-live-predict" class="btn-primary" onclick="handleLivePredictSubmit()" style="width: 100%; height: 46px; justify-content: center;">
+                                        <span class="btn-icon">🛰️</span>
+                                        <span data-en="Fetch Live Data & Predict" data-ta="நேரடி தரவைப் பெற்று கணக்கிடுக">Fetch Live Data & Predict</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Live District Geospatial & Retrieval Status Card -->
+                            <div id="live-district-status-card" class="district-live-status-card">
+                                <div class="status-meta-grid">
+                                    <div class="status-meta-item">
+                                        <span class="meta-label">Selected District:</span>
+                                        <span id="live-status-district" class="meta-val">--</span>
+                                    </div>
+                                    <div class="status-meta-item">
+                                        <span class="meta-label">Agro-Climatic Zone:</span>
+                                        <span id="live-status-zone" class="meta-val">--</span>
+                                    </div>
+                                    <div class="status-meta-item">
+                                        <span class="meta-label">Agricultural Centroid:</span>
+                                        <span id="live-status-coords" class="meta-val">--</span>
+                                    </div>
+                                    <div class="status-meta-item">
+                                        <span class="meta-label">Primary S2 Tile:</span>
+                                        <span id="live-status-tile" class="meta-val">--</span>
+                                    </div>
+                                    <div class="status-meta-item">
+                                        <span class="meta-label">Observation Window:</span>
+                                        <span id="live-status-window" class="meta-val">-- (365 Days)</span>
+                                    </div>
+                                    <div class="status-meta-item">
+                                        <span class="meta-label">Retrieval Status:</span>
+                                        <span id="live-status-badge" class="badge-status-neutral">Select a district to begin</span>
+                                    </div>
+                                </div>
+                                <div class="status-refresh-option">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="live-force-refresh">
+                                        <span data-en="Bypass local cache & force fresh remote API queries" data-ta="உள்ளூர் தற்காலிக நினைவகத்தைத் தவிர்த்து புதிய API வினவல்களை இயக்கவும்">Bypass local cache & force fresh remote API queries</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Animated Live Data Progress Card (Hidden by default) -->
+                        <div id="live-progress-card" class="live-progress-card hidden">
+                            <div class="progress-spinner-row">
+                                <div class="spinner"></div>
+                                <div class="progress-text-block">
+                                    <h4 id="live-progress-title">Retrieving Live Environmental Observations...</h4>
+                                    <p id="live-progress-subtitle">Communicating with Copernicus Data Space Ecosystem & Open-Meteo...</p>
+                                </div>
+                            </div>
+                            <div class="progress-steps-list">
+                                <div id="pstep-1" class="pstep active">🛰️ 1. Searching Copernicus Sentinel-2 L2A observations (12-Month lookback)</div>
+                                <div id="pstep-2" class="pstep">🌦️ 2. Retrieving ECMWF ERA5-Land daily meteorological reanalysis</div>
+                                <div id="pstep-3" class="pstep">📊 3. Deriving seasonal Kharif (Jun–Sep), Rabi (Oct–Feb), and Zaid (Mar–May) metrics</div>
+                                <div id="pstep-4" class="pstep">🧠 4. Executing Tuned Extra Trees regressor & computing SHAP waterfall values</div>
+                                <div id="pstep-5" class="pstep">🗄️ 5. Committing prediction provenance, features, and metadata to NeonDB</div>
+                            </div>
+                        </div>
+
+                        <!-- Live Results Container (Hidden until prediction) -->
+                        <div id="live-results-container" class="live-results-container hidden">
+                            <!-- Hero Predicted Yield Card -->
+                            <div class="results-hero-card">
+                                <div class="hero-header-row">
+                                    <div>
+                                        <span class="hero-tag-badge">🌾 ALGORITHMIC PREDICTION RESULT</span>
+                                        <h3 id="live-res-district-title" class="res-district-title">Thanjavur</h3>
+                                        <p class="res-sub-desc">Baseline predicted yield derived from 12-month reanalysis weather and agricultural baseline</p>
+                                    </div>
+                                    <div class="voice-btn-wrapper">
+                                        <button id="live-voice-btn" class="btn-voice-round" onclick="playLiveTamilVoice()" title="Listen in Tamil">
+                                            <span>🔊</span>
+                                            <span data-en="Listen (Tamil)" data-ta="தமிழில் கேட்க">Listen (Tamil)</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="hero-yield-highlight">
+                                    <div class="yield-number-block">
+                                        <span id="live-yield-val" class="yield-number">--</span>
+                                        <span class="yield-unit">tonnes / hectare</span>
+                                    </div>
+                                    <div class="yield-equiv-block">
+                                        <span id="live-yield-kg-acre" class="equiv-text">≈ -- kg / acre</span>
+                                        <span id="live-baseline-comp-badge" class="badge-comp">District Baseline: -- t/ha</span>
+                                    </div>
+                                </div>
+
+                                <div class="hero-footer-meta">
+                                    <span class="meta-pill"><strong>Model:</strong> Tuned Extra Trees Regressor</span>
+                                    <span class="meta-pill"><strong>Benchmark:</strong> Test R² = 0.6626 | Test MAE = 0.2666 t/ha</span>
+                                    <span class="meta-pill"><strong>Evaluation:</strong> Unseen Historical Test Set (2022–2023)</span>
+                                    <span class="meta-pill" id="live-neondb-badge"><strong>Storage:</strong> Logged to NeonDB</span>
+                                </div>
+                            </div>
+
+                            <!-- Grid: Observation Provenance & Weather Summary -->
+                            <div class="dashboard-duo-grid">
+                                <!-- Card A: Satellite Observation Provenance -->
+                                <div class="dashboard-card">
+                                    <div class="card-title-bar">
+                                        <h4>🛰️ Satellite Observation Provenance (Copernicus)</h4>
+                                        <span id="live-sat-source-tag" class="badge-source">Copernicus CDSE</span>
+                                    </div>
+                                    <div class="card-content-block">
+                                        <div class="provenance-detail-row">
+                                            <span class="detail-label">Sentinel-2 Product:</span>
+                                            <span class="detail-val">Sentinel-2 Level-2A Surface Reflectance</span>
+                                        </div>
+                                        <div class="provenance-detail-row">
+                                            <span class="detail-label">Target MGRS Tile:</span>
+                                            <span id="live-sat-tile-val" class="detail-val">--</span>
+                                        </div>
+                                        <div class="provenance-detail-row">
+                                            <span class="detail-label">Observation Window:</span>
+                                            <span id="live-sat-window-val" class="detail-val">--</span>
+                                        </div>
+                                        <div class="provenance-detail-row">
+                                            <span class="detail-label">Clear-Sky Usable Scenes:</span>
+                                            <span id="live-sat-obs-count" class="detail-val highlight-val">--</span>
+                                        </div>
+                                        <div class="provenance-detail-row">
+                                            <span class="detail-label">Mean Cloud Cover:</span>
+                                            <span id="live-sat-cloud-val" class="detail-val">--</span>
+                                        </div>
+                                        <div class="provenance-detail-row">
+                                            <span class="detail-label">Dominant Cropping Season:</span>
+                                            <span id="live-sat-season-val" class="detail-val">--</span>
+                                        </div>
+
+                                        <!-- Vegetation Indicators -->
+                                        <div class="veg-indicators-box">
+                                            <h5>🌿 Multi-Spectral Canopy Vigor Indicators (Genuine Pixel Metrics)</h5>
+                                            <div class="veg-pills-grid" style="grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                                                <div class="veg-pill">
+                                                    <span class="vpill-label">Mean NDVI</span>
+                                                    <span id="live-veg-ndvi-mean" class="vpill-val">--</span>
+                                                </div>
+                                                <div class="veg-pill">
+                                                    <span class="vpill-label">Median NDVI</span>
+                                                    <span id="live-veg-ndvi-max" class="vpill-val">--</span>
+                                                </div>
+                                                <div class="veg-pill">
+                                                    <span class="vpill-label">Mean NDRE</span>
+                                                    <span id="live-veg-ndre-mean" class="vpill-val">--</span>
+                                                </div>
+                                                <div class="veg-pill">
+                                                    <span class="vpill-label">Mean EVI</span>
+                                                    <span id="live-veg-evi-mean" class="vpill-val">--</span>
+                                                </div>
+                                                <div class="veg-pill">
+                                                    <span class="vpill-label">Mean NDWI</span>
+                                                    <span id="live-veg-ndwi-mean" class="vpill-val">--</span>
+                                                </div>
+                                                <div class="veg-pill">
+                                                    <span class="vpill-label">Valid Pixels</span>
+                                                    <span id="live-veg-valid-px" class="vpill-val">--</span>
+                                                </div>
+                                            </div>
+                                            <div id="live-sufficiency-banner" style="margin-top: 12px; padding: 10px 14px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; font-size: 0.85rem; color: #166534;">
+                                                <strong>Data Sufficiency & Model Provenance:</strong>
+                                                <p id="live-data-sufficiency-text" style="margin: 4px 0 0 0;">Level-2A BOA surface reflectance processed from genuine Sentinel-2 raster pixels. Periodic ESA observation (~5-day cycle), not continuous live video.</p>
+                                                <p id="live-model-name-text" style="margin: 2px 0 0 0; font-weight: 600;">Model: Tuned Extra Trees Regressor + Sentinel-2 Level-2A Canopy Calibration</p>
+                                            </div>
+                                            <p class="veg-note" style="margin-top: 8px;">Vegetation indices reflect photosynthetic crop canopy vigor and water content derived from actual Sentinel-2 pixels using SCL cloud & shadow masking.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card B: Meteorological Observations (Open-Meteo) -->
+                                <div class="dashboard-card">
+                                    <div class="card-title-bar">
+                                        <h4>🌦️ Meteorological Observations (Open-Meteo)</h4>
+                                        <span id="live-weather-source-tag" class="badge-source">ECMWF ERA5-Land</span>
+                                    </div>
+                                    <div class="card-content-block">
+                                        <div class="quick-stats-grid">
+                                            <div class="qstat-card">
+                                                <span class="qstat-icon">🌧️</span>
+                                                <div class="qstat-info">
+                                                    <span class="qstat-label">Total Rainfall</span>
+                                                    <span id="live-wx-tot-rain" class="qstat-val">-- mm</span>
+                                                </div>
+                                            </div>
+                                            <div class="qstat-card">
+                                                <span class="qstat-icon">🌡️</span>
+                                                <div class="qstat-info">
+                                                    <span class="qstat-label">Mean Temperature</span>
+                                                    <span id="live-wx-mean-temp" class="qstat-val">-- °C</span>
+                                                </div>
+                                            </div>
+                                            <div class="qstat-card">
+                                                <span class="qstat-icon">💧</span>
+                                                <div class="qstat-info">
+                                                    <span class="qstat-label">Mean Humidity</span>
+                                                    <span id="live-wx-mean-humidity" class="qstat-val">-- %</span>
+                                                </div>
+                                            </div>
+                                            <div class="qstat-card">
+                                                <span class="qstat-icon">🌱</span>
+                                                <div class="qstat-info">
+                                                    <span class="qstat-label">Soil Moisture</span>
+                                                    <span id="live-wx-soil-m" class="qstat-val">--</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Seasonal Breakdown Table -->
+                                        <h5 style="margin-top: 15px; margin-bottom: 8px; font-size: 0.9rem;">📅 Seasonal Climate Breakdown</h5>
+                                        <div class="table-responsive">
+                                            <table class="seasonal-metrics-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Season</th>
+                                                        <th>Total Rain</th>
+                                                        <th>Monthly Rain</th>
+                                                        <th>Mean Temp</th>
+                                                        <th>Humidity</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="live-seasonal-table-body">
+                                                    <!-- Injected dynamically -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SHAP Waterfall & Feature Impact -->
+                            <div class="dashboard-card" style="margin-top: 20px;">
+                                <div class="card-title-bar">
+                                    <h4>🔍 SHAP Explainability Decomposition</h4>
+                                    <span class="badge-source">SHapley Additive exPlanations</span>
+                                </div>
+                                <div class="card-content-block">
+                                    <p class="shap-intro-text">Yield prediction decomposed into positive and negative feature contributions relative to baseline (<span id="live-shap-base-val">3.53 t/ha</span>):</p>
+                                    <div class="shap-waterfall-grid">
+                                        <div class="shap-col positive-col">
+                                            <h5 class="shap-col-header">⬆️ Positive Drivers (Yield Boosting)</h5>
+                                            <div id="live-shap-positive-list" class="shap-items-list"></div>
+                                        </div>
+                                        <div class="shap-col negative-col">
+                                            <h5 class="shap-col-header">⬇️ Negative Constraints (Yield Limiting)</h5>
+                                            <div id="live-shap-negative-list" class="shap-items-list"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Historical Condition Quantile Insights & Guidance -->
+                            <div class="dashboard-card" style="margin-top: 20px;">
+                                <div class="card-title-bar">
+                                    <h4>💡 Historical Condition Insights & Agronomic Guidance</h4>
+                                    <span class="badge-source">District Percentile Engine</span>
+                                </div>
+                                <div class="card-content-block">
+                                    <p class="insights-intro-text">Input parameters benchmarked against historical district distributions (1997–2023):</p>
+                                    <div id="live-insights-container" class="insights-cards-list"></div>
+                                </div>
+                            </div>
+
+                            <!-- Scientific Warnings & Disclaimers -->
+                            <div class="data-quality-warnings-card" style="margin-top: 20px;">
+                                <div class="warn-header">
+                                    <span class="warn-icon">⚠️</span>
+                                    <h4>Scientific Method Notes & Data Quality Notice</h4>
+                                </div>
+                                <ul id="live-warnings-list" class="warnings-bullet-list">
+                                    <!-- Injected dynamically -->
+                                </ul>
+                                <div class="disclaimer-banner">
+                                    <strong>Scientific Disclaimer:</strong> This system provides an algorithmic yield prediction based on ECMWF ERA5-Land reanalysis and Copernicus Sentinel-2 Level-2A satellite data. It is not an official post-harvest crop cutting survey.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -188,11 +504,17 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                    <button type="button" class="btn-secondary-light" onclick="loadHistoricalDatasetRecord()" style="padding: 6px 14px; font-size: 0.82rem;">
+                                        <span data-en="📋 Load Historical Dataset Record (Optional Reference)" data-ta="📋 வரலாற்று தரவுத்தள பதிவை ஏற்றவும் (விருப்ப குறிப்பு)">📋 Load Historical Dataset Record (Optional Reference)</span>
+                                    </button>
+                                    <span id="manual-load-status" style="font-size: 0.8rem; color: var(--text-muted);" data-en="Manual entry active. Inputs are not auto-populated on district selection." data-ta="நேரடி உள்ளீடு முறை. தானாக தரவுகள் நிரப்பப்படாது.">Manual entry active. Inputs are not auto-populated on district selection.</span>
+                                </div>
                             </div>
 
                             <!-- Seasonal Climate Inputs -->
                             <div class="form-section">
-                                <h3 class="section-heading">🌦️ Seasonal Climate Parameters <span id="climate-source-badge" class="ref-badge" style="margin-left:10px; font-size:0.8rem">Auto-populated on selection</span></h3>
+                                <h3 class="section-heading">🌦️ Seasonal Climate Parameters <span id="climate-source-badge" class="ref-badge" style="margin-left:10px; font-size:0.8rem">Manual / Observed Inputs</span></h3>
                                 <div class="seasons-grid">
                                     <!-- Kharif -->
                                     <div class="season-card">

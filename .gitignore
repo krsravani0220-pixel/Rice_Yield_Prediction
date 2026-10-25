@@ -1,0 +1,51 @@
+.env
+# Credentials and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+service-account*.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Logs and temporary files
+*.log
+.pytest_cache/
+
+# Large raw satellite files
+*.SAFE/
+*.jp2
+*.tif
+*.tiff
+
+# Local caches
+data/cache/
+# SICKLE datasets and satellite patches
+sickle_dataset/
+sickle_toy_dataset/
+data/satellite_patches/
+
+# Local verification outputs
+verification_output/
+
+# Google Earth Engine credentials
+.gcloud/
+.google/
+# Large external WACV pretrained checkpoints
+weights/runs/wacv_2024/
+
+# Local research papers - do not upload to GitHub
+r*.pdf
+
+# Supplementary research tables
+Table S1.xlsx
+Table S2.xlsx
+
+# Temporary satellite query output
+scratch_pilot_cdse_query.json

@@ -1,0 +1,6 @@
+district,sensing_date,season,valid_pixel_count,cloud_invalid_pct,ndvi_mean,ndvi_median,ndre_mean,ndre_median,evi_mean,evi_median,ndwi_mean,ndwi_median,provenance_product_id
+Thanjavur,2023-02-14,Rabi (Samba / Thaladi),999996,0.0,-0.0035,-0.0035,,,-0.0021,-0.0021,0.0239,0.0239,9dd3df03-50d3-4c0e-8122-156971d0295f
+Thiruvarur,2023-02-14,Rabi (Samba / Thaladi),999996,0.0,-0.0035,-0.0035,,,-0.0021,-0.0021,0.0239,0.0239,9dd3df03-50d3-4c0e-8122-156971d0295f
+Salem,2020-04-03,Zaid (Navarai / Summer),996568,0.34,0.3251,0.3339,0.2408,0.2442,0.3313,0.3321,-0.333,-0.3369,4e18b8f2-8c10-4f81-a831-29472f84bc19
+Tiruchirappalli,2020-04-03,Zaid (Navarai / Summer),996568,0.34,0.3251,0.3339,0.2408,0.2442,0.3313,0.3321,-0.333,-0.3369,4e18b8f2-8c10-4f81-a831-29472f84bc19
+Dharmapuri,2020-04-03,Zaid (Navarai / Summer),996568,0.34,0.3251,0.3339,0.2408,0.2442,0.3313,0.3321,-0.333,-0.3369,4e18b8f2-8c10-4f81-a831-29472f84bc19

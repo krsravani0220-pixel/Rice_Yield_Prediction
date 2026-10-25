@@ -1,0 +1,58 @@
+[
+  {
+    "Model": "Simple Mean Baseline",
+    "Category": "Heuristic Benchmark",
+    "Features_Used": "Historical Training Mean",
+    "Train_Samples": 204,
+    "Test_Samples": 59,
+    "Train_MAE": 0.7622,
+    "Train_RMSE": 1.0609,
+    "Train_R2": 0.0,
+    "Test_MAE": 0.4312,
+    "Test_RMSE": 0.6542,
+    "Test_R2": -0.0673,
+    "Overfit_R2_Gap": 0.0673
+  },
+  {
+    "Model": "Historical Baseline Extra Trees",
+    "Category": "Historical Tabular Baseline",
+    "Features_Used": "22 Tabular Features (Weather, Soil, Inputs)",
+    "Train_Samples": 204,
+    "Test_Samples": 59,
+    "Train_MAE": 0.4956,
+    "Train_RMSE": 0.6774,
+    "Train_R2": 0.5923,
+    "Test_MAE": 0.3529,
+    "Test_RMSE": 0.4404,
+    "Test_R2": 0.5163,
+    "Overfit_R2_Gap": 0.076
+  },
+  {
+    "Model": "Sentinel-2 Satellite-Only Model",
+    "Category": "Satellite Spectral Model",
+    "Features_Used": "32 Copernicus S2 Seasonal Indices (NDVI, NDRE, EVI, NDWI)",
+    "Train_Samples": 204,
+    "Test_Samples": 59,
+    "Train_MAE": 0.6365,
+    "Train_RMSE": 0.9054,
+    "Train_R2": 0.2716,
+    "Test_MAE": 0.3882,
+    "Test_RMSE": 0.5823,
+    "Test_R2": 0.1545,
+    "Overfit_R2_Gap": 0.1171
+  },
+  {
+    "Model": "Multimodal Fusion Model (Satellite + Tabular)",
+    "Category": "Multimodal Hybrid Model",
+    "Features_Used": "54 Features (Tabular Weather/Soil + S2 Spectral)",
+    "Train_Samples": 204,
+    "Test_Samples": 59,
+    "Train_MAE": 0.4615,
+    "Train_RMSE": 0.6352,
+    "Train_R2": 0.6414,
+    "Test_MAE": 0.3553,
+    "Test_RMSE": 0.4365,
+    "Test_R2": 0.5248,
+    "Overfit_R2_Gap": 0.1166
+  }
+]

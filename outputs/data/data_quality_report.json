@@ -1,0 +1,16 @@
+{
+  "dataset_shape": [
+    270,
+    58
+  ],
+  "total_rows": 270,
+  "labeled_rows": 263,
+  "missing_yield_rows": 7,
+  "missing_yield_districts": [
+    "Chennai"
+  ],
+  "districts_with_complete_labels": 29,
+  "satellite_features_count": 32,
+  "temporal_range": "2015 - 2023",
+  "notes": "Chennai is an urban non-agricultural tract; census reports zero or missing commercial yield labels for 2015-2022."
+}
