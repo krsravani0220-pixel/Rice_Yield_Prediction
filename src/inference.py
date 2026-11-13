@@ -129,14 +129,19 @@ class RiceYieldInferenceSystem:
             'suggestions_ta': suggestions_ta[:5]
         }
 
-    def predict_forecast(self, district, target_year=2026, method='Exponential Smoothing'):
-        if int(target_year) not in [2026, 2027]:
-            raise ValueError(f"Forecast year '{target_year}' is invalid. Only 2026 and 2027 are available for forecasting.")
+    def predict_forecast(self, district, target_year=None, method='Exponential Smoothing'):
+        if target_year is None:
+            target_year = datetime.now().year
+        target_year = int(target_year)
+        if target_year < 1997:
+            raise ValueError(f"Forecast year '{target_year}' is invalid. Reference timeline starts from 1997.")
         fc_dict, all_methods = self.forecaster.generate_district_forecast(district, target_year, method=method)
         # Forecast mode passes full forecasted features dictionary into Yield ML model
         res = self.predict_manual(fc_dict, allow_missing=True)
         res['mode'] = f'Forecast Mode ({method})'
         res['selected_method'] = method
+        res['target_year'] = target_year
+        res['is_historical'] = False
         res['forecasted_features'] = fc_dict
         res['all_methods_forecasts'] = all_methods
         return res

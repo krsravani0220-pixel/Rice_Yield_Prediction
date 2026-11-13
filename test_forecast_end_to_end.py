@@ -55,15 +55,15 @@ def test_forecast(district, year, method, should_pass=True):
 if __name__ == '__main__':
     print("================ E2E FORECAST MODE TEST SUITE ================")
     
-    # Valid Years: 2026 and 2027
+    # Valid Future Forecast Years: current year and future years
     t1 = test_forecast("Thanjavur", 2026, "Exponential Smoothing", should_pass=True)
     t2 = test_forecast("Thanjavur", 2027, "Exponential Smoothing", should_pass=True)
-    t3 = test_forecast("Madurai", 2026, "Moving Average", should_pass=True)
-    t4 = test_forecast("Coimbatore", 2027, "Linear Trend", should_pass=True)
+    t3 = test_forecast("Madurai", 2028, "Moving Average", should_pass=True)
+    t4 = test_forecast("Coimbatore", 2030, "Linear Trend", should_pass=True)
     
-    # Invalid Years: 2024, 2025, 2028, 2030 (Must be rejected)
-    t5 = test_forecast("Thanjavur", 2028, "Exponential Smoothing", should_pass=False)
-    t6 = test_forecast("Madurai", 2030, "Exponential Smoothing", should_pass=False)
+    # Invalid Years: Years prior to historical start year 1997 (Must be rejected)
+    t5 = test_forecast("Thanjavur", 1990, "Exponential Smoothing", should_pass=False)
+    t6 = test_forecast("Madurai", 1996, "Exponential Smoothing", should_pass=False)
 
     print("\n================ SUMMARY ================")
     if all([t1, t2, t3, t4, t5, t6]):

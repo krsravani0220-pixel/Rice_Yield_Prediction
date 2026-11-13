@@ -1,5 +1,6 @@
 import os
 import json
+from datetime import datetime
 import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -90,7 +91,10 @@ class DistrictSeasonalForecaster:
         max_b = float(vals.max() * 1.2)
         return float(np.clip(pred, min_b, max_b))
 
-    def generate_district_forecast(self, district, target_year=2026, method='Exponential Smoothing'):
+    def generate_district_forecast(self, district, target_year=None, method='Exponential Smoothing'):
+        if target_year is None:
+            target_year = datetime.now().year
+        target_year = int(target_year)
         d_df = self.df[self.df['District'] == district]
         if d_df.empty:
             raise ValueError(f"District '{district}' not found in historical dataset.")

@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+from datetime import datetime
 import numpy as np
 from typing import Dict, Any, Optional, List
 from fastapi import FastAPI, HTTPException, BackgroundTasks
@@ -75,7 +76,7 @@ class ManualPredictRequest(BaseModel):
 
 class ForecastRequest(BaseModel):
     district: str = Field(..., example="Thanjavur")
-    target_year: int = Field(2026, example=2026)
+    target_year: int = Field(default_factory=lambda: datetime.now().year, example=2026)
     method: str = Field("Exponential Smoothing", example="Exponential Smoothing")
 
 from src.satellite.district_registry import get_district_profile, get_all_districts
@@ -89,7 +90,7 @@ class CropHealthRequest(BaseModel):
 
 class LivePredictRequest(BaseModel):
     district: str = Field(..., example="Thanjavur")
-    reference_date: Optional[str] = Field(None, example="2026-10-24")
+    reference_date: Optional[str] = Field(None, example="2026-11-13")
     force_refresh: Optional[bool] = Field(False, example=False)
 
 @app.get("/api/districts")
@@ -142,6 +143,9 @@ def get_district_year_params(district: str, year: int):
     if district not in inference_system.districts:
         raise HTTPException(status_code=400, detail=f"District '{district}' is invalid or excluded.")
 
+    if year < 1997:
+        raise HTTPException(status_code=400, detail=f"Year {year} is prior to historical reference start year (1997). Supported timeline starts from 1997.")
+
     if 1997 <= year <= 2023:
         df_match = inference_system.processed_df[
             (inference_system.processed_df['District'] == district) &
@@ -155,20 +159,21 @@ def get_district_year_params(district: str, year: int):
                 row[k] = None
         return {
             "source_type": "Dataset Value",
+            "is_historical": True,
             "district": district,
             "year": year,
             "params": row
         }
-    elif year in [2026, 2027]:
+    else:
+        # year >= 2024: Current or future years beyond historical census observations
         fc_dict, _ = inference_system.forecaster.generate_district_forecast(district, year, method='Exponential Smoothing')
         return {
             "source_type": "Forecasted Value",
+            "is_historical": False,
             "district": district,
             "year": year,
             "params": fc_dict
         }
-    else:
-        raise HTTPException(status_code=400, detail=f"Year {year} is not supported. Supported years are historical (1997-2023) or future (2026, 2027).")
 
 @app.post("/api/predict-yield")
 def predict_yield(request: ManualPredictRequest):
@@ -203,8 +208,8 @@ def predict_yield(request: ManualPredictRequest):
 @app.post("/api/forecast")
 def forecast_yield(request: ForecastRequest):
     try:
-        if request.target_year not in [2026, 2027]:
-            raise HTTPException(status_code=400, detail=f"Forecast target year must be 2026 or 2027. Received: {request.target_year}")
+        if request.target_year < 1997:
+            raise HTTPException(status_code=400, detail=f"Forecast target year {request.target_year} cannot be prior to reference start year (1997).")
         result = inference_system.predict_forecast(
             district=request.district,
             target_year=request.target_year,
@@ -321,11 +326,13 @@ def get_db_status():
     }
 
 @app.get("/api/satellite-district-prediction")
-def get_satellite_district_prediction(district: str, year: int = 2024):
+def get_satellite_district_prediction(district: str, year: Optional[int] = None):
     """
     Generates district-level baseline yield vs satellite-enhanced yield prediction
     with coverage status, confidence interval, and scientific notes.
     """
+    if year is None:
+        year = datetime.now().year
     try:
         res = satellite_workflow_manager.compute_district_yield_prediction(
             district=district,
@@ -348,7 +355,6 @@ def get_satellite_district_prediction(district: str, year: int = 2024):
 # ==============================================================================
 
 import glob
-from datetime import datetime
 import pandas as pd
 
 class SatellitePipelineRunRequest(BaseModel):
@@ -357,7 +363,7 @@ class SatellitePipelineRunRequest(BaseModel):
 
 class SatellitePredictRequest(BaseModel):
     district: str = Field(..., example="Thanjavur")
-    year: int = Field(2024, example=2024)
+    year: int = Field(default_factory=lambda: datetime.now().year, example=2026)
     model_type: Optional[str] = Field("satellite_only", example="satellite_only")
 
 
@@ -701,6 +707,7 @@ def get_satellite_pilot_audit():
 
 class SatellitePredictLiveRequest(BaseModel):
     district: str = Field(..., example="Thanjavur")
+    reference_date: Optional[str] = Field(None, example="2026-11-13")
 
 
 @app.post("/api/satellite-predict-live")
@@ -722,6 +729,7 @@ def satellite_predict_live(payload: SatellitePredictLiveRequest):
         from src.satellite.pilot_raster_pipeline import get_pilot_district_live_prediction
         result = get_pilot_district_live_prediction(
             target_district,
+            reference_date=payload.reference_date,
             baseline_model=inference_system.model,
             preprocessor=inference_system.preprocessor,
             inference_system=inference_system

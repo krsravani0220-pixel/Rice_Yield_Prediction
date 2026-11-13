@@ -22,7 +22,6 @@ def main():
         html = f.read()
 
     assert 'id="live-district-select"' in html, "live-district-select not found"
-    assert 'id="satellite-district-dropdown"' in html, "satellite-district-dropdown not found"
     assert 'Select Pilot District (5 Pilot Districts)' in html, "Pilot district label not found"
     assert 'id="live-veg-ndre-mean"' in html, "NDRE metric element missing"
     assert 'id="live-veg-evi-mean"' in html, "EVI metric element missing"

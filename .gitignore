@@ -49,3 +49,9 @@ Table S2.xlsx
 
 # Temporary satellite query output
 scratch_pilot_cdse_query.json
+
+# Temporary inspection and debugging scripts
+scratch/
+
+# Local dashboard screenshots
+outputs/frontend_dashboard.png

@@ -104,7 +104,7 @@
                                     <span class="btn-arrow">→</span>
                                 </button>
                                 <button class="btn-secondary-light" onclick="switchTab('forecast')">
-                                    <span data-en="Explore Forecast (2026/27)" data-ta="முன்கணிப்பை அறிக (2026/27)">Explore Forecast (2026/27)</span>
+                                    <span data-en="Explore Future Forecasts" data-ta="எதிர்கால முன்கணிப்பை அறிக">Explore Future Forecasts</span>
                                 </button>
                             </div>
                         </div>
@@ -127,7 +127,7 @@
                         <div class="feature-card" onclick="switchTab('forecast')">
                             <div class="feature-icon-wrapper teal-bg">🔮</div>
                             <h3 data-en="Forecast Mode" data-ta="முன்கணிப்பு முறை">Forecast Mode</h3>
-                            <p data-en="Forecast 2026 and 2027 environmental conditions and estimate future yield trajectories." data-ta="2026 மற்றும் 2027 ஆம் ஆண்டுக்கான வானிலையைக் கணித்து நெல் மகசூலை மதிப்பிடவும்.">Forecast 2026 and 2027 environmental conditions and estimate future yield trajectories.</p>
+                            <p data-en="Forecast seasonal environmental conditions and estimate future yield trajectories." data-ta="பருவகால வானிலையைக் கணித்து எதிர்கால நெல் மகசூலை மதிப்பிடவும்.">Forecast seasonal environmental conditions and estimate future yield trajectories.</p>
                             <span class="card-link" data-en="View Forecasts →" data-ta="முன்கணிப்புகளைக் காண்க →">View Forecasts →</span>
                         </div>
                         <div class="feature-card" onclick="switchTab('health')">
@@ -159,7 +159,7 @@
                                 </div>
                                 <div class="input-field">
                                     <label data-en="Reference Date *" data-ta="குறிப்புத் தேதி *">Reference Date *</label>
-                                    <input type="date" id="live-ref-date" value="2026-10-24" onchange="handleLiveDistrictChange()">
+                                    <input type="date" id="live-ref-date" min="1997-01-01" onchange="handleLiveDistrictChange()">
                                     <span class="input-helper-text" data-en="12-Month lookback period calculated relative to this date" data-ta="இந்த தேதியிலிருந்து 12 மாத கால இடைவெளி கணக்கிடப்படுகிறது">12-Month lookback period calculated relative to this date</span>
                                 </div>
                                 <div class="input-field" style="display: flex; flex-direction: column; justify-content: flex-end;">
@@ -255,9 +255,9 @@
                                 </div>
 
                                 <div class="hero-footer-meta">
-                                    <span class="meta-pill"><strong>Model:</strong> Tuned Extra Trees Regressor</span>
-                                    <span class="meta-pill"><strong>Benchmark:</strong> Test R² = 0.6626 | Test MAE = 0.2666 t/ha</span>
-                                    <span class="meta-pill"><strong>Evaluation:</strong> Unseen Historical Test Set (2022–2023)</span>
+                                    <span class="meta-pill" id="live-hero-model-pill"><strong>Model:</strong> Bidirectional LSTM with Temporal Attention + Sentinel-2 Level-2A</span>
+                                    <span class="meta-pill" id="live-hero-benchmark-pill"><strong>Benchmark:</strong> Test MAE = 0.4056 t/ha | Test RMSE = 0.5285 t/ha | Test R² = 0.2972</span>
+                                    <span class="meta-pill" id="live-hero-eval-pill"><strong>Evaluation:</strong> Unseen Historical Test Set (2022–2023) [N=58]</span>
                                     <span class="meta-pill" id="live-neondb-badge"><strong>Storage:</strong> Logged to NeonDB</span>
                                 </div>
                             </div>
@@ -328,7 +328,7 @@
                                             <div id="live-sufficiency-banner" style="margin-top: 12px; padding: 10px 14px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; font-size: 0.85rem; color: #166534;">
                                                 <strong>Data Sufficiency & Model Provenance:</strong>
                                                 <p id="live-data-sufficiency-text" style="margin: 4px 0 0 0;">Level-2A BOA surface reflectance processed from genuine Sentinel-2 raster pixels. Periodic ESA observation (~5-day cycle), not continuous live video.</p>
-                                                <p id="live-model-name-text" style="margin: 2px 0 0 0; font-weight: 600;">Model: Tuned Extra Trees Regressor + Sentinel-2 Level-2A Canopy Calibration</p>
+                                                <p id="live-model-name-text" style="margin: 2px 0 0 0; font-weight: 600;">Model: Bidirectional LSTM with Temporal Attention + Sentinel-2 Level-2A</p>
                                             </div>
                                             <p class="veg-note" style="margin-top: 8px;">Vegetation indices reflect photosynthetic crop canopy vigor and water content derived from actual Sentinel-2 pixels using SCL cloud & shadow masking.</p>
                                         </div>
@@ -402,7 +402,8 @@
                                     <span class="badge-source">SHapley Additive exPlanations</span>
                                 </div>
                                 <div class="card-content-block">
-                                    <p class="shap-intro-text">Yield prediction decomposed into positive and negative feature contributions relative to baseline (<span id="live-shap-base-val">3.53 t/ha</span>):</p>
+                                    <p class="shap-intro-text">Yield prediction decomposed into positive and negative feature contributions relative to base value (<span id="live-shap-base-val">2.76 t/ha</span>):</p>
+                                    <div id="live-shap-additivity-badge" style="margin-bottom: 12px; font-size: 0.84rem; color: #166534; font-weight: 600;"></div>
                                     <div class="shap-waterfall-grid">
                                         <div class="shap-col positive-col">
                                             <h5 class="shap-col-header">⬆️ Positive Drivers (Yield Boosting)</h5>
@@ -428,18 +429,9 @@
                                 </div>
                             </div>
 
-                            <!-- Scientific Warnings & Disclaimers -->
-                            <div class="data-quality-warnings-card" style="margin-top: 20px;">
-                                <div class="warn-header">
-                                    <span class="warn-icon">⚠️</span>
-                                    <h4>Scientific Method Notes & Data Quality Notice</h4>
-                                </div>
-                                <ul id="live-warnings-list" class="warnings-bullet-list">
-                                    <!-- Injected dynamically -->
-                                </ul>
-                                <div class="disclaimer-banner">
-                                    <strong>Scientific Disclaimer:</strong> This system provides an algorithmic yield prediction based on ECMWF ERA5-Land reanalysis and Copernicus Sentinel-2 Level-2A satellite data. It is not an official post-harvest crop cutting survey.
-                                </div>
+                            <!-- Scientific Disclaimer Banner -->
+                            <div class="disclaimer-banner" style="margin-top: 25px; padding: 14px 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; border-radius: 8px; font-size: 0.88rem; color: #334155; line-height: 1.5;">
+                                <strong>Scientific Disclaimer:</strong> This system provides an algorithmic rice yield prediction based on ECMWF ERA5-Land reanalysis meteorological data and Copernicus Sentinel-2 Level-2A satellite observations. It is an agro-meteorological estimation model, not an official post-harvest crop cutting survey.
                             </div>
                         </div>
                     </div>
@@ -695,6 +687,10 @@
                                     <strong id="manual-res-district">--</strong>
                                 </div>
                                 <div class="meta-item">
+                                    <span class="meta-label">Target Year:</span>
+                                    <strong id="manual-res-year">--</strong>
+                                </div>
+                                <div class="meta-item">
                                     <span class="meta-label">Historical District Average:</span>
                                     <strong><span id="manual-res-hist-avg">--</span> tonnes / ha</strong>
                                 </div>
@@ -794,7 +790,7 @@
                     <div id="forecast-empty-state" class="empty-state-card">
                         <div class="empty-icon">🔮</div>
                         <h3>Select a district and future year to generate a forecast.</h3>
-                        <p>Allowed future target years: <strong>2026</strong> and <strong>2027</strong>.</p>
+                        <p>Generate multi-season agro-climatic forecasts and yield estimates from current year through future years.</p>
                     </div>
 
                     <!-- Forecast Output Section -->
@@ -820,6 +816,10 @@
                                 <div class="meta-item">
                                     <span class="meta-label">District:</span>
                                     <strong id="forecast-res-district">--</strong>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Forecast Year:</span>
+                                    <strong id="forecast-res-year">--</strong>
                                 </div>
                                 <div class="meta-item">
                                     <span class="meta-label">Historical District Average:</span>
