@@ -120,6 +120,8 @@ def live_predict(request: LivePredictRequest):
             force_refresh=request.force_refresh or False
         )
         return json.loads(json.dumps(res, default=str))
+    except HTTPException:
+        raise
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
@@ -198,6 +200,8 @@ def predict_yield(request: ManualPredictRequest):
             satellite_workflow_manager.db_adapter.record_prediction(result)
 
         return json.loads(json.dumps(result, default=str))
+    except HTTPException:
+        raise
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
@@ -342,6 +346,8 @@ def get_satellite_district_prediction(district: str, year: Optional[int] = None)
             processed_df=inference_system.processed_df
         )
         return json.loads(json.dumps(res, default=str))
+    except HTTPException:
+        raise
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
@@ -735,6 +741,8 @@ def satellite_predict_live(payload: SatellitePredictLiveRequest):
             inference_system=inference_system
         )
         return json.loads(json.dumps(result, default=str))
+    except HTTPException:
+        raise
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:

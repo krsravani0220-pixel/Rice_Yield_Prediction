@@ -1,4 +1,4 @@
-const API_BASE = (typeof window !== 'undefined' && window.location.origin.includes(':8000'))
+const API_BASE = (typeof window !== 'undefined' && (window.location.origin.includes(':8000') || window.location.origin.includes('onrender.com') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
     ? ""
     : "https://rice-yield-prediction-ifpz.onrender.com";
 let currentLang = 'en';
