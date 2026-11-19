@@ -1,5 +1,6 @@
-const API_BASE = (typeof window !== 'undefined' && window.location.origin.includes(':8000')) ? "" : "http://127.0.0.1:8000";
-
+const API_BASE = (typeof window !== 'undefined' && window.location.origin.includes(':8000'))
+    ? ""
+    : "https://rice-yield-prediction-ifpz.onrender.com";
 let currentLang = 'en';
 let currentDistrictStats = {};
 let lastManualResult = null;
