@@ -9,6 +9,12 @@ import secrets
 from typing import Optional, Dict, Any, List
 
 try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.env')))
+except Exception:
+    pass
+
+try:
     import bcrypt
     BCRYPT_AVAILABLE = True
 except ImportError:
