@@ -115,6 +115,16 @@ class SavePredictionRequest(BaseModel):
     input_summary: Optional[Dict[str, Any]] = None
     shap_insights: Optional[Dict[str, Any]] = None
 
+class ProfileUpdateRequest(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    district: Optional[str] = None
+    role: Optional[str] = None
+    farm_size: Optional[float] = None
+    preferred_soil: Optional[str] = None
+    primary_crop: Optional[str] = None
+    external_api_keys: Optional[Dict[str, str]] = None
+
 def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Authentication required. Please sign in.")
@@ -185,6 +195,48 @@ def get_current_user_profile(user_payload: Dict[str, Any] = Depends(get_current_
         "status": "authenticated",
         "user": user_payload
     }
+
+@app.get("/api/profile")
+def get_user_profile_endpoint(user_payload: Dict[str, Any] = Depends(get_current_user)):
+    user_id = int(user_payload.get("sub", 0))
+    profile = db_manager.get_user_profile(user_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="User profile not found")
+    return {"status": "success", "profile": profile}
+
+@app.put("/api/profile")
+def update_user_profile_endpoint(
+    request: ProfileUpdateRequest,
+    user_payload: Dict[str, Any] = Depends(get_current_user)
+):
+    try:
+        user_id = int(user_payload.get("sub", 0))
+        data = request.dict(exclude_unset=True)
+        updated = db_manager.update_user_profile(user_id, data)
+        return {"status": "success", "message": "Profile updated successfully.", "profile": updated}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update profile: {str(e)}")
+
+@app.post("/api/profile/regenerate-api-key")
+def regenerate_user_api_key_endpoint(user_payload: Dict[str, Any] = Depends(get_current_user)):
+    try:
+        user_id = int(user_payload.get("sub", 0))
+        new_key = db_manager.regenerate_api_key(user_id)
+        return {"status": "success", "message": "New API key generated.", "api_key": new_key}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to regenerate key: {str(e)}")
+
+@app.post("/api/profile/external-api-keys")
+def save_external_api_keys_endpoint(
+    keys: Dict[str, str],
+    user_payload: Dict[str, Any] = Depends(get_current_user)
+):
+    try:
+        user_id = int(user_payload.get("sub", 0))
+        saved = db_manager.save_external_api_keys(user_id, keys)
+        return {"status": "success", "message": "External API keys saved.", "external_api_keys": saved}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save API keys: {str(e)}")
 
 @app.post("/api/auth/save-prediction")
 def save_user_prediction(

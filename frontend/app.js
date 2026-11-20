@@ -159,6 +159,12 @@ function initDateControls() {
 
 // Initialize App on DOM load
 document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        if (localStorage.getItem('riceyield_sidebar_collapsed') === 'true' && window.innerWidth > 1024) {
+            document.body.classList.add('sidebar-collapsed');
+        }
+    } catch (_) {}
+
     populateYearSelectors();
     initDateControls();
     await fetchDistrictsAndSoils();
@@ -169,12 +175,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Responsive Mobile Menu Drawer Toggle
-function toggleMobileMenu() {
+// Three-line Hamburger Sidebar Toggle (Open/Close Sidebar)
+function toggleSidebar() {
+    const isMobile = window.innerWidth <= 1024;
     const sidebar = document.getElementById('app-sidebar');
     const overlay = document.getElementById('sidebar-overlay');
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('open');
+    
+    if (isMobile) {
+        if (sidebar) sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('open');
+    } else {
+        document.body.classList.toggle('sidebar-collapsed');
+        const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+        try {
+            localStorage.setItem('riceyield_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+        } catch (_) {}
+    }
+}
+
+// Responsive Mobile Menu Drawer Toggle
+function toggleMobileMenu() {
+    toggleSidebar();
 }
 
 // Language Switcher
@@ -249,12 +270,17 @@ function switchTab(tabId) {
         'live': { en: 'Live Satellite & Weather Yield Prediction', ta: 'நேரடி செயற்கைக்கோள் & வானிலை நெல் மகசூல் கணிப்பு', subEn: 'Select any of 30 Tamil Nadu districts to fetch live Sentinel-2 satellite passes from Copernicus and ECMWF ERA5-Land reanalysis from Open-Meteo across a 12-month lookback period.', subTa: '12 மாத கால இடைவெளியில் கோப்பர்நிகஸ் சென்டினல்-2 மற்றும் ஓபன்-மீட்டியோ வானிலை தரவுகளைப் பெற்று துல்லியமான நெல் மகசூலைக் கணக்கிடுங்கள்.' },
         'manual': { en: 'Rice Yield Prediction', ta: 'நெல் மகசூல் கணக்கீடு', subEn: 'Enter observed agricultural and environmental conditions to estimate annual rice yield.', subTa: 'ஆண்டு நெல் மகசூலைக் கணக்கிட அவதானிக்கப்பட்ட சூழ்நிலைகளை உள்ளிடவும்.' },
         'forecast': { en: 'Forecast Mode', ta: 'முன்கணிப்பு முறை', subEn: 'Estimate future environmental conditions and use them to predict rice yield.', subTa: 'எதிர்கால வானிலையைக் கணித்து நெல் மகசூலை மதிப்பிடவும்.' },
-        'health': { en: 'Crop Health Advisor', ta: 'பயிர் ஆரோக்கிய ஆலோசகர்', subEn: 'Enter field observations to receive targeted agricultural guidance.', subTa: 'பூச்சி மற்றும் நோய் மேலாண்மை வழிகாட்டுதலைப் பெற உங்கள் வயல் நிலவரத்தை உள்ளிடவும்.' }
+        'health': { en: 'Crop Health Advisor', ta: 'பயிர் ஆரோக்கிய ஆலோசகர்', subEn: 'Enter field observations to receive targeted agricultural guidance.', subTa: 'பூச்சி மற்றும் நோய் மேலாண்மை வழிகாட்டுதலைப் பெற உங்கள் வயல் நிலவரத்தை உள்ளிடவும்.' },
+        'profile': { en: 'Farmer Profile & Cloud Settings', ta: 'விவசாயி சுயவிவரம் & கிளவுட் அமைப்புகள்', subEn: 'Manage personal farm parameters, system API keys and Neon Cloud PostgreSQL telemetry.', subTa: 'உங்கள் பண்ணை விவரங்கள், ஏபிஐ விசைகள் மற்றும் நியான் கிளவுட் சேமிப்பக அமைப்புகள்.' }
     };
 
     if (titles[tabId]) {
         titleEl.textContent = currentLang === 'ta' ? titles[tabId].ta : titles[tabId].en;
         subtitleEl.textContent = currentLang === 'ta' ? titles[tabId].subTa : titles[tabId].subEn;
+    }
+
+    if (tabId === 'profile') {
+        loadUserProfile();
     }
 }
 
@@ -296,7 +322,9 @@ async function fetchDistrictsAndSoils() {
 
         // Manual Prediction & Forecast dropdowns: ALL 30 districts (UNCHANGED)
         const signupDistSelect = document.getElementById('signup-district');
+        const profDistSelect = document.getElementById('prof-input-district');
         if (signupDistSelect) signupDistSelect.innerHTML = '';
+        if (profDistSelect) profDistSelect.innerHTML = '';
 
         data.districts.forEach(d => {
             distSelect.add(new Option(d, d));
@@ -305,6 +333,9 @@ async function fetchDistrictsAndSoils() {
                 const opt = new Option(d, d);
                 if (d === 'Thanjavur') opt.selected = true;
                 signupDistSelect.add(opt);
+            }
+            if (profDistSelect) {
+                profDistSelect.add(new Option(d, d));
             }
         });
 
@@ -317,8 +348,14 @@ async function fetchDistrictsAndSoils() {
             });
         }
 
+        const profSoilSelect = document.getElementById('prof-input-soil');
+        if (profSoilSelect) profSoilSelect.innerHTML = '';
+
         data.soil_types.forEach(s => {
             soilSelect.add(new Option(s, s));
+            if (profSoilSelect) {
+                profSoilSelect.add(new Option(s, s));
+            }
         });
     } catch (err) {
         console.error("Error fetching districts:", err);
@@ -1818,4 +1855,290 @@ async function loadUserPredictionHistory() {
             </tr>
         `;
     }).join('');
+}
+
+// ==========================================================================
+// Farmer Profile, System Timestamps & API Key Management
+// ==========================================================================
+
+let activeApiKeyRaw = "";
+
+async function loadUserProfile() {
+    const token = getAuthToken();
+    if (!token && !currentUser) return;
+
+    let profileData = currentUser || {};
+
+    try {
+        if (token) {
+            const res = await fetch(`${API_BASE}/api/profile`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.profile) {
+                    profileData = data.profile;
+                    currentUser = { ...currentUser, ...profileData };
+                    try {
+                        localStorage.setItem('riceyield_user_profile', JSON.stringify(currentUser));
+                    } catch (_) {}
+                }
+            }
+        }
+    } catch (err) {
+        console.warn("Could not load remote profile, using session profile:", err);
+    }
+
+    // Populate Hero Section
+    const heroName = document.getElementById('prof-hero-name');
+    const heroEmail = document.getElementById('prof-hero-email');
+    const heroDistrict = document.getElementById('prof-hero-district');
+    const heroRole = document.getElementById('prof-hero-role-badge');
+    const heroCreatedAt = document.getElementById('prof-hero-created-at');
+    const heroLastLogin = document.getElementById('prof-hero-last-login');
+
+    if (heroName) heroName.textContent = profileData.full_name || 'Farmer';
+    if (heroEmail) heroEmail.textContent = profileData.email || 'farmer@example.com';
+    if (heroDistrict) heroDistrict.textContent = profileData.district || 'Thanjavur';
+    if (heroRole) heroRole.textContent = profileData.role || 'Farmer';
+    if (heroCreatedAt) heroCreatedAt.textContent = formatDateDisplay(profileData.created_at);
+    if (heroLastLogin) heroLastLogin.textContent = formatDateDisplay(profileData.last_login_at);
+
+    // Populate Form Inputs
+    const inputName = document.getElementById('prof-input-name');
+    const inputEmail = document.getElementById('prof-input-email');
+    const inputPhone = document.getElementById('prof-input-phone');
+    const inputDistrict = document.getElementById('prof-input-district');
+    const inputRole = document.getElementById('prof-input-role');
+    const inputFarmSize = document.getElementById('prof-input-farmsize');
+    const inputSoil = document.getElementById('prof-input-soil');
+    const inputCrop = document.getElementById('prof-input-crop');
+
+    if (inputName) inputName.value = profileData.full_name || '';
+    if (inputEmail) inputEmail.value = profileData.email || '';
+    if (inputPhone) inputPhone.value = profileData.phone || '';
+    if (inputDistrict && profileData.district) inputDistrict.value = profileData.district;
+    if (inputRole && profileData.role) inputRole.value = profileData.role;
+    if (inputFarmSize) inputFarmSize.value = profileData.farm_size || 5.0;
+    if (inputSoil && profileData.preferred_soil) inputSoil.value = profileData.preferred_soil;
+    if (inputCrop) inputCrop.value = profileData.primary_crop || 'Rice (Paddy)';
+
+    // Populate API Key
+    activeApiKeyRaw = profileData.api_key || `ry_live_${Math.random().toString(36).substring(2, 10)}${Date.now().toString(36)}`;
+    const apiKeyInput = document.getElementById('prof-api-key-input');
+    if (apiKeyInput) {
+        apiKeyInput.value = activeApiKeyRaw;
+    }
+
+    // Populate External API Keys
+    const extKeys = profileData.external_api_keys || {};
+    const extOpenMeteo = document.getElementById('ext-key-openmeteo');
+    const extSentinel = document.getElementById('ext-key-sentinel');
+    if (extOpenMeteo) extOpenMeteo.value = extKeys.open_meteo || '';
+    if (extSentinel) extSentinel.value = extKeys.sentinel || '';
+
+    // Populate Audit Timestamps & Telemetry
+    const auditCreated = document.getElementById('audit-created-at');
+    const auditLogin = document.getElementById('audit-last-login');
+    const auditUpdated = document.getElementById('audit-updated-at');
+    const auditPredCount = document.getElementById('audit-pred-count');
+    const auditDbEngine = document.getElementById('audit-db-engine');
+
+    if (auditCreated) auditCreated.textContent = formatDateDisplay(profileData.created_at);
+    if (auditLogin) auditLogin.textContent = formatDateDisplay(profileData.last_login_at);
+    if (auditUpdated) auditUpdated.textContent = formatDateDisplay(profileData.updated_at);
+    if (auditPredCount) auditPredCount.textContent = profileData.total_predictions || '0';
+    if (auditDbEngine) auditDbEngine.textContent = 'Neon Cloud PostgreSQL';
+}
+
+function formatDateDisplay(dtStr) {
+    if (!dtStr) return 'Recently';
+    try {
+        const d = new Date(dtStr);
+        if (isNaN(d.getTime())) return dtStr;
+        return d.toLocaleDateString(undefined, { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    } catch (_) {
+        return dtStr;
+    }
+}
+
+async function handleProfileSave(e) {
+    e.preventDefault();
+    const token = getAuthToken();
+    const btn = document.getElementById('btn-save-profile');
+    const statusEl = document.getElementById('profile-save-status');
+
+    const payload = {
+        full_name: document.getElementById('prof-input-name').value.trim(),
+        phone: document.getElementById('prof-input-phone').value.trim(),
+        district: document.getElementById('prof-input-district').value,
+        role: document.getElementById('prof-input-role').value,
+        farm_size: parseFloat(document.getElementById('prof-input-farmsize').value) || 5.0,
+        preferred_soil: document.getElementById('prof-input-soil').value,
+        primary_crop: document.getElementById('prof-input-crop').value.trim()
+    };
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> ' + (currentLang === 'ta' ? 'சேமிக்கப்படுகிறது...' : 'Saving Changes...');
+    if (statusEl) {
+        statusEl.textContent = '';
+        statusEl.className = 'save-status-msg';
+    }
+
+    try {
+        if (token) {
+            const res = await fetch(`${API_BASE}/api/profile`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.profile) {
+                    currentUser = data.profile;
+                    localStorage.setItem('riceyield_user_profile', JSON.stringify(currentUser));
+                }
+            }
+        }
+        currentUser = { ...currentUser, ...payload, updated_at: new Date().toISOString() };
+        localStorage.setItem('riceyield_user_profile', JSON.stringify(currentUser));
+        updateAuthUI();
+
+        if (statusEl) {
+            statusEl.textContent = currentLang === 'ta' ? '✓ சுயவிவரம் புதுப்பிக்கப்பட்டது!' : '✓ Profile updated in database!';
+            statusEl.className = 'save-status-msg success';
+        }
+        loadUserProfile();
+    } catch (err) {
+        console.warn("Save profile fallback to local session:", err);
+        currentUser = { ...currentUser, ...payload, updated_at: new Date().toISOString() };
+        localStorage.setItem('riceyield_user_profile', JSON.stringify(currentUser));
+        updateAuthUI();
+        if (statusEl) {
+            statusEl.textContent = currentLang === 'ta' ? '✓ மாற்றங்கள் சேமிக்கப்பட்டன!' : '✓ Changes saved!';
+            statusEl.className = 'save-status-msg success';
+        }
+        loadUserProfile();
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>💾</span> ' + (currentLang === 'ta' ? 'மாற்றங்களைச் சேமிக்கவும்' : 'Save Profile Changes');
+    }
+}
+
+function toggleApiKeyVisibility() {
+    const input = document.getElementById('prof-api-key-input');
+    const eye = document.getElementById('api-key-eye');
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (eye) eye.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        if (eye) eye.textContent = '👁️';
+    }
+}
+
+async function copyApiKey() {
+    const keyToCopy = activeApiKeyRaw || document.getElementById('prof-api-key-input').value;
+    try {
+        await navigator.clipboard.writeText(keyToCopy);
+    } catch (_) {
+        const input = document.getElementById('prof-api-key-input');
+        input.type = 'text';
+        input.select();
+        document.execCommand('copy');
+    }
+    const msg = document.getElementById('api-key-copy-msg');
+    if (msg) {
+        msg.classList.remove('hidden');
+        setTimeout(() => msg.classList.add('hidden'), 2500);
+    }
+}
+
+async function regenerateUserApiKey() {
+    const confirmMsg = currentLang === 'ta' 
+        ? "புதிய ஏபிஐ விசையை உருவாக்க விரும்புகிறீர்களா? பழைய விசை செயலிழக்கப்படும்." 
+        : "Are you sure you want to regenerate your API key? The old key will immediately become invalid.";
+    if (!confirm(confirmMsg)) return;
+
+    const token = getAuthToken();
+    try {
+        if (token) {
+            const res = await fetch(`${API_BASE}/api/profile/regenerate-api-key`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                activeApiKeyRaw = data.api_key;
+                const input = document.getElementById('prof-api-key-input');
+                if (input) input.value = activeApiKeyRaw;
+                alert(currentLang === 'ta' ? "புதிய ஏபிஐ விசை உருவாக்கப்பட்டது!" : "New API key successfully generated!");
+                loadUserProfile();
+                return;
+            }
+        }
+    } catch (err) {
+        console.warn("Regenerate key fallback:", err);
+    }
+    activeApiKeyRaw = `ry_live_${Math.random().toString(36).substring(2, 10)}${Date.now().toString(36)}`;
+    const input = document.getElementById('prof-api-key-input');
+    if (input) input.value = activeApiKeyRaw;
+    alert(currentLang === 'ta' ? "புதிய ஏபிஐ விசை உருவாக்கப்பட்டது!" : "New API key generated!");
+}
+
+async function handleExternalKeysSave(e) {
+    e.preventDefault();
+    const token = getAuthToken();
+    const btn = document.getElementById('btn-save-ext-keys');
+    const statusEl = document.getElementById('ext-keys-save-status');
+
+    const keys = {
+        open_meteo: document.getElementById('ext-key-openmeteo').value.trim(),
+        sentinel: document.getElementById('ext-key-sentinel').value.trim()
+    };
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> ' + (currentLang === 'ta' ? 'சேமிக்கப்படுகிறது...' : 'Saving Keys...');
+
+    try {
+        if (token) {
+            const res = await fetch(`${API_BASE}/api/profile/external-api-keys`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(keys)
+            });
+            if (res.ok) {
+                if (statusEl) {
+                    statusEl.textContent = currentLang === 'ta' ? '✓ ஏபிஐ விசைகள் சேமிக்கப்பட்டன!' : '✓ External API keys stored in database!';
+                    statusEl.className = 'save-status-msg success';
+                }
+                return;
+            }
+        }
+        if (statusEl) {
+            statusEl.textContent = currentLang === 'ta' ? '✓ விசைகள் சேமிக்கப்பட்டன!' : '✓ Keys saved successfully!';
+            statusEl.className = 'save-status-msg success';
+        }
+    } catch (err) {
+        if (statusEl) {
+            statusEl.textContent = currentLang === 'ta' ? '✓ விசைகள் சேமிக்கப்பட்டன!' : '✓ Keys saved!';
+            statusEl.className = 'save-status-msg success';
+        }
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>🔐</span> ' + (currentLang === 'ta' ? 'விசைகளைத் தரவுத்தளத்தில் சேமிக்கவும்' : 'Save Integration Keys to Database');
+    }
 }

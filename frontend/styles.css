@@ -3017,24 +3017,406 @@ body.is-authenticated .sidebar {
     }
 }
 
-@media (max-width: 768px) {
-    .header-status {
-        display: none;
+/* ==========================================================================
+   Hamburger Three-Line Sidebar Toggle & Collapsed State System
+   ========================================================================== */
+
+.sidebar-toggle-btn {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 36px;
+    height: 34px;
+    padding: 8px 7px;
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-right: 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-toggle-btn .hamburger-line {
+    width: 100%;
+    height: 2.2px;
+    background-color: var(--primary-forest);
+    border-radius: 2px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle-btn:hover {
+    background: var(--sage-light);
+    border-color: var(--primary-emerald);
+}
+
+.sidebar-toggle-btn:hover .hamburger-line {
+    background-color: var(--primary-leaf);
+}
+
+/* Sidebar Smooth Transitions */
+.sidebar {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-wrapper {
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Collapsed Sidebar State (Desktop & Tablet) */
+body.sidebar-collapsed .sidebar {
+    transform: translateX(-100%);
+}
+
+body.sidebar-collapsed .main-wrapper {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* User Badge Quick Actions */
+.btn-profile-shortcut {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: transform 0.18s ease;
+}
+
+.btn-profile-shortcut:hover {
+    transform: scale(1.15);
+}
+
+/* ==========================================================================
+   Farmer Profile, Database Telemetry & API Keys Section Styling
+   ========================================================================== */
+
+.profile-hero-card {
+    background: linear-gradient(135deg, var(--primary-forest) 0%, #205c40 50%, var(--primary-leaf) 100%);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    color: #ffffff;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: 0 6px 20px rgba(27, 67, 50, 0.16);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-hero-avatar {
+    width: 72px;
+    height: 72px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-hero-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-hero-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+
+.profile-hero-title-row h2 {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 0;
+    color: #ffffff;
+}
+
+.badge-role {
+    background: var(--gold-accent);
+    color: #1b4332;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.badge-db-status {
+    background: rgba(255, 255, 255, 0.15);
+    color: #d1fae5;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.76rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.profile-hero-info p {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    margin-bottom: 10px;
+}
+
+.profile-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: #e2e8f0;
+}
+
+.profile-hero-meta strong {
+    color: #ffffff;
+}
+
+.profile-sections-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.profile-card {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-sm);
+}
+
+.profile-card-header {
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+}
+
+.profile-card-header h3 {
+    font-family: var(--font-heading);
+    font-size: 1.22rem;
+    font-weight: 700;
+    color: var(--primary-forest);
+    margin-bottom: 4px;
+}
+
+.profile-card-header .card-hint {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.profile-input-field label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.profile-input-field input,
+.profile-input-field select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.profile-input-field input:focus,
+.profile-input-field select:focus {
+    outline: none;
+    border-color: var(--primary-leaf);
+    box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.12);
+}
+
+.profile-input-field input:disabled {
+    background: #f8fafc;
+    color: #64748b;
+    cursor: not-allowed;
+    border-style: dashed;
+}
+
+.profile-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-top: 8px;
+}
+
+.save-status-msg {
+    font-size: 0.86rem;
+    font-weight: 600;
+    transition: opacity 0.3s ease;
+}
+.save-status-msg.success { color: #16a34a; }
+.save-status-msg.error { color: #dc2626; }
+
+/* API Key Display Box */
+.api-key-box {
+    background: #f8fafc;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.api-key-box label {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--primary-forest);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.api-key-box .key-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.api-key-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 680px;
+}
+
+.api-key-row input {
+    flex: 1;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.92rem;
+    padding: 10px 14px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: var(--radius-sm);
+    color: var(--primary-forest);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.btn-key-tool {
+    padding: 9px 14px;
+    border: 1px solid var(--card-border);
+    background: #ffffff;
+    border-radius: var(--radius-sm);
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-key-tool:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: var(--text-primary);
+}
+
+.btn-key-tool.btn-key-regen {
+    background: var(--sage-light);
+    border-color: var(--sage-border);
+    color: var(--primary-forest);
+}
+
+.btn-key-tool.btn-key-regen:hover {
+    background: #d1fae5;
+    border-color: var(--primary-leaf);
+}
+
+.copy-alert {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #16a34a;
+}
+
+.external-keys-subcard {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 18px;
+}
+
+.external-keys-subcard h4 {
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: var(--primary-forest);
+    margin-bottom: 14px;
+}
+
+/* Audit Telemetry Metrics Grid */
+.audit-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.audit-stat-card {
+    background: #f8fafc;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.audit-stat-card .audit-lbl {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.audit-stat-card .audit-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary-forest);
+    word-break: break-all;
+}
+
+@media (max-width: 900px) {
+    .profile-hero-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px;
     }
-    .top-header {
-        padding: 12px 16px;
+    .profile-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .audit-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .api-key-row {
         flex-wrap: wrap;
-        gap: 10px;
     }
-    .top-header-right {
-        gap: 8px;
-    }
-    .header-lang-selector .lang-pill {
-        padding: 4px 8px;
-        font-size: 0.76rem;
-    }
-    .btn-auth-signin, .btn-auth-signup {
-        padding: 6px 10px;
-        font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+    .audit-stats-grid {
+        grid-template-columns: 1fr;
     }
 }

@@ -5,6 +5,7 @@ import datetime
 import hashlib
 import hmac
 import base64
+import secrets
 from typing import Optional, Dict, Any, List
 
 try:
@@ -74,6 +75,7 @@ class NeonDatabaseManager:
                 self.is_neon = True
                 print(" Successfully connected to Neon Cloud PostgreSQL!")
                 self._create_tables_postgres()
+                self._ensure_profile_columns()
                 return
             except Exception as e:
                 self.connection_error = str(e)
@@ -82,6 +84,7 @@ class NeonDatabaseManager:
         # Fallback to local SQLite
         self.is_neon = False
         self._create_tables_sqlite()
+        self._ensure_profile_columns()
         print(" Using local database fallback for user storage (Set DATABASE_URL to link Neon.tech).")
 
     def _get_pg_connection(self):
@@ -167,6 +170,54 @@ class NeonDatabaseManager:
         finally:
             conn.close()
 
+    def _ensure_profile_columns(self):
+        if self.is_neon:
+            cols = [
+                ("farm_size", "REAL DEFAULT 5.0"),
+                ("preferred_soil", "VARCHAR(100) DEFAULT 'Clayey'"),
+                ("primary_crop", "VARCHAR(100) DEFAULT 'Rice (Paddy)'"),
+                ("api_key", "VARCHAR(150)"),
+                ("external_api_keys", "TEXT DEFAULT '{}'"),
+                ("last_login_at", "TIMESTAMP WITH TIME ZONE"),
+                ("updated_at", "TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP")
+            ]
+            conn = self._get_pg_connection()
+            try:
+                with conn.cursor() as cur:
+                    for col_name, col_type in cols:
+                        try:
+                            cur.execute(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {col_name} {col_type};")
+                        except Exception:
+                            pass
+                conn.commit()
+            except Exception:
+                pass
+            finally:
+                conn.close()
+        else:
+            cols = [
+                ("farm_size", "REAL DEFAULT 5.0"),
+                ("preferred_soil", "TEXT DEFAULT 'Clayey'"),
+                ("primary_crop", "TEXT DEFAULT 'Rice (Paddy)'"),
+                ("api_key", "TEXT"),
+                ("external_api_keys", "TEXT DEFAULT '{}'"),
+                ("last_login_at", "TEXT"),
+                ("updated_at", "TEXT")
+            ]
+            conn = self._get_sqlite_connection()
+            try:
+                cur = conn.cursor()
+                for col_name, col_type in cols:
+                    try:
+                        cur.execute(f"ALTER TABLE users ADD COLUMN {col_name} {col_type};")
+                    except Exception:
+                        pass
+                conn.commit()
+            except Exception:
+                pass
+            finally:
+                conn.close()
+
     # --- Authentication Methods ---
 
     def register_user(self, full_name: str, email: str, password: str, district: str = "Thanjavur", role: str = "Farmer", phone: str = "") -> Dict[str, Any]:
@@ -181,6 +232,8 @@ class NeonDatabaseManager:
             raise ValueError("Please provide a valid email address.")
 
         hashed = _secure_hash(password)
+        api_key = f"ry_live_{secrets.token_hex(16)}"
+        now_ts = datetime.datetime.utcnow().isoformat()
 
         if self.is_neon:
             conn = self._get_pg_connection()
@@ -191,10 +244,10 @@ class NeonDatabaseManager:
                         raise ValueError("An account with this email address already exists. Please Sign In.")
                     
                     cur.execute("""
-                    INSERT INTO users (full_name, email, password_hash, district, role, phone)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                    RETURNING id, full_name, email, district, role, phone, created_at;
-                    """, (full_name, email, hashed, district, role, phone))
+                    INSERT INTO users (full_name, email, password_hash, district, role, phone, api_key, farm_size, preferred_soil, primary_crop, created_at, last_login_at, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, 5.0, 'Clayey', 'Rice (Paddy)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    RETURNING id, full_name, email, district, role, phone, api_key, farm_size, preferred_soil, primary_crop, created_at, last_login_at, updated_at;
+                    """, (full_name, email, hashed, district, role, phone, api_key))
                     user = cur.fetchone()
                 conn.commit()
                 return dict(user)
@@ -209,9 +262,9 @@ class NeonDatabaseManager:
                     raise ValueError("An account with this email address already exists. Please Sign In.")
 
                 cur.execute("""
-                INSERT INTO users (full_name, email, password_hash, district, role, phone)
-                VALUES (?, ?, ?, ?, ?, ?);
-                """, (full_name, email, hashed, district, role, phone))
+                INSERT INTO users (full_name, email, password_hash, district, role, phone, api_key, farm_size, preferred_soil, primary_crop, created_at, last_login_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 5.0, 'Clayey', 'Rice (Paddy)', ?, ?, ?);
+                """, (full_name, email, hashed, district, role, phone, api_key, now_ts, now_ts, now_ts))
                 user_id = cur.lastrowid
                 conn.commit()
                 return {
@@ -221,13 +274,20 @@ class NeonDatabaseManager:
                     "district": district,
                     "role": role,
                     "phone": phone,
-                    "created_at": datetime.datetime.utcnow().isoformat()
+                    "api_key": api_key,
+                    "farm_size": 5.0,
+                    "preferred_soil": "Clayey",
+                    "primary_crop": "Rice (Paddy)",
+                    "created_at": now_ts,
+                    "last_login_at": now_ts,
+                    "updated_at": now_ts
                 }
             finally:
                 conn.close()
 
     def authenticate_user(self, email: str, password: str) -> Dict[str, Any]:
         email = email.strip().lower()
+        now_ts = datetime.datetime.utcnow().isoformat()
 
         if self.is_neon:
             conn = self._get_pg_connection()
@@ -244,7 +304,15 @@ class NeonDatabaseManager:
 
                     user_dict = dict(user)
                     user_dict.pop('password_hash', None)
-                    return user_dict
+
+                    # Ensure api_key exists
+                    if not user_dict.get('api_key'):
+                        user_dict['api_key'] = f"ry_live_{secrets.token_hex(16)}"
+                    
+                    cur.execute("UPDATE users SET last_login_at = CURRENT_TIMESTAMP, api_key = %s WHERE id = %s", 
+                                (user_dict['api_key'], user_dict['id']))
+                conn.commit()
+                return user_dict
             finally:
                 conn.close()
         else:
@@ -260,14 +328,25 @@ class NeonDatabaseManager:
                 if not _verify_hash(password, pw_hash):
                     raise ValueError("Incorrect password. Please try again.")
 
+                row_dict = dict(row)
+                api_key = row_dict.get('api_key') or f"ry_live_{secrets.token_hex(16)}"
+                cur.execute("UPDATE users SET last_login_at = ?, api_key = ? WHERE id = ?", (now_ts, api_key, row_dict['id']))
+                conn.commit()
+
                 return {
-                    "id": row['id'],
-                    "full_name": row['full_name'],
-                    "email": row['email'],
-                    "district": row['district'],
-                    "role": row['role'],
-                    "phone": row['phone'],
-                    "created_at": row['created_at']
+                    "id": row_dict['id'],
+                    "full_name": row_dict['full_name'],
+                    "email": row_dict['email'],
+                    "district": row_dict.get('district', 'Thanjavur'),
+                    "role": row_dict.get('role', 'Farmer'),
+                    "phone": row_dict.get('phone', ''),
+                    "api_key": api_key,
+                    "farm_size": row_dict.get('farm_size', 5.0),
+                    "preferred_soil": row_dict.get('preferred_soil', 'Clayey'),
+                    "primary_crop": row_dict.get('primary_crop', 'Rice (Paddy)'),
+                    "created_at": row_dict.get('created_at', now_ts),
+                    "last_login_at": now_ts,
+                    "updated_at": row_dict.get('updated_at', now_ts)
                 }
             finally:
                 conn.close()
@@ -398,6 +477,142 @@ class NeonDatabaseManager:
                 return result
             finally:
                 conn.close()
+
+    # --- Profile & API Key Management Methods ---
+
+    def get_user_profile(self, user_id: int) -> Optional[Dict[str, Any]]:
+        if self.is_neon:
+            conn = self._get_pg_connection()
+            try:
+                with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                    cur.execute("""
+                    SELECT id, full_name, email, district, role, phone, api_key, 
+                           farm_size, preferred_soil, primary_crop, external_api_keys,
+                           created_at, last_login_at, updated_at
+                    FROM users WHERE id = %s
+                    """, (user_id,))
+                    row = cur.fetchone()
+                    if not row:
+                        return None
+                    profile = dict(row)
+                    cur.execute("SELECT COUNT(*) as count FROM user_predictions WHERE user_id = %s", (user_id,))
+                    c_row = cur.fetchone()
+                    profile["total_predictions"] = c_row["count"] if c_row else 0
+                    if not profile.get("api_key"):
+                        profile["api_key"] = f"ry_live_{secrets.token_hex(16)}"
+                        cur.execute("UPDATE users SET api_key = %s WHERE id = %s", (profile["api_key"], user_id))
+                        conn.commit()
+                    if isinstance(profile.get("external_api_keys"), str):
+                        try:
+                            profile["external_api_keys"] = json.loads(profile["external_api_keys"])
+                        except Exception:
+                            profile["external_api_keys"] = {}
+                    return profile
+            finally:
+                conn.close()
+        else:
+            conn = self._get_sqlite_connection()
+            try:
+                cur = conn.cursor()
+                cur.execute("""
+                SELECT id, full_name, email, district, role, phone, api_key,
+                       farm_size, preferred_soil, primary_crop, external_api_keys,
+                       created_at, last_login_at, updated_at
+                FROM users WHERE id = ?
+                """, (user_id,))
+                row = cur.fetchone()
+                if not row:
+                    return None
+                profile = dict(row)
+                cur.execute("SELECT COUNT(*) as count FROM user_predictions WHERE user_id = ?", (user_id,))
+                c_row = cur.fetchone()
+                profile["total_predictions"] = c_row["count"] if c_row else 0
+                if not profile.get("api_key"):
+                    profile["api_key"] = f"ry_live_{secrets.token_hex(16)}"
+                    cur.execute("UPDATE users SET api_key = ? WHERE id = ?", (profile["api_key"], user_id))
+                    conn.commit()
+                if isinstance(profile.get("external_api_keys"), str):
+                    try:
+                        profile["external_api_keys"] = json.loads(profile["external_api_keys"])
+                    except Exception:
+                        profile["external_api_keys"] = {}
+                return profile
+            finally:
+                conn.close()
+
+    def update_user_profile(self, user_id: int, updates: Dict[str, Any]) -> Dict[str, Any]:
+        now_ts = datetime.datetime.utcnow().isoformat()
+        allowed = ["full_name", "phone", "district", "role", "farm_size", "preferred_soil", "primary_crop"]
+        data_to_update = {k: v for k, v in updates.items() if k in allowed and v is not None}
+        
+        if self.is_neon:
+            conn = self._get_pg_connection()
+            try:
+                with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                    if data_to_update:
+                        set_clauses = [f"{k} = %s" for k in data_to_update.keys()]
+                        set_clauses.append("updated_at = CURRENT_TIMESTAMP")
+                        values = list(data_to_update.values()) + [user_id]
+                        cur.execute(f"UPDATE users SET {', '.join(set_clauses)} WHERE id = %s", values)
+                        conn.commit()
+            finally:
+                conn.close()
+        else:
+            conn = self._get_sqlite_connection()
+            try:
+                cur = conn.cursor()
+                if data_to_update:
+                    set_clauses = [f"{k} = ?" for k in data_to_update.keys()]
+                    set_clauses.append("updated_at = ?")
+                    values = list(data_to_update.values()) + [now_ts, user_id]
+                    cur.execute(f"UPDATE users SET {', '.join(set_clauses)} WHERE id = ?", values)
+                    conn.commit()
+            finally:
+                conn.close()
+
+        return self.get_user_profile(user_id) or {}
+
+    def regenerate_api_key(self, user_id: int) -> str:
+        new_key = f"ry_live_{secrets.token_hex(16)}"
+        now_ts = datetime.datetime.utcnow().isoformat()
+        if self.is_neon:
+            conn = self._get_pg_connection()
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("UPDATE users SET api_key = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s", (new_key, user_id))
+                conn.commit()
+            finally:
+                conn.close()
+        else:
+            conn = self._get_sqlite_connection()
+            try:
+                cur = conn.cursor()
+                cur.execute("UPDATE users SET api_key = ?, updated_at = ? WHERE id = ?", (new_key, now_ts, user_id))
+                conn.commit()
+            finally:
+                conn.close()
+        return new_key
+
+    def save_external_api_keys(self, user_id: int, external_keys: Dict[str, str]) -> Dict[str, str]:
+        keys_json = json.dumps(external_keys)
+        now_ts = datetime.datetime.utcnow().isoformat()
+        if self.is_neon:
+            conn = self._get_pg_connection()
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("UPDATE users SET external_api_keys = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s", (keys_json, user_id))
+                conn.commit()
+            finally:
+                conn.close()
+        else:
+            conn = self._get_sqlite_connection()
+            try:
+                cur = conn.cursor()
+                cur.execute("UPDATE users SET external_api_keys = ?, updated_at = ? WHERE id = ?", (keys_json, now_ts, user_id))
+                conn.commit()
+            finally:
+                conn.close()
+        return external_keys
 
     def get_status(self) -> Dict[str, Any]:
         return {

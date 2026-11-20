@@ -50,6 +50,10 @@
                     <span class="nav-icon">🍃</span>
                     <span class="nav-text" data-en="Crop Health Advisor" data-ta="பயிர் ஆலோசகர்">Crop Health Advisor</span>
                 </button>
+                <button id="nav-profile" class="nav-item auth-only" onclick="switchTab('profile')">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text" data-en="Farmer Profile" data-ta="சுயவிவரம்">Farmer Profile</span>
+                </button>
                 
                 <!-- Unauthenticated Sidebar Unlock Hint -->
                 <div class="sidebar-auth-promo unauth-only">
@@ -62,16 +66,6 @@
                     </button>
                 </div>
             </nav>
-
-            <div class="sidebar-footer">
-                <div class="lang-selector">
-                    <span class="lang-label" data-en="Language" data-ta="மொழி">Language:</span>
-                    <div class="lang-pills">
-                        <button id="lang-en" class="lang-pill active" onclick="setLanguage('en')">English</button>
-                        <button id="lang-ta" class="lang-pill" onclick="setLanguage('ta')">தமிழ்</button>
-                    </div>
-                </div>
-            </div>
         </aside>
 
         <!-- Sidebar Overlay for Mobile -->
@@ -81,6 +75,13 @@
         <div class="main-wrapper">
             <!-- Top Navbar Header -->
             <header class="top-header">
+                <!-- Hamburger Button (Three-line thing to open/close sidebar) -->
+                <button id="sidebar-toggle-btn" class="sidebar-toggle-btn auth-only" onclick="toggleSidebar()" title="Toggle Sidebar (Open/Close)" aria-label="Toggle Sidebar">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+
                 <!-- Brand logo for unauthenticated view (when sidebar is hidden) -->
                 <div class="header-brand-unauth unauth-only">
                     <span class="header-brand-icon">🌾</span>
@@ -118,13 +119,14 @@
                             <span class="auth-btn-icon">✨</span>
                             <span data-en="Sign Up / Register" data-ta="பதிவு செய்க">Sign Up / Register</span>
                         </button>
-                        <div id="user-profile-badge" class="user-profile-badge hidden">
+                        <div id="user-profile-badge" class="user-profile-badge hidden" onclick="switchTab('profile')" title="View Farmer Profile / சுயவிவரத்தைக் காண்க">
                             <div class="user-avatar">🌾</div>
                             <div class="user-info">
                                 <span id="user-display-name" class="user-name">Farmer</span>
                                 <span id="user-display-district" class="user-sub">Thanjavur</span>
                             </div>
-                            <button class="btn-signout" onclick="handleSignOut()" title="Sign Out">🚪</button>
+                            <button class="btn-profile-shortcut" onclick="event.stopPropagation(); switchTab('profile');" title="Profile Details">👤</button>
+                            <button class="btn-signout" onclick="event.stopPropagation(); handleSignOut();" title="Sign Out">🚪</button>
                         </div>
                     </div>
                 </div>
@@ -1145,6 +1147,183 @@
                         <div class="advisory-card">
                             <h3 data-en="Recommended Agricultural Actions" data-ta="பரிந்துரைக்கப்பட்ட விவசாய நடவடிக்கைகள்">Recommended Agricultural Actions</h3>
                             <ul id="health-advisory-list" class="suggestions-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================================
+                     SECTION 6: FARMER PROFILE, TIMESTAMPS & API KEYS (STORED IN DB)
+                     ======================================================== -->
+                <div id="panel-profile" class="panel">
+                    <!-- Profile Hero Banner -->
+                    <div class="profile-hero-card">
+                        <div class="profile-hero-avatar">
+                            <span class="avatar-icon">🌾</span>
+                        </div>
+                        <div class="profile-hero-info">
+                            <div class="profile-hero-title-row">
+                                <h2 id="prof-hero-name">Farmer</h2>
+                                <span id="prof-hero-role-badge" class="badge-role">Farmer</span>
+                                <span id="prof-hero-db-badge" class="badge-db-status">● Neon Cloud PostgreSQL</span>
+                            </div>
+                            <p id="prof-hero-email">farmer@example.com</p>
+                            <div class="profile-hero-meta">
+                                <span>📍 <strong id="prof-hero-district">Thanjavur</strong></span>
+                                <span>📅 <span data-en="Member Since:" data-ta="உறுப்பினர்:">Member Since:</span> <strong id="prof-hero-created-at">Today</strong></span>
+                                <span>🕒 <span data-en="Last Login:" data-ta="கடைசி உள்நுழைவு:">Last Login:</span> <strong id="prof-hero-last-login">Just now</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Sections Grid -->
+                    <div class="profile-sections-grid">
+                        <!-- Card 1: Farmer & Farm Parameters Form -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <div>
+                                    <h3 data-en="🧑‍🌾 Farmer & Farm Details" data-ta="🧑‍🌾 விவசாயி & பண்ணை விவரங்கள்">🧑‍🌾 Farmer & Farm Details</h3>
+                                    <span class="card-hint" data-en="Synchronized with Neon Cloud PostgreSQL storage" data-ta="நியான் கிளவுட் போஸ்ட்கிரெஸ்கியூஎல் சேமிப்பகத்துடன் இணைக்கப்பட்டுள்ளது">Synchronized with Neon Cloud PostgreSQL storage</span>
+                                </div>
+                            </div>
+                            <form id="form-profile-details" onsubmit="handleProfileSave(event)">
+                                <div class="profile-form-grid">
+                                    <div class="profile-input-field">
+                                        <label data-en="Full Name *" data-ta="முழுப் பெயர் *">Full Name *</label>
+                                        <input type="text" id="prof-input-name" required placeholder="e.g. K. Ramasamy">
+                                    </div>
+                                    <div class="profile-input-field">
+                                        <label data-en="Email Address (Account ID)" data-ta="மின்னஞ்சல் முகவரி">Email Address (Account ID)</label>
+                                        <input type="email" id="prof-input-email" disabled title="Email is fixed as your unique account ID">
+                                    </div>
+                                    <div class="profile-input-field">
+                                        <label data-en="Phone Number" data-ta="தொலைபேசி எண்">Phone Number</label>
+                                        <input type="tel" id="prof-input-phone" placeholder="e.g. +91 98765 43210">
+                                    </div>
+                                    <div class="profile-input-field">
+                                        <label data-en="Primary Farming District" data-ta="முதன்மை விவசாய மாவட்டம்">Primary Farming District</label>
+                                        <select id="prof-input-district"></select>
+                                    </div>
+                                    <div class="profile-input-field">
+                                        <label data-en="User Role" data-ta="பயனர் நிலை">User Role</label>
+                                        <select id="prof-input-role">
+                                            <option value="Farmer">Farmer (விவசாயி)</option>
+                                            <option value="Agronomist">Agronomist (வேளாண் நிபுணர்)</option>
+                                            <option value="Researcher">Researcher (ஆராய்ச்சியாளர்)</option>
+                                            <option value="Agri Officer">Agri Extension Officer (அதிகாரி)</option>
+                                        </select>
+                                    </div>
+                                    <div class="profile-input-field">
+                                        <label data-en="Farm Size (Acres)" data-ta="பண்ணை அளவு (ஏக்கர்)">Farm Size (Acres)</label>
+                                        <input type="number" id="prof-input-farmsize" step="0.1" min="0.1" placeholder="5.0">
+                                    </div>
+                                    <div class="profile-input-field">
+                                        <label data-en="Preferred Soil Type" data-ta="மண் வகை">Preferred Soil Type</label>
+                                        <select id="prof-input-soil"></select>
+                                    </div>
+                                    <div class="profile-input-field">
+                                        <label data-en="Primary Rice Variety" data-ta="நெல் ரகம்">Primary Rice Variety</label>
+                                        <input type="text" id="prof-input-crop" placeholder="e.g. CR 1009, ADT 43, BPT 5204">
+                                    </div>
+                                </div>
+                                <div class="profile-actions-bar">
+                                    <button type="submit" id="btn-save-profile" class="btn-primary">
+                                        <span>💾</span>
+                                        <span data-en="Save Profile Changes" data-ta="மாற்றங்களைச் சேமிக்கவும்">Save Profile Changes</span>
+                                    </button>
+                                    <span id="profile-save-status" class="save-status-msg"></span>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Card 2: Developer & Automated Integration API Keys -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <div>
+                                    <h3 data-en="🔑 API Keys & Developer Access" data-ta="🔑 ஏபிஐ விசைகள் & டெவலப்பர் அணுகல்">🔑 API Keys & Developer Access</h3>
+                                    <span class="card-hint" data-en="Persistent database storage for headless inference, batch scripts & IoT" data-ta="தானியங்கி கணக்கீடுகளுக்கான நிலையான தரவுத்தள ஏபிஐ விசைகள்">Persistent database storage for headless inference, batch scripts & IoT</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Personal API Key Box -->
+                            <div class="api-key-box">
+                                <label data-en="Your Personal RiceYield DSS API Key" data-ta="உங்கள் தனிப்பயன் RiceYield DSS ஏபிஐ விசை">Your Personal RiceYield DSS API Key</label>
+                                <p class="key-desc" data-en="Use this key in the Authorization header (Bearer or X-API-Key) for batch yield forecasting and automated pipelines." data-ta="தானியங்கி நெல் மகசூல் கணிப்புகளுக்கு இந்த ஏபிஐ விசையைப் பயன்படுத்தவும்.">
+                                    Use this key in the Authorization header (Bearer or X-API-Key) for batch yield forecasting and automated pipelines.
+                                </p>
+                                <div class="api-key-row">
+                                    <input type="password" id="prof-api-key-input" readonly value="ry_live_••••••••••••••••">
+                                    <button type="button" class="btn-key-tool" onclick="toggleApiKeyVisibility()" title="Show/Hide Key">
+                                        <span id="api-key-eye">👁️</span>
+                                    </button>
+                                    <button type="button" class="btn-key-tool" onclick="copyApiKey()" title="Copy API Key">
+                                        <span>📋 <span data-en="Copy" data-ta="நகலெடு">Copy</span></span>
+                                    </button>
+                                    <button type="button" class="btn-key-tool btn-key-regen" onclick="regenerateUserApiKey()" title="Generate New Key">
+                                        <span>🔄 <span data-en="Regenerate" data-ta="புதிய விசை">Regenerate</span></span>
+                                    </button>
+                                </div>
+                                <span id="api-key-copy-msg" class="copy-alert hidden" data-en="✓ API Key copied to clipboard!" data-ta="✓ ஏபிஐ விசை நகலெடுக்கப்பட்டது!">✓ API Key copied to clipboard!</span>
+                            </div>
+
+                            <!-- External Cloud Keys Form -->
+                            <div class="external-keys-subcard">
+                                <h4 data-en="🛰️ External Climate & Satellite API Keys (Stored in DB)" data-ta="🛰️ வெளிப்புற செயற்கைக்கோள் ஏபிஐ விசைகள்">🛰️ External Climate & Satellite API Keys (Stored in DB)</h4>
+                                <form id="form-external-keys" onsubmit="handleExternalKeysSave(event)">
+                                    <div class="profile-form-grid">
+                                        <div class="profile-input-field">
+                                            <label data-en="Open-Meteo Weather API Key (Optional)" data-ta="ஓபன்-மீட்டியோ வானிலை ஏபிஐ விசை">Open-Meteo Weather API Key (Optional)</label>
+                                            <input type="text" id="ext-key-openmeteo" placeholder="Default: Public free reanalysis tier">
+                                        </div>
+                                        <div class="profile-input-field">
+                                            <label data-en="Copernicus Sentinel-2 Client Secret (Optional)" data-ta="சென்டினல்-2 அணுகல் குறியீடு">Copernicus Sentinel-2 Client Secret (Optional)</label>
+                                            <input type="text" id="ext-key-sentinel" placeholder="Default: Built-in pilot pipeline token">
+                                        </div>
+                                    </div>
+                                    <div class="profile-actions-bar">
+                                        <button type="submit" id="btn-save-ext-keys" class="btn-secondary-light">
+                                            <span>🔐</span>
+                                            <span data-en="Save Integration Keys to Database" data-ta="விசைகளைத் தரவுத்தளத்தில் சேமிக்கவும்">Save Integration Keys to Database</span>
+                                        </button>
+                                        <span id="ext-keys-save-status" class="save-status-msg"></span>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Audit Timestamps & Account Security -->
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <div>
+                                    <h3 data-en="🕒 System Timestamps & Database Telemetry" data-ta="🕒 கணினி நேர முத்திரைகள் & தரவுத்தள விவரங்கள்">🕒 System Timestamps & Database Telemetry</h3>
+                                    <span class="card-hint" data-en="Live records fetched from Neon Cloud PostgreSQL users table" data-ta="நியான் போஸ்ட்கிரெஸ்கியூஎல் நேரடிப் பதிவுகள்">Live records fetched from Neon Cloud PostgreSQL users table</span>
+                                </div>
+                            </div>
+                            <div class="audit-stats-grid">
+                                <div class="audit-stat-card">
+                                    <span class="audit-lbl" data-en="Account Created" data-ta="கணக்கு உருவாக்கப்பட்டது">Account Created</span>
+                                    <strong id="audit-created-at" class="audit-val">Loading...</strong>
+                                </div>
+                                <div class="audit-stat-card">
+                                    <span class="audit-lbl" data-en="Last Active / Login" data-ta="கடைசி உள்நுழைவு">Last Active / Login</span>
+                                    <strong id="audit-last-login" class="audit-val">Loading...</strong>
+                                </div>
+                                <div class="audit-stat-card">
+                                    <span class="audit-lbl" data-en="Last Profile Update" data-ta="சுயவிவரப் புதுப்பிப்பு">Last Profile Update</span>
+                                    <strong id="audit-updated-at" class="audit-val">Loading...</strong>
+                                </div>
+                                <div class="audit-stat-card">
+                                    <span class="audit-lbl" data-en="Total Saved Predictions" data-ta="சேமிக்கப்பட்ட மகசூல் முடிவுகள்">Total Saved Predictions</span>
+                                    <strong id="audit-pred-count" class="audit-val">0</strong>
+                                </div>
+                                <div class="audit-stat-card">
+                                    <span class="audit-lbl" data-en="Database Storage Engine" data-ta="தரவுத்தள சேமிப்பு">Database Storage Engine</span>
+                                    <strong id="audit-db-engine" class="audit-val">Neon Cloud PostgreSQL</strong>
+                                </div>
+                                <div class="audit-stat-card">
+                                    <span class="audit-lbl" data-en="Security & Encryption" data-ta="பாதுகாப்பு மற்றும் குறியாக்கம்">Security & Encryption</span>
+                                    <strong class="audit-val">Bcrypt + SHA-256 HMAC</strong>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
