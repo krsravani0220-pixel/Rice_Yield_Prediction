@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 import numpy as np
 from typing import Dict, Any, Optional, List
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Header, Depends
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Header, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -126,16 +126,23 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, A
 
 # --- Neon Cloud Authentication & User Persistence Endpoints ---
 
-@app.post("/api/auth/register")
-def register_user(request: RegisterRequest):
+@app.api_route("/api/auth/register", methods=["GET", "POST"])
+def register_user_route(request_data: Optional[RegisterRequest] = None, raw_request: Request = None):
+    if raw_request and raw_request.method == "GET":
+        return {
+            "status": "info",
+            "message": "Auth register endpoint active. Send a POST request with JSON payload: {full_name, email, password, district, role}."
+        }
+    if not request_data:
+        raise HTTPException(status_code=400, detail="Missing registration payload.")
     try:
         user = db_manager.register_user(
-            full_name=request.full_name,
-            email=request.email,
-            password=request.password,
-            district=request.district,
-            role=request.role,
-            phone=request.phone or ""
+            full_name=request_data.full_name,
+            email=request_data.email,
+            password=request_data.password,
+            district=request_data.district,
+            role=request_data.role,
+            phone=request_data.phone or ""
         )
         token = db_manager.create_token(user)
         return {
@@ -149,10 +156,17 @@ def register_user(request: RegisterRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
-@app.post("/api/auth/login")
-def login_user(request: LoginRequest):
+@app.api_route("/api/auth/login", methods=["GET", "POST"])
+def login_user_route(request_data: Optional[LoginRequest] = None, raw_request: Request = None):
+    if raw_request and raw_request.method == "GET":
+        return {
+            "status": "info",
+            "message": "Auth login endpoint active. Send a POST request with JSON payload: {email, password}."
+        }
+    if not request_data:
+        raise HTTPException(status_code=400, detail="Missing login payload.")
     try:
-        user = db_manager.authenticate_user(request.email, request.password)
+        user = db_manager.authenticate_user(request_data.email, request_data.password)
         token = db_manager.create_token(user)
         return {
             "status": "success",

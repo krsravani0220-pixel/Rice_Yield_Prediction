@@ -2,9 +2,22 @@ import os
 import sys
 import json
 import datetime
+import hashlib
+import hmac
+import base64
 from typing import Optional, Dict, Any, List
-import bcrypt
-import jwt
+
+try:
+    import bcrypt
+    BCRYPT_AVAILABLE = True
+except ImportError:
+    BCRYPT_AVAILABLE = False
+
+try:
+    import jwt
+    JWT_AVAILABLE = True
+except ImportError:
+    JWT_AVAILABLE = False
 
 # Try importing psycopg2 for Neon PostgreSQL
 try:
@@ -20,6 +33,30 @@ import sqlite3
 JWT_SECRET = os.getenv("JWT_SECRET", "tamilnadu-rice-yield-dss-neon-secret-key-2026")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24 * 7  # 7 days
+
+def _secure_hash(password: str) -> str:
+    if BCRYPT_AVAILABLE:
+        salt = bcrypt.gensalt()
+        return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+    salt = os.urandom(16).hex()
+    hashed = hashlib.sha256((salt + password).encode('utf-8')).hexdigest()
+    return f"sha256${salt}${hashed}"
+
+def _verify_hash(password: str, pw_hash: str) -> bool:
+    if pw_hash.startswith("sha256$"):
+        parts = pw_hash.split("$")
+        if len(parts) == 3:
+            salt = parts[1]
+            expected = parts[2]
+            computed = hashlib.sha256((salt + password).encode('utf-8')).hexdigest()
+            return hmac.compare_digest(expected, computed)
+    if BCRYPT_AVAILABLE:
+        try:
+            return bcrypt.checkpw(password.encode('utf-8'), pw_hash.encode('utf-8'))
+        except Exception:
+            return False
+    # Fallback comparison if plain sha256 was used
+    return False
 
 class NeonDatabaseManager:
     def __init__(self):
@@ -143,8 +180,7 @@ class NeonDatabaseManager:
         if "@" not in email or "." not in email:
             raise ValueError("Please provide a valid email address.")
 
-        salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+        hashed = _secure_hash(password)
 
         if self.is_neon:
             conn = self._get_pg_connection()
@@ -203,7 +239,7 @@ class NeonDatabaseManager:
                         raise ValueError("No account found with this email. Please check or register.")
                     
                     pw_hash = user['password_hash']
-                    if not bcrypt.checkpw(password.encode('utf-8'), pw_hash.encode('utf-8')):
+                    if not _verify_hash(password, pw_hash):
                         raise ValueError("Incorrect password. Please try again.")
 
                     user_dict = dict(user)
@@ -221,7 +257,7 @@ class NeonDatabaseManager:
                     raise ValueError("No account found with this email. Please check or register.")
                 
                 pw_hash = row['password_hash']
-                if not bcrypt.checkpw(password.encode('utf-8'), pw_hash.encode('utf-8')):
+                if not _verify_hash(password, pw_hash):
                     raise ValueError("Incorrect password. Please try again.")
 
                 return {
@@ -243,14 +279,38 @@ class NeonDatabaseManager:
             "full_name": user_dict["full_name"],
             "district": user_dict.get("district", "Thanjavur"),
             "role": user_dict.get("role", "Farmer"),
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=JWT_EXPIRATION_HOURS)
+            "exp": (datetime.datetime.utcnow() + datetime.timedelta(hours=JWT_EXPIRATION_HOURS)).timestamp()
         }
-        return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+        if JWT_AVAILABLE:
+            try:
+                return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+            except Exception:
+                pass
+        # Graceful token fallback
+        data_str = json.dumps(payload, default=str)
+        b64_data = base64.urlsafe_b64encode(data_str.encode()).decode()
+        sig = hmac.new(JWT_SECRET.encode(), b64_data.encode(), hashlib.sha256).hexdigest()
+        return f"{b64_data}.{sig}"
 
     def verify_token(self, token: str) -> Optional[Dict[str, Any]]:
+        if JWT_AVAILABLE:
+            try:
+                payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+                return payload
+            except Exception:
+                pass
         try:
-            payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-            return payload
+            parts = token.split(".")
+            if len(parts) == 2:
+                b64_data, sig = parts
+                expected_sig = hmac.new(JWT_SECRET.encode(), b64_data.encode(), hashlib.sha256).hexdigest()
+                if hmac.compare_digest(expected_sig, sig):
+                    data_str = base64.urlsafe_b64decode(b64_data.encode()).decode()
+                    payload = json.loads(data_str)
+                    if payload.get("exp") and datetime.datetime.utcnow().timestamp() > payload["exp"]:
+                        return None
+                    return payload
+            return None
         except Exception:
             return None
 
