@@ -1528,6 +1528,15 @@ async function initAuthSession() {
     }
 }
 
+function getInitials(name) {
+    if (!name) return 'FR';
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+}
+
 function updateAuthUI() {
     const isAuth = !!(currentUser && currentAuthToken);
 
@@ -1546,6 +1555,7 @@ function updateAuthUI() {
     const displayDistrict = document.getElementById('user-display-district');
     const authWelcomeName = document.getElementById('auth-welcome-name');
     const authWelcomeSub = document.getElementById('auth-welcome-sub');
+    const userAvatarText = document.getElementById('user-avatar-text');
 
     if (isAuth) {
         if (btnSignin) btnSignin.classList.add('hidden');
@@ -1554,6 +1564,7 @@ function updateAuthUI() {
             badge.classList.remove('hidden');
             if (displayName) displayName.textContent = currentUser.full_name || 'Farmer';
             if (displayDistrict) displayDistrict.textContent = `${currentUser.district || 'Thanjavur'} (${currentUser.role || 'Farmer'})`;
+            if (userAvatarText) userAvatarText.textContent = getInitials(currentUser.full_name);
         }
         if (authWelcomeName) authWelcomeName.textContent = currentUser.full_name || 'Farmer';
         if (authWelcomeSub) {
@@ -1858,36 +1869,11 @@ async function loadUserPredictionHistory() {
 }
 
 // ==========================================================================
-// Farmer Profile, System Timestamps & API Key Management
+// Farmer Profile, System Timestamps & Cloud Telemetry
 // ==========================================================================
 
-let activeApiKeyRaw = "";
-
-async function loadUserProfile() {
-    const token = getAuthToken();
-    if (!token && !currentUser) return;
-
-    let profileData = currentUser || {};
-
-    try {
-        if (token) {
-            const res = await fetch(`${API_BASE}/api/profile`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.profile) {
-                    profileData = data.profile;
-                    currentUser = { ...currentUser, ...profileData };
-                    try {
-                        localStorage.setItem('riceyield_user_profile', JSON.stringify(currentUser));
-                    } catch (_) {}
-                }
-            }
-        }
-    } catch (err) {
-        console.warn("Could not load remote profile, using session profile:", err);
-    }
+function renderProfileData(profileData) {
+    if (!profileData) return;
 
     // Populate Hero Section
     const heroName = document.getElementById('prof-hero-name');
@@ -1896,6 +1882,7 @@ async function loadUserProfile() {
     const heroRole = document.getElementById('prof-hero-role-badge');
     const heroCreatedAt = document.getElementById('prof-hero-created-at');
     const heroLastLogin = document.getElementById('prof-hero-last-login');
+    const avatarBadge = document.getElementById('prof-avatar-badge');
 
     if (heroName) heroName.textContent = profileData.full_name || 'Farmer';
     if (heroEmail) heroEmail.textContent = profileData.email || 'farmer@example.com';
@@ -1903,6 +1890,7 @@ async function loadUserProfile() {
     if (heroRole) heroRole.textContent = profileData.role || 'Farmer';
     if (heroCreatedAt) heroCreatedAt.textContent = formatDateDisplay(profileData.created_at);
     if (heroLastLogin) heroLastLogin.textContent = formatDateDisplay(profileData.last_login_at);
+    if (avatarBadge) avatarBadge.textContent = getInitials(profileData.full_name);
 
     // Populate Form Inputs
     const inputName = document.getElementById('prof-input-name');
@@ -1923,20 +1911,6 @@ async function loadUserProfile() {
     if (inputSoil && profileData.preferred_soil) inputSoil.value = profileData.preferred_soil;
     if (inputCrop) inputCrop.value = profileData.primary_crop || 'Rice (Paddy)';
 
-    // Populate API Key
-    activeApiKeyRaw = profileData.api_key || `ry_live_${Math.random().toString(36).substring(2, 10)}${Date.now().toString(36)}`;
-    const apiKeyInput = document.getElementById('prof-api-key-input');
-    if (apiKeyInput) {
-        apiKeyInput.value = activeApiKeyRaw;
-    }
-
-    // Populate External API Keys
-    const extKeys = profileData.external_api_keys || {};
-    const extOpenMeteo = document.getElementById('ext-key-openmeteo');
-    const extSentinel = document.getElementById('ext-key-sentinel');
-    if (extOpenMeteo) extOpenMeteo.value = extKeys.open_meteo || '';
-    if (extSentinel) extSentinel.value = extKeys.sentinel || '';
-
     // Populate Audit Timestamps & Telemetry
     const auditCreated = document.getElementById('audit-created-at');
     const auditLogin = document.getElementById('audit-last-login');
@@ -1949,6 +1923,44 @@ async function loadUserProfile() {
     if (auditUpdated) auditUpdated.textContent = formatDateDisplay(profileData.updated_at);
     if (auditPredCount) auditPredCount.textContent = profileData.total_predictions || '0';
     if (auditDbEngine) auditDbEngine.textContent = 'Neon Cloud PostgreSQL';
+}
+
+async function loadUserProfile() {
+    const token = getAuthToken();
+    if (!token && !currentUser) return;
+
+    // 1. Instant Synchronous Cache Render (0ms latency, zero delay)
+    let cachedProfile = currentUser;
+    if (!cachedProfile) {
+        try {
+            const raw = localStorage.getItem('riceyield_user_profile');
+            if (raw) cachedProfile = JSON.parse(raw);
+        } catch (_) {}
+    }
+    if (cachedProfile) {
+        renderProfileData(cachedProfile);
+    }
+
+    // 2. Fast Asynchronous Background Sync with NeonDB
+    if (token) {
+        try {
+            const res = await fetch(`${API_BASE}/api/profile`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.profile) {
+                    currentUser = { ...currentUser, ...data.profile };
+                    try {
+                        localStorage.setItem('riceyield_user_profile', JSON.stringify(currentUser));
+                    } catch (_) {}
+                    renderProfileData(currentUser);
+                }
+            }
+        } catch (err) {
+            console.warn("Background profile sync fallback to local session:", err);
+        }
+    }
 }
 
 function formatDateDisplay(dtStr) {
@@ -1985,7 +1997,7 @@ async function handleProfileSave(e) {
     };
 
     btn.disabled = true;
-    btn.innerHTML = '<span>⏳</span> ' + (currentLang === 'ta' ? 'சேமிக்கப்படுகிறது...' : 'Saving Changes...');
+    btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span>${currentLang === 'ta' ? 'சேமிக்கப்படுகிறது...' : 'Saving Changes...'}</span>`;
     if (statusEl) {
         statusEl.textContent = '';
         statusEl.className = 'save-status-msg';
@@ -2014,10 +2026,10 @@ async function handleProfileSave(e) {
         updateAuthUI();
 
         if (statusEl) {
-            statusEl.textContent = currentLang === 'ta' ? '✓ சுயவிவரம் புதுப்பிக்கப்பட்டது!' : '✓ Profile updated in database!';
+            statusEl.textContent = currentLang === 'ta' ? '✓ சுயவிவரம் புதுப்பிக்கப்பட்டது!' : '✓ Profile updated in Neon Cloud!';
             statusEl.className = 'save-status-msg success';
         }
-        loadUserProfile();
+        renderProfileData(currentUser);
     } catch (err) {
         console.warn("Save profile fallback to local session:", err);
         currentUser = { ...currentUser, ...payload, updated_at: new Date().toISOString() };
@@ -2027,118 +2039,9 @@ async function handleProfileSave(e) {
             statusEl.textContent = currentLang === 'ta' ? '✓ மாற்றங்கள் சேமிக்கப்பட்டன!' : '✓ Changes saved!';
             statusEl.className = 'save-status-msg success';
         }
-        loadUserProfile();
+        renderProfileData(currentUser);
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<span>💾</span> ' + (currentLang === 'ta' ? 'மாற்றங்களைச் சேமிக்கவும்' : 'Save Profile Changes');
-    }
-}
-
-function toggleApiKeyVisibility() {
-    const input = document.getElementById('prof-api-key-input');
-    const eye = document.getElementById('api-key-eye');
-    if (!input) return;
-    if (input.type === 'password') {
-        input.type = 'text';
-        if (eye) eye.textContent = '🙈';
-    } else {
-        input.type = 'password';
-        if (eye) eye.textContent = '👁️';
-    }
-}
-
-async function copyApiKey() {
-    const keyToCopy = activeApiKeyRaw || document.getElementById('prof-api-key-input').value;
-    try {
-        await navigator.clipboard.writeText(keyToCopy);
-    } catch (_) {
-        const input = document.getElementById('prof-api-key-input');
-        input.type = 'text';
-        input.select();
-        document.execCommand('copy');
-    }
-    const msg = document.getElementById('api-key-copy-msg');
-    if (msg) {
-        msg.classList.remove('hidden');
-        setTimeout(() => msg.classList.add('hidden'), 2500);
-    }
-}
-
-async function regenerateUserApiKey() {
-    const confirmMsg = currentLang === 'ta' 
-        ? "புதிய ஏபிஐ விசையை உருவாக்க விரும்புகிறீர்களா? பழைய விசை செயலிழக்கப்படும்." 
-        : "Are you sure you want to regenerate your API key? The old key will immediately become invalid.";
-    if (!confirm(confirmMsg)) return;
-
-    const token = getAuthToken();
-    try {
-        if (token) {
-            const res = await fetch(`${API_BASE}/api/profile/regenerate-api-key`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                activeApiKeyRaw = data.api_key;
-                const input = document.getElementById('prof-api-key-input');
-                if (input) input.value = activeApiKeyRaw;
-                alert(currentLang === 'ta' ? "புதிய ஏபிஐ விசை உருவாக்கப்பட்டது!" : "New API key successfully generated!");
-                loadUserProfile();
-                return;
-            }
-        }
-    } catch (err) {
-        console.warn("Regenerate key fallback:", err);
-    }
-    activeApiKeyRaw = `ry_live_${Math.random().toString(36).substring(2, 10)}${Date.now().toString(36)}`;
-    const input = document.getElementById('prof-api-key-input');
-    if (input) input.value = activeApiKeyRaw;
-    alert(currentLang === 'ta' ? "புதிய ஏபிஐ விசை உருவாக்கப்பட்டது!" : "New API key generated!");
-}
-
-async function handleExternalKeysSave(e) {
-    e.preventDefault();
-    const token = getAuthToken();
-    const btn = document.getElementById('btn-save-ext-keys');
-    const statusEl = document.getElementById('ext-keys-save-status');
-
-    const keys = {
-        open_meteo: document.getElementById('ext-key-openmeteo').value.trim(),
-        sentinel: document.getElementById('ext-key-sentinel').value.trim()
-    };
-
-    btn.disabled = true;
-    btn.innerHTML = '<span>⏳</span> ' + (currentLang === 'ta' ? 'சேமிக்கப்படுகிறது...' : 'Saving Keys...');
-
-    try {
-        if (token) {
-            const res = await fetch(`${API_BASE}/api/profile/external-api-keys`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(keys)
-            });
-            if (res.ok) {
-                if (statusEl) {
-                    statusEl.textContent = currentLang === 'ta' ? '✓ ஏபிஐ விசைகள் சேமிக்கப்பட்டன!' : '✓ External API keys stored in database!';
-                    statusEl.className = 'save-status-msg success';
-                }
-                return;
-            }
-        }
-        if (statusEl) {
-            statusEl.textContent = currentLang === 'ta' ? '✓ விசைகள் சேமிக்கப்பட்டன!' : '✓ Keys saved successfully!';
-            statusEl.className = 'save-status-msg success';
-        }
-    } catch (err) {
-        if (statusEl) {
-            statusEl.textContent = currentLang === 'ta' ? '✓ விசைகள் சேமிக்கப்பட்டன!' : '✓ Keys saved!';
-            statusEl.className = 'save-status-msg success';
-        }
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span>🔐</span> ' + (currentLang === 'ta' ? 'விசைகளைத் தரவுத்தளத்தில் சேமிக்கவும்' : 'Save Integration Keys to Database');
+        btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> <span>${currentLang === 'ta' ? 'மாற்றங்களைச் சேமிக்கவும்' : 'Save Profile Changes'}</span>`;
     }
 }
