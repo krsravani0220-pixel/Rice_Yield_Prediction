@@ -77,6 +77,25 @@
                     <span class="status-indicator"></span>
                     <span class="status-text">System Status: <strong>Operational</strong></span>
                 </div>
+                <!-- Neon Cloud Auth Action Buttons / User Badge -->
+                <div id="auth-header-container" class="auth-header-container">
+                    <button id="btn-open-signin" class="btn-auth-signin" onclick="openAuthModal('signin')">
+                        <span class="auth-btn-icon">🔑</span>
+                        <span data-en="Sign In" data-ta="உள்நுழைக">Sign In</span>
+                    </button>
+                    <button id="btn-open-signup" class="btn-auth-signup" onclick="openAuthModal('signup')">
+                        <span class="auth-btn-icon">✨</span>
+                        <span data-en="Sign Up / Register" data-ta="பதிவு செய்க">Sign Up / Register</span>
+                    </button>
+                    <div id="user-profile-badge" class="user-profile-badge hidden">
+                        <div class="user-avatar">🌾</div>
+                        <div class="user-info">
+                            <span id="user-display-name" class="user-name">Farmer</span>
+                            <span id="user-display-district" class="user-sub">Thanjavur</span>
+                        </div>
+                        <button class="btn-signout" onclick="handleSignOut()" title="Sign Out">🚪</button>
+                    </div>
+                </div>
             </header>
 
             <!-- Validation Message Banner -->
@@ -107,6 +126,58 @@
                                     <span data-en="Explore Future Forecasts" data-ta="எதிர்கால முன்கணிப்பை அறிக">Explore Future Forecasts</span>
                                 </button>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Farmer Portal & Neon Cloud Persistence Banner -->
+                    <div id="dashboard-auth-card" class="dashboard-auth-card">
+                        <div class="auth-card-content">
+                            <span class="auth-card-badge">☁️ NEON CLOUD PERSISTENCE</span>
+                            <h2 data-en="Farmer Portal & Yield Prediction History" data-ta="விவசாயி போர்ட்டல் & மகசூல் வரலாறு">Farmer Portal & Yield Prediction History</h2>
+                            <p data-en="Sign in or register to securely save your seasonal yield predictions, compare historical analytics, and sync farm recommendations to Neon Cloud." data-ta="உங்கள் பருவ கால மகசூல் கணிப்புகளை பாதுகாப்பாக சேமிக்கவும் மற்றும் நியான் கிளவுடில் கண்காணிக்கவும் உள்நுழையவும் அல்லது பதிவு செய்யவும்.">
+                                Sign in or register to securely save your seasonal yield predictions, compare historical analytics, and sync farm recommendations to Neon Cloud.
+                            </p>
+                            <div class="auth-card-actions">
+                                <button class="btn-primary" onclick="openAuthModal('signin')">
+                                    <span>🔑</span>
+                                    <span data-en="Sign In" data-ta="உள்நுழைக">Sign In</span>
+                                </button>
+                                <button class="btn-secondary-light" onclick="openAuthModal('signup')">
+                                    <span>✨</span>
+                                    <span data-en="Sign Up / Register" data-ta="புதிய கணக்கு பதிவு">Sign Up / Register</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prediction History Table (Logged In Users) -->
+                    <div id="dashboard-history-card" class="dashboard-history-card hidden">
+                        <div class="history-card-header">
+                            <h3>
+                                <span>🌾</span>
+                                <span data-en="My Saved Yield Predictions" data-ta="என் சேமிக்கப்பட்ட மகசூல் கணிப்புகள்">My Saved Yield Predictions</span>
+                            </h3>
+                            <span class="history-badge-cloud">☁️ Synced to Neon Cloud</span>
+                        </div>
+                        <div class="history-table-wrapper">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th data-en="Date & Time" data-ta="தேதி">Date & Time</th>
+                                        <th data-en="District" data-ta="மாவட்டம்">District</th>
+                                        <th data-en="Year / Season" data-ta="ஆண்டு">Year</th>
+                                        <th data-en="Prediction Type" data-ta="முறை">Type</th>
+                                        <th data-en="Predicted Yield" data-ta="கணிக்கப்பட்ட மகசூல்">Predicted Yield</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-table-body">
+                                    <tr>
+                                        <td colspan="5" style="text-align:center; color: var(--text-muted); padding: 20px;">
+                                            No predictions saved yet. Run a prediction to store your first record in Neon Cloud!
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -948,6 +1019,89 @@
                 </div>
 
             </main>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         Glassmorphic Neon Cloud Authentication Modal
+         ========================================================================== -->
+    <div id="auth-modal" class="auth-modal-backdrop hidden" onclick="handleAuthBackdropClick(event)">
+        <div class="auth-modal-card" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeAuthModal()" title="Close">✕</button>
+            <div class="auth-modal-header">
+                <div class="auth-modal-logo">🌾</div>
+                <h3 id="auth-modal-title" class="auth-modal-title" data-en="Farmer Portal Access" data-ta="விவசாயி போர்ட்டல் அணுகல்">Farmer Portal Access</h3>
+                <p class="auth-modal-subtitle" data-en="Secure cloud storage powered by Neon Cloud PostgreSQL" data-ta="நியான் கிளவுட் போஸ்ட்கிரெஸ்கியூஎல் மூலம் பாதுகாப்பான தரவு சேமிப்பு">Secure cloud storage powered by Neon Cloud PostgreSQL</p>
+            </div>
+            
+            <div class="auth-tabs-nav">
+                <button id="tab-signin-btn" class="auth-tab-btn active" onclick="switchAuthTab('signin')">
+                    <span data-en="Sign In" data-ta="உள்நுழைக">Sign In</span>
+                </button>
+                <button id="tab-signup-btn" class="auth-tab-btn" onclick="switchAuthTab('signup')">
+                    <span data-en="Sign Up / Register" data-ta="புதிய பதிவு">Sign Up / Register</span>
+                </button>
+            </div>
+
+            <div class="auth-modal-body">
+                <div id="auth-modal-alert" class="auth-alert hidden"></div>
+
+                <!-- Sign In Form -->
+                <form id="form-signin" onsubmit="handleSignInSubmit(event)">
+                    <div class="auth-form-group">
+                        <label data-en="Email Address *" data-ta="மின்னஞ்சல் முகவரி *">Email Address *</label>
+                        <input type="email" id="signin-email" required placeholder="farmer@example.com">
+                    </div>
+                    <div class="auth-form-group">
+                        <label data-en="Password *" data-ta="கடவுச்சொல் *">Password *</label>
+                        <input type="password" id="signin-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" id="btn-signin-submit" class="btn-auth-submit">
+                        <span data-en="Sign In to Neon Cloud" data-ta="உள்நுழைக">Sign In to Neon Cloud</span>
+                    </button>
+                    <p style="text-align: center; margin-top: 14px; font-size: 0.85rem; color: var(--text-muted);">
+                        <span data-en="Don't have an account?" data-ta="கணக்கு இல்லையா?">Don't have an account?</span>
+                        <a href="javascript:void(0)" onclick="switchAuthTab('signup')" style="color: var(--primary-leaf); font-weight: 700; text-decoration: none;"> Sign Up</a>
+                    </p>
+                </form>
+
+                <!-- Sign Up Form -->
+                <form id="form-signup" class="hidden" onsubmit="handleSignUpSubmit(event)">
+                    <div class="auth-form-group">
+                        <label data-en="Full Name *" data-ta="முழுப் பெயர் *">Full Name *</label>
+                        <input type="text" id="signup-name" required placeholder="e.g. K. Ramasamy">
+                    </div>
+                    <div class="auth-form-group">
+                        <label data-en="Email Address *" data-ta="மின்னஞ்சல் முகவரி *">Email Address *</label>
+                        <input type="email" id="signup-email" required placeholder="farmer@example.com">
+                    </div>
+                    <div class="auth-form-group">
+                        <label data-en="Primary Farming District *" data-ta="முதன்மை விவசாய மாவட்டம் *">Primary Farming District *</label>
+                        <select id="signup-district" required>
+                            <option value="Thanjavur" selected>Thanjavur</option>
+                        </select>
+                    </div>
+                    <div class="auth-form-group">
+                        <label data-en="User Role" data-ta="பயனர் வகை">User Role</label>
+                        <select id="signup-role">
+                            <option value="Farmer" selected>Farmer (விவசாயி)</option>
+                            <option value="Agricultural Officer">Agricultural Extension Officer (வேளாண்மை அலுவலர்)</option>
+                            <option value="Researcher">Agronomy Researcher (ஆராய்ச்சியாளர்)</option>
+                        </select>
+                    </div>
+                    <div class="auth-form-group">
+                        <label data-en="Password (Min 6 chars) *" data-ta="கடவுச்சொல் (குறைந்தது 6 எழுத்துக்கள்) *">Password *</label>
+                        <input type="password" id="signup-password" minlength="6" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" id="btn-signup-submit" class="btn-auth-submit">
+                        <span data-en="Create Account in Neon Cloud" data-ta="கணக்கை உருவாக்கு">Create Account in Neon Cloud</span>
+                    </button>
+                    <p style="text-align: center; margin-top: 14px; font-size: 0.85rem; color: var(--text-muted);">
+                        <span data-en="Already registered?" data-ta="ஏற்கனவே பதிவு செய்துள்ளீர்களா?">Already registered?</span>
+                        <a href="javascript:void(0)" onclick="switchAuthTab('signin')" style="color: var(--primary-leaf); font-weight: 700; text-decoration: none;"> Sign In</a>
+                    </p>
+                </form>
+            </div>
         </div>
     </div>
 

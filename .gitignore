@@ -17,6 +17,7 @@ venv/
 # Logs and temporary files
 *.log
 .pytest_cache/
+*.db
 
 # Large raw satellite files
 *.SAFE/

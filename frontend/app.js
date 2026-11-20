@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     populateYearSelectors();
     initDateControls();
     await fetchDistrictsAndSoils();
+    await initAuthSession();
     if (window.location.hash) {
         const target = window.location.hash.replace('#', '');
         switchTab(target);
@@ -198,8 +199,23 @@ function setLanguage(lang) {
     }
 }
 
-// Navigation Tab Switcher (Strict View Isolation)
+// Navigation Tab Switcher (Strict View Isolation & Auth Guard)
+let pendingRedirectTab = null;
+
 function switchTab(tabId) {
+    // Auth Guard: Require sign in to explore any feature outside Dashboard
+    if (tabId !== 'dashboard' && !getAuthToken()) {
+        pendingRedirectTab = tabId;
+        openAuthModal('signin');
+        showAuthAlert(
+            currentLang === 'ta'
+                ? "இந்த அம்சத்தைப் பயன்படுத்த தயவுசெய்து உள்நுழையவும் அல்லது பதிவு செய்யவும்."
+                : "Please sign in or register to explore and use this feature.",
+            "error"
+        );
+        return;
+    }
+
     const sidebar = document.getElementById('app-sidebar');
     const overlay = document.getElementById('sidebar-overlay');
     if (sidebar.classList.contains('open')) {
@@ -272,9 +288,17 @@ async function fetchDistrictsAndSoils() {
         soilSelect.innerHTML = '<option value="" disabled selected>-- Select Soil Type --</option>';
 
         // Manual Prediction & Forecast dropdowns: ALL 30 districts (UNCHANGED)
+        const signupDistSelect = document.getElementById('signup-district');
+        if (signupDistSelect) signupDistSelect.innerHTML = '';
+
         data.districts.forEach(d => {
             distSelect.add(new Option(d, d));
             fcDistSelect.add(new Option(d, d));
+            if (signupDistSelect) {
+                const opt = new Option(d, d);
+                if (d === 'Thanjavur') opt.selected = true;
+                signupDistSelect.add(opt);
+            }
         });
 
         // Satellite Prediction dropdown: EXACTLY the 5 pilot districts
@@ -598,6 +622,17 @@ async function handleManualSubmit(e) {
         lastManualResult = result;
         renderManualPredictionResults(result);
 
+        // Auto-save to Neon Cloud if farmer is signed in
+        savePredictionToNeonIfLoggedIn({
+            district: district,
+            year: parseInt(yearVal) || 2024,
+            prediction_type: 'manual',
+            predicted_yield: result.predicted_yield,
+            unit: result.unit || 'tonnes/ha',
+            input_summary: payload,
+            shap_insights: result.shap_explanation
+        });
+
         document.getElementById('manual-empty-state').classList.add('hidden');
         document.getElementById('manual-yield-output-section').classList.remove('hidden');
     } catch (err) {
@@ -644,6 +679,17 @@ async function handleForecastSubmit(e) {
         const result = await res.json();
         lastForecastResult = result;
         renderForecastPredictionResults(result);
+
+        // Auto-save forecast prediction to Neon Cloud if farmer is signed in
+        savePredictionToNeonIfLoggedIn({
+            district: district,
+            year: parseInt(target_year) || 2026,
+            prediction_type: `forecast (${method})`,
+            predicted_yield: result.predicted_yield,
+            unit: result.unit || 'tonnes/ha',
+            input_summary: result.forecasted_features,
+            shap_insights: result.shap_explanation
+        });
 
         document.getElementById('forecast-empty-state').classList.add('hidden');
         document.getElementById('forecast-yield-output-section').classList.remove('hidden');
@@ -1378,4 +1424,310 @@ function playLiveTamilVoice() {
     if (taVoice) utterance.voice = taVoice;
 
     window.speechSynthesis.speak(utterance);
+}
+
+// ==========================================================================
+// Neon Cloud Authentication & Farmer Session Management
+// ==========================================================================
+
+let currentUser = null;
+let currentAuthToken = null;
+
+function getAuthToken() {
+    return localStorage.getItem('riceyield_auth_token') || null;
+}
+
+function setAuthSession(token, user) {
+    currentAuthToken = token;
+    currentUser = user;
+    localStorage.setItem('riceyield_auth_token', token);
+    localStorage.setItem('riceyield_user_profile', JSON.stringify(user));
+    updateAuthUI();
+}
+
+function clearAuthSession() {
+    currentAuthToken = null;
+    currentUser = null;
+    localStorage.removeItem('riceyield_auth_token');
+    localStorage.removeItem('riceyield_user_profile');
+    updateAuthUI();
+}
+
+async function initAuthSession() {
+    const token = getAuthToken();
+    if (!token) {
+        updateAuthUI();
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            currentUser = data.user;
+            currentAuthToken = token;
+            updateAuthUI();
+            loadUserPredictionHistory();
+        } else {
+            clearAuthSession();
+        }
+    } catch (err) {
+        console.warn("Could not verify session with backend:", err);
+        const storedUser = localStorage.getItem('riceyield_user_profile');
+        if (storedUser) {
+            currentUser = JSON.parse(storedUser);
+            currentAuthToken = token;
+            updateAuthUI();
+        }
+    }
+}
+
+function updateAuthUI() {
+    const btnSignin = document.getElementById('btn-open-signin');
+    const btnSignup = document.getElementById('btn-open-signup');
+    const badge = document.getElementById('user-profile-badge');
+    const displayName = document.getElementById('user-display-name');
+    const displayDistrict = document.getElementById('user-display-district');
+    const authCard = document.getElementById('dashboard-auth-card');
+    const historyCard = document.getElementById('dashboard-history-card');
+
+    if (currentUser && currentAuthToken) {
+        if (btnSignin) btnSignin.classList.add('hidden');
+        if (btnSignup) btnSignup.classList.add('hidden');
+        if (badge) {
+            badge.classList.remove('hidden');
+            if (displayName) displayName.textContent = currentUser.full_name || 'Farmer';
+            if (displayDistrict) displayDistrict.textContent = `${currentUser.district || 'Thanjavur'} (${currentUser.role || 'Farmer'})`;
+        }
+        if (authCard) {
+            authCard.innerHTML = `
+                <div class="auth-card-content">
+                    <span class="auth-card-badge">☁️ NEON CLOUD CONNECTED</span>
+                    <h2>${currentLang === 'ta' ? `வரவேற்கிறோம், ${currentUser.full_name}!` : `Welcome back, ${currentUser.full_name}!`}</h2>
+                    <p>${currentLang === 'ta' 
+                        ? `உங்கள் கணக்கு நியான் கிளவுட் போஸ்ட்கிரெஸ்கியூஎல் தரவுத்தளத்துடன் இணைக்கப்பட்டுள்ளது. உங்கள் மகசூல் கணிப்புகள் தானாகவே கிளவுடில் சேமிக்கப்படும்.` 
+                        : `Your farmer profile is synced with Neon Cloud PostgreSQL. All predictions you run are securely logged to your personal farm analytics history.`}</p>
+                    <div class="auth-card-actions">
+                        <button class="btn-primary" onclick="switchTab('manual')">
+                            <span>🌾</span>
+                            <span>${currentLang === 'ta' ? 'புதிய கணிப்பு செய்ய' : 'Run New Prediction'}</span>
+                        </button>
+                        <button class="btn-secondary-light" onclick="loadUserPredictionHistory()">
+                            <span>🔄</span>
+                            <span>${currentLang === 'ta' ? 'வரலாற்றைப் புதுப்பி' : 'Refresh Cloud History'}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        if (historyCard) {
+            historyCard.classList.remove('hidden');
+        }
+    } else {
+        if (btnSignin) btnSignin.classList.remove('hidden');
+        if (btnSignup) btnSignup.classList.remove('hidden');
+        if (badge) badge.classList.add('hidden');
+        if (historyCard) historyCard.classList.add('hidden');
+    }
+}
+
+function openAuthModal(tab = 'signin') {
+    const modal = document.getElementById('auth-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    switchAuthTab(tab);
+    clearAuthAlert();
+}
+
+function closeAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function handleAuthBackdropClick(event) {
+    if (event.target.id === 'auth-modal') {
+        closeAuthModal();
+    }
+}
+
+function switchAuthTab(tab) {
+    const tabSignin = document.getElementById('tab-signin-btn');
+    const tabSignup = document.getElementById('tab-signup-btn');
+    const formSignin = document.getElementById('form-signin');
+    const formSignup = document.getElementById('form-signup');
+    const title = document.getElementById('auth-modal-title');
+
+    clearAuthAlert();
+
+    if (tab === 'signin') {
+        if (tabSignin) tabSignin.classList.add('active');
+        if (tabSignup) tabSignup.classList.remove('active');
+        if (formSignin) formSignin.classList.remove('hidden');
+        if (formSignup) formSignup.classList.add('hidden');
+        if (title) title.textContent = currentLang === 'ta' ? 'விவசாயி போர்ட்டல் - உள்நுழைக' : 'Farmer Portal - Sign In';
+    } else {
+        if (tabSignin) tabSignin.classList.remove('active');
+        if (tabSignup) tabSignup.classList.add('active');
+        if (formSignin) formSignin.classList.add('hidden');
+        if (formSignup) formSignup.classList.remove('hidden');
+        if (title) title.textContent = currentLang === 'ta' ? 'விவசாயி போர்ட்டல் - புதிய பதிவு' : 'Farmer Portal - Sign Up / Register';
+    }
+}
+
+function showAuthAlert(msg, type = 'error') {
+    const alert = document.getElementById('auth-modal-alert');
+    if (!alert) return;
+    alert.textContent = msg;
+    alert.className = `auth-alert ${type}`;
+    alert.classList.remove('hidden');
+}
+
+function clearAuthAlert() {
+    const alert = document.getElementById('auth-modal-alert');
+    if (alert) alert.classList.add('hidden');
+}
+
+async function handleSignInSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById('signin-email').value.trim();
+    const password = document.getElementById('signin-password').value;
+    const btn = document.getElementById('btn-signin-submit');
+
+    btn.disabled = true;
+    btn.textContent = currentLang === 'ta' ? 'உள்நுழைகிறது...' : 'Signing In...';
+
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.detail || "Authentication failed");
+        }
+        setAuthSession(data.token, data.user);
+        showAuthAlert(currentLang === 'ta' ? "வெற்றிகரமாக உள்நுழைந்தது!" : "Signed in successfully!", "success");
+        setTimeout(() => {
+            closeAuthModal();
+            loadUserPredictionHistory();
+            if (pendingRedirectTab) {
+                const target = pendingRedirectTab;
+                pendingRedirectTab = null;
+                switchTab(target);
+            }
+        }, 600);
+    } catch (err) {
+        showAuthAlert(err.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = currentLang === 'ta' ? 'உள்நுழைக' : 'Sign In to Neon Cloud';
+    }
+}
+
+async function handleSignUpSubmit(e) {
+    e.preventDefault();
+    const full_name = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const district = document.getElementById('signup-district').value;
+    const role = document.getElementById('signup-role').value;
+    const password = document.getElementById('signup-password').value;
+    const btn = document.getElementById('btn-signup-submit');
+
+    btn.disabled = true;
+    btn.textContent = currentLang === 'ta' ? 'பதிவாகிறது...' : 'Creating Account...';
+
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ full_name, email, district, role, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.detail || "Registration failed");
+        }
+        setAuthSession(data.token, data.user);
+        showAuthAlert(currentLang === 'ta' ? "கணக்கு உருவாக்கப்பட்டது!" : "Account created in Neon Cloud!", "success");
+        setTimeout(() => {
+            closeAuthModal();
+            loadUserPredictionHistory();
+            if (pendingRedirectTab) {
+                const target = pendingRedirectTab;
+                pendingRedirectTab = null;
+                switchTab(target);
+            }
+        }, 600);
+    } catch (err) {
+        showAuthAlert(err.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = currentLang === 'ta' ? 'கணக்கை உருவாக்கு' : 'Create Account in Neon Cloud';
+    }
+}
+
+function handleSignOut() {
+    clearAuthSession();
+    window.location.reload();
+}
+
+async function savePredictionToNeonIfLoggedIn(record) {
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/save-prediction`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(record)
+        });
+        if (res.ok) {
+            loadUserPredictionHistory();
+        }
+    } catch (err) {
+        console.warn("Could not auto-save prediction to Neon:", err);
+    }
+}
+
+async function loadUserPredictionHistory() {
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/history?limit=10`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const tbody = document.getElementById('history-table-body');
+        if (!tbody) return;
+
+        if (!data.history || data.history.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 20px;">No predictions stored yet in Neon Cloud. Run a prediction to see your history!</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = data.history.map(item => {
+            const dt = new Date(item.created_at).toLocaleString();
+            const yVal = parseFloat(item.predicted_yield);
+            const pillClass = yVal >= 3.5 ? 'yield-pill-high' : 'yield-pill-mod';
+            return `
+                <tr>
+                    <td><strong>${dt}</strong></td>
+                    <td>${item.district}</td>
+                    <td>${item.year}</td>
+                    <td><span style="text-transform: capitalize; font-weight: 600;">${item.prediction_type}</span></td>
+                    <td><span class="${pillClass}">${yVal.toFixed(2)} ${item.unit || 'tonnes/ha'}</span></td>
+                </tr>
+            `;
+        }).join('');
+    } catch (err) {
+        console.warn("Could not load prediction history:", err);
+    }
 }

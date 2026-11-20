@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 import numpy as np
 from typing import Dict, Any, Optional, List
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -16,6 +16,7 @@ load_dotenv(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.env'
 
 from src.inference import RiceYieldInferenceSystem
 from src.satellite.satellite_workflow import SatelliteWorkflowManager
+from backend.app.neon_db import db_manager
 
 app = FastAPI(
     title="Tamil Nadu Rice Yield Decision Support System API",
@@ -92,6 +93,128 @@ class LivePredictRequest(BaseModel):
     district: str = Field(..., example="Thanjavur")
     reference_date: Optional[str] = Field(None, example="2026-11-13")
     force_refresh: Optional[bool] = Field(False, example=False)
+
+class RegisterRequest(BaseModel):
+    full_name: str = Field(..., example="K. Ramasamy")
+    email: str = Field(..., example="ramasamy@example.com")
+    password: str = Field(..., example="SecurePassword123")
+    district: str = Field("Thanjavur", example="Thanjavur")
+    role: str = Field("Farmer", example="Farmer")
+    phone: Optional[str] = Field(None, example="9876543210")
+
+class LoginRequest(BaseModel):
+    email: str = Field(..., example="ramasamy@example.com")
+    password: str = Field(..., example="SecurePassword123")
+
+class SavePredictionRequest(BaseModel):
+    district: str = Field(..., example="Thanjavur")
+    year: int = Field(..., example=2024)
+    prediction_type: str = Field("manual", example="manual")
+    predicted_yield: float = Field(..., example=3.74)
+    unit: str = Field("tonnes/ha", example="tonnes/ha")
+    input_summary: Optional[Dict[str, Any]] = None
+    shap_insights: Optional[Dict[str, Any]] = None
+
+def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Authentication required. Please sign in.")
+    token = authorization.split(" ")[1]
+    payload = db_manager.verify_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Session expired or invalid token. Please sign in again.")
+    return payload
+
+# --- Neon Cloud Authentication & User Persistence Endpoints ---
+
+@app.post("/api/auth/register")
+def register_user(request: RegisterRequest):
+    try:
+        user = db_manager.register_user(
+            full_name=request.full_name,
+            email=request.email,
+            password=request.password,
+            district=request.district,
+            role=request.role,
+            phone=request.phone or ""
+        )
+        token = db_manager.create_token(user)
+        return {
+            "status": "success",
+            "message": "Account created successfully in Neon Cloud database.",
+            "token": token,
+            "user": user
+        }
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
+
+@app.post("/api/auth/login")
+def login_user(request: LoginRequest):
+    try:
+        user = db_manager.authenticate_user(request.email, request.password)
+        token = db_manager.create_token(user)
+        return {
+            "status": "success",
+            "message": "Signed in successfully.",
+            "token": token,
+            "user": user
+        }
+    except ValueError as ve:
+        raise HTTPException(status_code=401, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
+
+@app.get("/api/auth/me")
+def get_current_user_profile(user_payload: Dict[str, Any] = Depends(get_current_user)):
+    return {
+        "status": "authenticated",
+        "user": user_payload
+    }
+
+@app.post("/api/auth/save-prediction")
+def save_user_prediction(
+    request: SavePredictionRequest,
+    user_payload: Dict[str, Any] = Depends(get_current_user)
+):
+    try:
+        user_id = int(user_payload.get("sub", 0))
+        pred_id = db_manager.save_prediction(
+            user_id=user_id,
+            district=request.district,
+            year=request.year,
+            prediction_type=request.prediction_type,
+            predicted_yield=request.predicted_yield,
+            input_summary=request.input_summary,
+            shap_insights=request.shap_insights
+        )
+        return {
+            "status": "saved",
+            "message": "Yield prediction saved to Neon Cloud store.",
+            "prediction_id": pred_id
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save prediction: {str(e)}")
+
+@app.get("/api/auth/history")
+def get_user_prediction_history(
+    limit: int = 20,
+    user_payload: Dict[str, Any] = Depends(get_current_user)
+):
+    try:
+        user_id = int(user_payload.get("sub", 0))
+        history = db_manager.get_user_predictions(user_id=user_id, limit=limit)
+        return {
+            "status": "success",
+            "count": len(history),
+            "history": history
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch history: {str(e)}")
+
+@app.get("/api/auth/neon-status")
+def get_neon_cloud_status():
+    return db_manager.get_status()
 
 @app.get("/api/districts")
 def get_districts():
