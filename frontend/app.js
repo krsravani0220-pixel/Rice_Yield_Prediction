@@ -180,8 +180,15 @@ function toggleMobileMenu() {
 // Language Switcher
 function setLanguage(lang) {
     currentLang = lang;
-    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-    document.getElementById('lang-ta').classList.toggle('active', lang === 'ta');
+    const lEn = document.getElementById('lang-en');
+    const lTa = document.getElementById('lang-ta');
+    if (lEn) lEn.classList.toggle('active', lang === 'en');
+    if (lTa) lTa.classList.toggle('active', lang === 'ta');
+
+    const hEn = document.getElementById('header-lang-en');
+    const hTa = document.getElementById('header-lang-ta');
+    if (hEn) hEn.classList.toggle('active', lang === 'en');
+    if (hTa) hTa.classList.toggle('active', lang === 'ta');
 
     document.querySelectorAll('[data-en]').forEach(el => {
         const text = el.getAttribute(`data-${lang}`);

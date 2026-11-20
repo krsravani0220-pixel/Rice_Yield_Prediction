@@ -2199,11 +2199,84 @@ html, body {
    Neon Cloud Authentication & Farmer Profile Styling
    ========================================================================== */
 
+.top-header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: auto;
+}
+
+.header-lang-selector {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f1f5f9;
+    border: 1px solid var(--card-border);
+    padding: 3px 6px;
+    border-radius: var(--radius-full);
+}
+
+.header-lang-selector .header-lang-globe {
+    font-size: 0.95rem;
+    padding-left: 4px;
+    padding-right: 2px;
+}
+
+.header-lang-selector .lang-pill {
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.header-lang-selector .lang-pill:hover:not(.active) {
+    color: var(--text-dark);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.header-lang-selector .lang-pill.active {
+    background: var(--primary-forest);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(27, 67, 50, 0.25);
+}
+
+.header-brand-unauth {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-brand-unauth .header-brand-icon {
+    font-size: 1.85rem;
+    line-height: 1;
+}
+
+.header-brand-unauth .header-brand-text h2 {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--primary-forest);
+    line-height: 1.1;
+    margin: 0;
+}
+
+.header-brand-unauth .header-brand-text span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--gold-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
 .auth-header-container {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-left: auto;
 }
 
 .btn-auth-signin, .btn-auth-signup {
@@ -2624,13 +2697,31 @@ html, body {
    Client-Grade Public Showcase / Landing Page & Auth State Controls
    ========================================================================== */
 
-/* Two-State Visibility Controls */
+/* Two-State Visibility & Layout Controls */
 body.is-unauthenticated .auth-only {
     display: none !important;
 }
 
 body.is-authenticated .unauth-only {
     display: none !important;
+}
+
+/* Pre-Login Landing Page: Sidebar completely removed for a full-width showcase */
+body.is-unauthenticated .sidebar,
+body.is-unauthenticated #sidebar-overlay,
+body.is-unauthenticated .mobile-header {
+    display: none !important;
+}
+
+body.is-unauthenticated .main-wrapper {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Post-Login Workspace: Restore sidebar */
+body.is-authenticated .sidebar {
+    display: flex;
 }
 
 /* Sidebar Lock Badge & Promo Card */
@@ -2911,5 +3002,27 @@ body.is-authenticated .unauth-only {
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-status {
+        display: none;
+    }
+    .top-header {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .top-header-right {
+        gap: 8px;
+    }
+    .header-lang-selector .lang-pill {
+        padding: 4px 8px;
+        font-size: 0.76rem;
+    }
+    .btn-auth-signin, .btn-auth-signup {
+        padding: 6px 10px;
+        font-size: 0.8rem;
     }
 }

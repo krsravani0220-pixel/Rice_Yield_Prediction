@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="is-unauthenticated">
     <div class="app-layout">
         <!-- Mobile Header Bar -->
         <div class="mobile-header">
@@ -81,31 +81,51 @@
         <div class="main-wrapper">
             <!-- Top Navbar Header -->
             <header class="top-header">
-                <div class="header-title">
+                <!-- Brand logo for unauthenticated view (when sidebar is hidden) -->
+                <div class="header-brand-unauth unauth-only">
+                    <span class="header-brand-icon">🌾</span>
+                    <div class="header-brand-text">
+                        <h2>RiceYield AI</h2>
+                        <span>Tamil Nadu Agri DSS</span>
+                    </div>
+                </div>
+
+                <div class="header-title auth-only">
                     <h1 id="page-title">Dashboard</h1>
                     <p id="page-subtitle">Explainable Agricultural Decision Support & Forecasting</p>
                 </div>
+
                 <div class="header-status">
                     <span class="status-indicator"></span>
                     <span class="status-text">System Status: <strong>Operational</strong></span>
                 </div>
-                <!-- Neon Cloud Auth Action Buttons / User Badge -->
-                <div id="auth-header-container" class="auth-header-container">
-                    <button id="btn-open-signin" class="btn-auth-signin" onclick="openAuthModal('signin')">
-                        <span class="auth-btn-icon">🔑</span>
-                        <span data-en="Sign In" data-ta="உள்நுழைக">Sign In</span>
-                    </button>
-                    <button id="btn-open-signup" class="btn-auth-signup" onclick="openAuthModal('signup')">
-                        <span class="auth-btn-icon">✨</span>
-                        <span data-en="Sign Up / Register" data-ta="பதிவு செய்க">Sign Up / Register</span>
-                    </button>
-                    <div id="user-profile-badge" class="user-profile-badge hidden">
-                        <div class="user-avatar">🌾</div>
-                        <div class="user-info">
-                            <span id="user-display-name" class="user-name">Farmer</span>
-                            <span id="user-display-district" class="user-sub">Thanjavur</span>
+
+                <!-- Right End Controls: Language Switcher placed before Sign In / Register -->
+                <div class="top-header-right">
+                    <div class="header-lang-selector" title="Switch Language / மொழி மாற்றவும்">
+                        <span class="header-lang-globe">🌐</span>
+                        <button id="header-lang-en" class="lang-pill active" onclick="setLanguage('en')">English</button>
+                        <button id="header-lang-ta" class="lang-pill" onclick="setLanguage('ta')">தமிழ்</button>
+                    </div>
+
+                    <!-- Neon Cloud Auth Action Buttons / User Badge -->
+                    <div id="auth-header-container" class="auth-header-container">
+                        <button id="btn-open-signin" class="btn-auth-signin" onclick="openAuthModal('signin')">
+                            <span class="auth-btn-icon">🔑</span>
+                            <span data-en="Sign In" data-ta="உள்நுழைக">Sign In</span>
+                        </button>
+                        <button id="btn-open-signup" class="btn-auth-signup" onclick="openAuthModal('signup')">
+                            <span class="auth-btn-icon">✨</span>
+                            <span data-en="Sign Up / Register" data-ta="பதிவு செய்க">Sign Up / Register</span>
+                        </button>
+                        <div id="user-profile-badge" class="user-profile-badge hidden">
+                            <div class="user-avatar">🌾</div>
+                            <div class="user-info">
+                                <span id="user-display-name" class="user-name">Farmer</span>
+                                <span id="user-display-district" class="user-sub">Thanjavur</span>
+                            </div>
+                            <button class="btn-signout" onclick="handleSignOut()" title="Sign Out">🚪</button>
                         </div>
-                        <button class="btn-signout" onclick="handleSignOut()" title="Sign Out">🚪</button>
                     </div>
                 </div>
             </header>
