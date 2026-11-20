@@ -2619,3 +2619,297 @@ html, body {
     cursor: not-allowed;
     transform: none;
 }
+
+/* ==========================================================================
+   Client-Grade Public Showcase / Landing Page & Auth State Controls
+   ========================================================================== */
+
+/* Two-State Visibility Controls */
+body.is-unauthenticated .auth-only {
+    display: none !important;
+}
+
+body.is-authenticated .unauth-only {
+    display: none !important;
+}
+
+/* Sidebar Lock Badge & Promo Card */
+.sidebar-auth-promo {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin: 16px 12px;
+    color: #ffffff;
+    text-align: center;
+}
+
+.sidebar-auth-promo p {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: #e2e8f0;
+    margin-bottom: 12px;
+}
+
+.btn-sidebar-unlock {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: var(--radius-full);
+    background: var(--gold-accent);
+    color: #1b4332;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-sidebar-unlock:hover {
+    background: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* Landing Page Showcase Stats Bar */
+.showcase-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.showcase-stat-card {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 20px 16px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.showcase-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.showcase-stat-icon {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+}
+
+.showcase-stat-number {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--primary-forest);
+    line-height: 1.2;
+}
+
+.showcase-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Landing Page Section Header */
+.showcase-section-header {
+    text-align: center;
+    max-width: 650px;
+    margin: 0 auto 28px;
+}
+
+.showcase-section-tag {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--primary-leaf);
+    text-transform: uppercase;
+    background: var(--sage-light);
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.showcase-section-header h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-forest);
+    margin-bottom: 8px;
+}
+
+.showcase-section-header p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+/* Landing Page Feature Cards */
+.showcase-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 36px;
+}
+
+.showcase-feature-card {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 26px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.showcase-feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+.showcase-card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.showcase-icon-box {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+
+.showcase-card-top h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-forest);
+    margin-bottom: 6px;
+}
+
+.showcase-card-top p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.showcase-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.showcase-card-tag {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.showcase-explore-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--primary-leaf);
+    transition: color 0.2s;
+}
+
+.showcase-feature-card:hover .showcase-explore-btn {
+    color: var(--primary-forest);
+}
+
+/* Bottom Client CTA Banner */
+.showcase-cta-banner {
+    background: linear-gradient(135deg, var(--primary-forest) 0%, var(--primary-leaf) 100%);
+    border-radius: var(--radius-lg);
+    padding: 36px 40px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 24px;
+}
+
+.showcase-cta-text h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.showcase-cta-text p {
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    max-width: 560px;
+}
+
+.showcase-cta-actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* Authenticated Workspace Welcome Card */
+.auth-workspace-hero {
+    background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%);
+    border-radius: var(--radius-lg);
+    padding: 32px 36px;
+    color: #ffffff;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-workspace-hero h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.auth-workspace-hero p {
+    font-size: 0.95rem;
+    color: #d1fae5;
+    max-width: 650px;
+    margin-bottom: 20px;
+}
+
+.workspace-quick-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+    .showcase-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .showcase-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    .showcase-cta-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+}

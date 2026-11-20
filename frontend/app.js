@@ -1485,15 +1485,25 @@ async function initAuthSession() {
 }
 
 function updateAuthUI() {
+    const isAuth = !!(currentUser && currentAuthToken);
+
+    if (isAuth) {
+        document.body.classList.add('is-authenticated');
+        document.body.classList.remove('is-unauthenticated');
+    } else {
+        document.body.classList.add('is-unauthenticated');
+        document.body.classList.remove('is-authenticated');
+    }
+
     const btnSignin = document.getElementById('btn-open-signin');
     const btnSignup = document.getElementById('btn-open-signup');
     const badge = document.getElementById('user-profile-badge');
     const displayName = document.getElementById('user-display-name');
     const displayDistrict = document.getElementById('user-display-district');
-    const authCard = document.getElementById('dashboard-auth-card');
-    const historyCard = document.getElementById('dashboard-history-card');
+    const authWelcomeName = document.getElementById('auth-welcome-name');
+    const authWelcomeSub = document.getElementById('auth-welcome-sub');
 
-    if (currentUser && currentAuthToken) {
+    if (isAuth) {
         if (btnSignin) btnSignin.classList.add('hidden');
         if (btnSignup) btnSignup.classList.add('hidden');
         if (badge) {
@@ -1501,35 +1511,14 @@ function updateAuthUI() {
             if (displayName) displayName.textContent = currentUser.full_name || 'Farmer';
             if (displayDistrict) displayDistrict.textContent = `${currentUser.district || 'Thanjavur'} (${currentUser.role || 'Farmer'})`;
         }
-        if (authCard) {
-            authCard.innerHTML = `
-                <div class="auth-card-content">
-                    <span class="auth-card-badge">☁️ NEON CLOUD CONNECTED</span>
-                    <h2>${currentLang === 'ta' ? `வரவேற்கிறோம், ${currentUser.full_name}!` : `Welcome back, ${currentUser.full_name}!`}</h2>
-                    <p>${currentLang === 'ta' 
-                        ? `உங்கள் கணக்கு நியான் கிளவுட் போஸ்ட்கிரெஸ்கியூஎல் தரவுத்தளத்துடன் இணைக்கப்பட்டுள்ளது. உங்கள் மகசூல் கணிப்புகள் தானாகவே கிளவுடில் சேமிக்கப்படும்.` 
-                        : `Your farmer profile is synced with Neon Cloud PostgreSQL. All predictions you run are securely logged to your personal farm analytics history.`}</p>
-                    <div class="auth-card-actions">
-                        <button class="btn-primary" onclick="switchTab('manual')">
-                            <span>🌾</span>
-                            <span>${currentLang === 'ta' ? 'புதிய கணிப்பு செய்ய' : 'Run New Prediction'}</span>
-                        </button>
-                        <button class="btn-secondary-light" onclick="loadUserPredictionHistory()">
-                            <span>🔄</span>
-                            <span>${currentLang === 'ta' ? 'வரலாற்றைப் புதுப்பி' : 'Refresh Cloud History'}</span>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-        if (historyCard) {
-            historyCard.classList.remove('hidden');
+        if (authWelcomeName) authWelcomeName.textContent = currentUser.full_name || 'Farmer';
+        if (authWelcomeSub) {
+            authWelcomeSub.textContent = `District: ${currentUser.district || 'Thanjavur'} · Role: ${currentUser.role || 'Farmer'} · Neon Cloud PostgreSQL Connected`;
         }
     } else {
         if (btnSignin) btnSignin.classList.remove('hidden');
         if (btnSignup) btnSignup.classList.remove('hidden');
         if (badge) badge.classList.add('hidden');
-        if (historyCard) historyCard.classList.add('hidden');
     }
 }
 

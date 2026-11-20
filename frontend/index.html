@@ -31,24 +31,36 @@
             <nav class="sidebar-menu">
                 <button id="nav-dashboard" class="nav-item active" onclick="switchTab('dashboard')">
                     <span class="nav-icon">🏠</span>
-                    <span class="nav-text" data-en="Dashboard" data-ta="முகப்பு">Dashboard</span>
+                    <span class="nav-text auth-only" data-en="Dashboard" data-ta="முகப்பு">Dashboard</span>
+                    <span class="nav-text unauth-only" data-en="Project Overview" data-ta="திட்ட கண்ணோட்டம்">Project Overview</span>
                 </button>
-                <button id="nav-live" class="nav-item" onclick="switchTab('live')">
+                <button id="nav-live" class="nav-item auth-only" onclick="switchTab('live')">
                     <span class="nav-icon">🛰️</span>
                     <span class="nav-text" data-en="Live Satellite & Weather" data-ta="நேரடி செயற்கைக்கோள் & வானிலை">Live Satellite & Weather</span>
                 </button>
-                <button id="nav-manual" class="nav-item" onclick="switchTab('manual')">
+                <button id="nav-manual" class="nav-item auth-only" onclick="switchTab('manual')">
                     <span class="nav-icon">📝</span>
                     <span class="nav-text" data-en="Custom Input Prediction" data-ta="தனிப்பயன் கணக்கீடு">Custom Input Prediction</span>
                 </button>
-                <button id="nav-forecast" class="nav-item" onclick="switchTab('forecast')">
+                <button id="nav-forecast" class="nav-item auth-only" onclick="switchTab('forecast')">
                     <span class="nav-icon">🔮</span>
                     <span class="nav-text" data-en="Forecast Mode" data-ta="முன்கணிப்பு முறை">Forecast Mode</span>
                 </button>
-                <button id="nav-health" class="nav-item" onclick="switchTab('health')">
+                <button id="nav-health" class="nav-item auth-only" onclick="switchTab('health')">
                     <span class="nav-icon">🍃</span>
                     <span class="nav-text" data-en="Crop Health Advisor" data-ta="பயிர் ஆலோசகர்">Crop Health Advisor</span>
                 </button>
+                
+                <!-- Unauthenticated Sidebar Unlock Hint -->
+                <div class="sidebar-auth-promo unauth-only">
+                    <p data-en="Sign in to unlock interactive satellite tools, custom models, and Neon Cloud sync." data-ta="செயற்கைக்கோள் கருவிகள் மற்றும் கிளவுட் சேமிப்பைத் திறக்க உள்நுழையவும்.">
+                        Sign in to unlock interactive satellite tools, custom models, and Neon Cloud sync.
+                    </p>
+                    <button class="btn-sidebar-unlock" onclick="openAuthModal('signin')">
+                        <span>🔒</span>
+                        <span data-en="Unlock Tools" data-ta="கருவிகளைத் திறக்க">Unlock Tools</span>
+                    </button>
+                </div>
             </nav>
 
             <div class="sidebar-footer">
@@ -109,103 +121,202 @@
 
                 <!-- SECTION 1: DASHBOARD / HOME PAGE -->
                 <div id="panel-dashboard" class="panel active">
-                    <!-- Hero Section -->
-                    <div class="hero-banner">
-                        <div class="hero-overlay"></div>
-                        <div class="hero-content">
-                            <span class="hero-tag">🌾 AGRICULTURAL DSS FOR TAMIL NADU</span>
-                            <h1>Tamil Nadu Rice Yield<br><span class="highlight-text">Decision Support System</span></h1>
-                            <p class="hero-subtitle-text" data-en="Explainable Agricultural Decision Support & Forecasting" data-ta="விளக்கக்கூடிய விவசாய முடிவு ஆதரவு மற்றும் முன்கணிப்பு">Explainable Agricultural Decision Support & Forecasting</p>
-                            <p class="hero-desc" data-en="Use historical agricultural data, seasonal forecasting and explainable insights to support rice yield decisions." data-ta="வரலாற்று விவசாயத் தரவுகள் மற்றும் பருவகால முன்கணிப்புகளைப் பயன்படுத்தி நெல் மகசூல் முடிவுகளை மேம்படுத்துங்கள்.">Use historical agricultural data, seasonal forecasting and explainable insights to support rice yield decisions.</p>
-                            <div class="hero-actions">
-                                <button class="btn-primary" onclick="switchTab('live')">
-                                    <span data-en="Live Satellite & Weather Prediction" data-ta="நேரடி செயற்கைக்கோள் & வானிலை கணிப்பு">Live Satellite & Weather Prediction</span>
-                                    <span class="btn-arrow">→</span>
-                                </button>
-                                <button class="btn-secondary-light" onclick="switchTab('forecast')">
-                                    <span data-en="Explore Future Forecasts" data-ta="எதிர்கால முன்கணிப்பை அறிக">Explore Future Forecasts</span>
-                                </button>
+
+                    <!-- ========================================================
+                         STATE 1: PUBLIC SHOWCASE LANDING PAGE (BEFORE LOGIN)
+                         ======================================================== -->
+                    <div id="dashboard-unauth-view" class="unauth-only">
+                        <!-- Hero Section -->
+                        <div class="hero-banner">
+                            <div class="hero-overlay"></div>
+                            <div class="hero-content">
+                                <span class="hero-tag">🌾 AGRICULTURAL DECISION SUPPORT SYSTEM · TAMIL NADU</span>
+                                <h1>Tamil Nadu Rice Yield<br><span class="highlight-text">Decision Support System</span></h1>
+                                <p class="hero-subtitle-text" data-en="Next-Generation Crop Analytics, Satellite Remote Sensing & Climate Foresight" data-ta="அடுத்த தலைமுறை பயிர் பகுப்பாய்வு, செயற்கைக்கோள் உணர்திறன் மற்றும் காலநிலை முன்னறிவிப்பு">Next-Generation Crop Analytics, Satellite Remote Sensing & Climate Foresight</p>
+                                <p class="hero-desc" data-en="An advanced agro-climatic intelligence platform engineered for 30 Tamil Nadu districts. Fusing Copernicus Sentinel-2 multispectral imagery, ECMWF ERA5-Land reanalysis, and explainable machine learning models (Extra Trees & SHAP) to empower farmers, extension officers, and agronomists with precision yield predictions, risk alerts, and seasonal foresight." data-ta="30 தமிழக மாவட்டங்களுக்காக வடிவமைக்கப்பட்ட மேம்பட்ட விவசாய-காலநிலை தளமாகும். கோப்பர்நிகஸ் சென்டினல்-2 செயற்கைக்கோள் தரவு, ஈசிஎம்டபிள்யூஎஃப் வானிலை பகுப்பாய்வு மற்றும் விளக்கக்கூடிய இயந்திர கற்றல் மாதிரிகளைப் பயன்படுத்தி துல்லியமான நெல் மகசூல் கணிப்பு மற்றும் இடர் எச்சரிக்கைகளை வழங்குகிறது.">
+                                    An advanced agro-climatic intelligence platform engineered for 30 Tamil Nadu districts. Fusing Copernicus Sentinel-2 multispectral imagery, ECMWF ERA5-Land reanalysis, and explainable machine learning models (Extra Trees & SHAP) to empower farmers, extension officers, and agronomists with precision yield predictions, risk alerts, and seasonal foresight.
+                                </p>
+                                <div class="hero-actions">
+                                    <button class="btn-primary" onclick="openAuthModal('signin')">
+                                        <span data-en="🌾 Sign In to Explore Platform" data-ta="🌾 தளத்தை ஆராய உள்நுழைக">🌾 Sign In to Explore Platform</span>
+                                        <span class="btn-arrow">→</span>
+                                    </button>
+                                    <button class="btn-secondary-light" onclick="openAuthModal('signup')">
+                                        <span data-en="✨ Create Free Farmer Account" data-ta="✨ புதிய விவசாயி கணக்கை உருவாக்க">✨ Create Free Farmer Account</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Farmer Portal & Neon Cloud Persistence Banner -->
-                    <div id="dashboard-auth-card" class="dashboard-auth-card">
-                        <div class="auth-card-content">
-                            <span class="auth-card-badge">☁️ NEON CLOUD PERSISTENCE</span>
-                            <h2 data-en="Farmer Portal & Yield Prediction History" data-ta="விவசாயி போர்ட்டல் & மகசூல் வரலாறு">Farmer Portal & Yield Prediction History</h2>
-                            <p data-en="Sign in or register to securely save your seasonal yield predictions, compare historical analytics, and sync farm recommendations to Neon Cloud." data-ta="உங்கள் பருவ கால மகசூல் கணிப்புகளை பாதுகாப்பாக சேமிக்கவும் மற்றும் நியான் கிளவுடில் கண்காணிக்கவும் உள்நுழையவும் அல்லது பதிவு செய்யவும்.">
-                                Sign in or register to securely save your seasonal yield predictions, compare historical analytics, and sync farm recommendations to Neon Cloud.
-                            </p>
-                            <div class="auth-card-actions">
+                        <!-- System Highlights Stats Bar -->
+                        <div class="showcase-stats-grid">
+                            <div class="showcase-stat-card">
+                                <div class="showcase-stat-icon">🏛️</div>
+                                <div class="showcase-stat-number">30 Districts</div>
+                                <div class="showcase-stat-label" data-en="Agro-Climatic Zones" data-ta="விவசாய மண்டலங்கள்">Agro-Climatic Zones</div>
+                            </div>
+                            <div class="showcase-stat-card">
+                                <div class="showcase-stat-icon">📈</div>
+                                <div class="showcase-stat-number">27 Years Data</div>
+                                <div class="showcase-stat-label" data-en="1997–2023 Historical Records" data-ta="வரலாற்று பதிவுகள்">Historical Trajectory</div>
+                            </div>
+                            <div class="showcase-stat-card">
+                                <div class="showcase-stat-icon">🛰️</div>
+                                <div class="showcase-stat-number">Sentinel-2 L2A</div>
+                                <div class="showcase-stat-label" data-en="Canopy Vigor Indices" data-ta="பயிர் பசுமை குறியீடு">Multispectral Imagery</div>
+                            </div>
+                            <div class="showcase-stat-card">
+                                <div class="showcase-stat-icon">☁️</div>
+                                <div class="showcase-stat-number">Neon Cloud</div>
+                                <div class="showcase-stat-label" data-en="Serverless PostgreSQL" data-ta="பாதுகாப்பான கிளவுட்">Encrypted Persistence</div>
+                            </div>
+                        </div>
+
+                        <!-- Section Header -->
+                        <div class="showcase-section-header">
+                            <span class="showcase-section-tag" data-en="Core Capabilities" data-ta="முதன்மை திறன்கள்">Core Capabilities</span>
+                            <h2 data-en="Precision Agronomic Intelligence at Scale" data-ta="துல்லியமான விவசாய பகுப்பாய்வு திறன்கள்">Precision Agronomic Intelligence at Scale</h2>
+                            <p data-en="Sign in to access real-time satellite telemetry, tailored district simulations, seasonal forecasts, and automated crop disease diagnosis." data-ta="நேரடி செயற்கைக்கோள் தரவு, மாவட்ட மாதிரிகள், பருவ கால முன்கணிப்பு மற்றும் நோய் கண்டறிதலை அணுக உள்நுழையவும்.">Sign in to access real-time satellite telemetry, tailored district simulations, seasonal forecasts, and automated crop disease diagnosis.</p>
+                        </div>
+
+                        <!-- 4 Showcase Feature Preview Cards -->
+                        <div class="showcase-cards-grid">
+                            <div class="showcase-feature-card" onclick="openAuthModal('signin')">
+                                <div class="showcase-card-top">
+                                    <div class="showcase-icon-box green-bg">🛰️</div>
+                                    <div>
+                                        <h3 data-en="Live Copernicus Satellite Ingestion" data-ta="நேரடி சென்டினல்-2 செயற்கைக்கோள் தரவு">Live Copernicus Satellite Ingestion</h3>
+                                        <p data-en="Queries live cloud-optimized Sentinel-2 L2A passes and ECMWF weather reanalysis across a 12-month window. Computes real-time NDVI, NDRE, EVI, and NDWI canopy vigor indices." data-ta="சென்டினல்-2 செயற்கைக்கோள் மற்றும் ஈசிஎம்டபிள்யூஎஃப் வானிலை தரவுகளை நேரடியாக ஆய்வு செய்து பயிர் பசுமை குறியீடுகளைக் கணக்கிடுகிறது.">Queries live cloud-optimized Sentinel-2 L2A passes and ECMWF weather reanalysis across a 12-month window. Computes real-time NDVI, NDRE, EVI, and NDWI canopy vigor indices.</p>
+                                    </div>
+                                </div>
+                                <div class="showcase-card-footer">
+                                    <span class="showcase-card-tag">🛰️ 5 Pilot Districts Active</span>
+                                    <span class="showcase-explore-btn" data-en="Sign In to Launch →" data-ta="துவங்க உள்நுழைக →">Sign In to Launch →</span>
+                                </div>
+                            </div>
+
+                            <div class="showcase-feature-card" onclick="openAuthModal('signin')">
+                                <div class="showcase-card-top">
+                                    <div class="showcase-icon-box sage-bg">📝</div>
+                                    <div>
+                                        <h3 data-en="Custom Parameter Yield Modeling" data-ta="தனிப்பயன் மகசூல் மாதிரி">Custom Parameter Yield Modeling</h3>
+                                        <p data-en="Simulates yield across 25 agricultural, soil, and climate parameters. Integrates SHAP TreeExplainer for full transparency into positive and limiting yield drivers." data-ta="25 விவசாய, மண் மற்றும் வானிலை காரணிகளை மதிப்பீடு செய்து சாதக மற்றும் பாதக காரணிகளை வெளிப்படையாக விளக்குகிறது.">Simulates yield across 25 agricultural, soil, and climate parameters. Integrates SHAP TreeExplainer for full transparency into positive and limiting yield drivers.</p>
+                                    </div>
+                                </div>
+                                <div class="showcase-card-footer">
+                                    <span class="showcase-card-tag">📊 Test R² = 0.66 (Extra Trees)</span>
+                                    <span class="showcase-explore-btn" data-en="Sign In to Launch →" data-ta="துவங்க உள்நுழைக →">Sign In to Launch →</span>
+                                </div>
+                            </div>
+
+                            <div class="showcase-feature-card" onclick="openAuthModal('signin')">
+                                <div class="showcase-card-top">
+                                    <div class="showcase-icon-box teal-bg">🔮</div>
+                                    <div>
+                                        <h3 data-en="Multi-Season Weather Forecasting" data-ta="பருவகால வானிலை முன்கணிப்பு">Multi-Season Weather Forecasting</h3>
+                                        <p data-en="Produces forward environmental predictions for 2026 and 2027 seasons using Holt's Linear Exponential Smoothing, 5-Year Moving Average, and trend analysis." data-ta="ஹோல்ட்ஸ் எக்ஸ்போனன்ஷியல் மற்றும் மூவிங் ஆவரேஜ் முறைகளைப் பயன்படுத்தி 2026/2027 எதிர்கால வானிலையைக் கணிக்கிறது.">Produces forward environmental predictions for 2026 and 2027 seasons using Holt's Linear Exponential Smoothing, 5-Year Moving Average, and trend analysis.</p>
+                                    </div>
+                                </div>
+                                <div class="showcase-card-footer">
+                                    <span class="showcase-card-tag">🔮 Backtested MAPE = 16.3%</span>
+                                    <span class="showcase-explore-btn" data-en="Sign In to Launch →" data-ta="துவங்க உள்நுழைக →">Sign In to Launch →</span>
+                                </div>
+                            </div>
+
+                            <div class="showcase-feature-card" onclick="openAuthModal('signin')">
+                                <div class="showcase-card-top">
+                                    <div class="showcase-icon-box sage-bg">🍃</div>
+                                    <div>
+                                        <h3 data-en="Crop Health & Pest Diagnostic Doctor" data-ta="பயிர் ஆரோக்கிய ஆலோசகர்">Crop Health & Pest Diagnostic Doctor</h3>
+                                        <p data-en="Provides rule-based agronomic guidance for leaf yellowing, browning, drought stress, and pest infestations (stem borer, BPH, blast) with Tamil audio support." data-ta="இலை மஞ்சள், பழுப்பு, வறட்சி அழுத்தம் மற்றும் பூச்சி தாக்குதல்களுக்கு தகுந்த விவசாய நடவடிக்கைகளை பரிந்துரைக்கிறது.">Provides rule-based agronomic guidance for leaf yellowing, browning, drought stress, and pest infestations (stem borer, BPH, blast) with Tamil audio support.</p>
+                                    </div>
+                                </div>
+                                <div class="showcase-card-footer">
+                                    <span class="showcase-card-tag">🔊 Bilingual Tamil Audio</span>
+                                    <span class="showcase-explore-btn" data-en="Sign In to Launch →" data-ta="துவங்க உள்நுழைக →">Sign In to Launch →</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Showcase Bottom CTA Banner -->
+                        <div class="showcase-cta-banner">
+                            <div class="showcase-cta-text">
+                                <h3 data-en="Ready to explore precision rice analytics for your farm?" data-ta="உங்கள் பண்ணைக்கான துல்லியமான நெல் பகுப்பாய்வை ஆராயத் தயாரா?">Ready to explore precision rice analytics for your farm?</h3>
+                                <p data-en="Sign in to access live Sentinel-2 satellite passes, district forecasting, and cloud-synced farm logs powered by Neon Cloud." data-ta="நேரடி செயற்கைக்கோள் தரவு, முன்கணிப்பு மற்றும் நியான் கிளவுட் சேமிப்பை அணுக உள்நுழையவும்.">Sign in to access live Sentinel-2 satellite passes, district forecasting, and cloud-synced farm logs powered by Neon Cloud.</p>
+                            </div>
+                            <div class="showcase-cta-actions">
                                 <button class="btn-primary" onclick="openAuthModal('signin')">
                                     <span>🔑</span>
                                     <span data-en="Sign In" data-ta="உள்நுழைக">Sign In</span>
                                 </button>
                                 <button class="btn-secondary-light" onclick="openAuthModal('signup')">
                                     <span>✨</span>
-                                    <span data-en="Sign Up / Register" data-ta="புதிய கணக்கு பதிவு">Sign Up / Register</span>
+                                    <span data-en="Register Free" data-ta="இலவச பதிவு">Register Free</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Prediction History Table (Logged In Users) -->
-                    <div id="dashboard-history-card" class="dashboard-history-card hidden">
-                        <div class="history-card-header">
-                            <h3>
-                                <span>🌾</span>
-                                <span data-en="My Saved Yield Predictions" data-ta="என் சேமிக்கப்பட்ட மகசூல் கணிப்புகள்">My Saved Yield Predictions</span>
-                            </h3>
-                            <span class="history-badge-cloud">☁️ Synced to Neon Cloud</span>
+                    <!-- ========================================================
+                         STATE 2: AUTHENTICATED WORKSPACE DASHBOARD (AFTER LOGIN)
+                         ======================================================== -->
+                    <div id="dashboard-auth-view" class="auth-only">
+                        <!-- Authenticated Hero Card -->
+                        <div class="auth-workspace-hero">
+                            <span class="hero-tag">🌾 ACTIVE FARMER SESSION · NEON CLOUD SYNCED</span>
+                            <h2><span data-en="Welcome back," data-ta="வரவேற்கிறோம்,">Welcome back,</span> <span id="auth-welcome-name">Farmer</span>!</h2>
+                            <p id="auth-welcome-sub">District: Thanjavur · Role: Farmer · Neon Cloud PostgreSQL Connected</p>
+                            <div class="workspace-quick-actions">
+                                <button class="btn-primary" onclick="switchTab('live')">
+                                    <span>🛰️</span>
+                                    <span data-en="Live Satellite Yield" data-ta="நேரடி செயற்கைக்கோள் மகசூல்">Live Satellite Yield</span>
+                                    <span class="btn-arrow">→</span>
+                                </button>
+                                <button class="btn-primary" onclick="switchTab('manual')">
+                                    <span>📝</span>
+                                    <span data-en="Custom Parameters" data-ta="தனிப்பயன் அளவுருக்கள்">Custom Parameters</span>
+                                    <span class="btn-arrow">→</span>
+                                </button>
+                                <button class="btn-secondary-light" onclick="switchTab('forecast')">
+                                    <span>🔮</span>
+                                    <span data-en="Forecast 2026/27" data-ta="முன்கணிப்பு 2026/27">Forecast 2026/27</span>
+                                </button>
+                                <button class="btn-secondary-light" onclick="switchTab('health')">
+                                    <span>🍃</span>
+                                    <span data-en="Crop Doctor" data-ta="பயிர் மருத்துவர்">Crop Doctor</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="history-table-wrapper">
-                            <table class="history-table">
-                                <thead>
-                                    <tr>
-                                        <th data-en="Date & Time" data-ta="தேதி">Date & Time</th>
-                                        <th data-en="District" data-ta="மாவட்டம்">District</th>
-                                        <th data-en="Year / Season" data-ta="ஆண்டு">Year</th>
-                                        <th data-en="Prediction Type" data-ta="முறை">Type</th>
-                                        <th data-en="Predicted Yield" data-ta="கணிக்கப்பட்ட மகசூல்">Predicted Yield</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="history-table-body">
-                                    <tr>
-                                        <td colspan="5" style="text-align:center; color: var(--text-muted); padding: 20px;">
-                                            No predictions saved yet. Run a prediction to store your first record in Neon Cloud!
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
 
-                    <!-- 5 Feature Cards Grid -->
-                    <div class="dashboard-features-grid">
-                        <div class="feature-card" onclick="switchTab('live')">
-                            <div class="feature-icon-wrapper green-bg">🛰️</div>
-                            <h3 data-en="Live Satellite & Weather Yield" data-ta="நேரடி செயற்கைக்கோள் & வானிலை மகசூல்">Live Satellite & Weather Yield</h3>
-                            <p data-en="Select any of 30 Tamil Nadu districts to fetch live Sentinel-2 & Open-Meteo observations and predict yield." data-ta="30 தமிழக மாவட்டங்களில் ஒன்றைத் தேர்ந்தெடுத்து நேரடி சென்டினல்-2 மற்றும் வானிலை தரவுகளுடன் மகசூலைக் கணக்கிடுங்கள்.">Select any of 30 Tamil Nadu districts to fetch live Sentinel-2 & Open-Meteo observations and predict yield.</p>
-                            <span class="card-link" data-en="Predict with Live Data →" data-ta="நேரடி தரவுடன் கணக்கிடுங்கள் →">Predict with Live Data →</span>
-                        </div>
-                        <div class="feature-card" onclick="switchTab('manual')">
-                            <div class="feature-icon-wrapper sage-bg">📝</div>
-                            <h3 data-en="Custom Input Prediction" data-ta="தனிப்பயன் கணக்கீடு">Custom Input Prediction</h3>
-                            <p data-en="Enter custom observed or tailored agricultural and weather parameters to test yield sensitivity." data-ta="மகசூல் உணர்திறனை சோதிக்க தனிப்பயன் விவசாய மற்றும் வானிலை அளவுருக்களை உள்ளிடவும்.">Enter custom observed or tailored agricultural and weather parameters to test yield sensitivity.</p>
-                            <span class="card-link" data-en="Custom Parameters →" data-ta="தனிப்பயன் அளவுருக்கள் →">Custom Parameters →</span>
-                        </div>
-                        <div class="feature-card" onclick="switchTab('forecast')">
-                            <div class="feature-icon-wrapper teal-bg">🔮</div>
-                            <h3 data-en="Forecast Mode" data-ta="முன்கணிப்பு முறை">Forecast Mode</h3>
-                            <p data-en="Forecast seasonal environmental conditions and estimate future yield trajectories." data-ta="பருவகால வானிலையைக் கணித்து எதிர்கால நெல் மகசூலை மதிப்பிடவும்.">Forecast seasonal environmental conditions and estimate future yield trajectories.</p>
-                            <span class="card-link" data-en="View Forecasts →" data-ta="முன்கணிப்புகளைக் காண்க →">View Forecasts →</span>
-                        </div>
-                        <div class="feature-card" onclick="switchTab('health')">
-                            <div class="feature-icon-wrapper sage-bg">🍃</div>
-                            <h3 data-en="Crop Health Advisor" data-ta="பயிர் ஆலோசகர்">Crop Health Advisor</h3>
-                            <p data-en="Receive rule-based crop condition and agricultural guidance." data-ta="பயிர் நிலை மற்றும் விவசாய வழிகாட்டுதலைப் பெறுங்கள்.">Receive rule-based crop condition and agricultural guidance.</p>
-                            <span class="card-link" data-en="Get Guidance →" data-ta="வழிகாட்டல் பெறுக →">Get Guidance →</span>
+                        <!-- Prediction History Table (Logged In Users) -->
+                        <div id="dashboard-history-card" class="dashboard-history-card">
+                            <div class="history-card-header">
+                                <h3>
+                                    <span>🌾</span>
+                                    <span data-en="My Saved Yield Predictions" data-ta="என் சேமிக்கப்பட்ட மகசூல் கணிப்புகள்">My Saved Yield Predictions</span>
+                                </h3>
+                                <span class="history-badge-cloud">☁️ Synced to Neon Cloud</span>
+                            </div>
+                            <div class="history-table-wrapper">
+                                <table class="history-table">
+                                    <thead>
+                                        <tr>
+                                            <th data-en="Date & Time" data-ta="தேதி">Date & Time</th>
+                                            <th data-en="District" data-ta="மாவட்டம்">District</th>
+                                            <th data-en="Year / Season" data-ta="ஆண்டு">Year</th>
+                                            <th data-en="Prediction Type" data-ta="முறை">Type</th>
+                                            <th data-en="Predicted Yield" data-ta="கணிக்கப்பட்ட மகசூல்">Predicted Yield</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="history-table-body">
+                                        <tr>
+                                            <td colspan="5" style="text-align:center; color: var(--text-muted); padding: 20px;">
+                                                No predictions saved yet. Run a prediction to store your first record in Neon Cloud!
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
