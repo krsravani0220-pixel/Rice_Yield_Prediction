@@ -57,6 +57,11 @@ html, body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* Global Utility Classes */
+.hidden {
+    display: none !important;
+}
+
 /* ==========================================================================
    Layout Structure (Sidebar + Main)
    ========================================================================== */
@@ -2637,6 +2642,13 @@ html, body {
 }
 
 .auth-alert.hidden {
+    display: none !important;
+}
+
+/* Strict Auth Forms Isolation - Only show the active tab's form */
+#form-signin.hidden,
+#form-signup.hidden,
+form.hidden {
     display: none !important;
 }
 

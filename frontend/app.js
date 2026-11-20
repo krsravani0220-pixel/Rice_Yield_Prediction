@@ -1560,14 +1560,26 @@ function switchAuthTab(tab) {
     if (tab === 'signin') {
         if (tabSignin) tabSignin.classList.add('active');
         if (tabSignup) tabSignup.classList.remove('active');
-        if (formSignin) formSignin.classList.remove('hidden');
-        if (formSignup) formSignup.classList.add('hidden');
+        if (formSignin) {
+            formSignin.classList.remove('hidden');
+            formSignin.style.display = 'block';
+        }
+        if (formSignup) {
+            formSignup.classList.add('hidden');
+            formSignup.style.display = 'none';
+        }
         if (title) title.textContent = currentLang === 'ta' ? 'விவசாயி போர்ட்டல் - உள்நுழைக' : 'Farmer Portal - Sign In';
     } else {
         if (tabSignin) tabSignin.classList.remove('active');
         if (tabSignup) tabSignup.classList.add('active');
-        if (formSignin) formSignin.classList.add('hidden');
-        if (formSignup) formSignup.classList.remove('hidden');
+        if (formSignin) {
+            formSignin.classList.add('hidden');
+            formSignin.style.display = 'none';
+        }
+        if (formSignup) {
+            formSignup.classList.remove('hidden');
+            formSignup.style.display = 'block';
+        }
         if (title) title.textContent = currentLang === 'ta' ? 'விவசாயி போர்ட்டல் - புதிய பதிவு' : 'Farmer Portal - Sign Up / Register';
     }
 }
