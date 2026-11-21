@@ -62,12 +62,24 @@ class HistoricalInsightsEngine:
                         'mean': float(vals.mean()),
                         'std': float(vals.std())
                     }
+
+    def get_district_avg_yield(self, district: str) -> float:
+        from src.satellite.district_registry import get_parent_district, normalize_district_name
+        canonical = normalize_district_name(district)
+        if canonical in self.district_avg_yield:
+            return self.district_avg_yield[canonical]
+        parent = get_parent_district(canonical)
+        return self.district_avg_yield.get(parent, 3.53)
                     
     def evaluate_feature_condition(self, district, feature_name, value):
         """
         Classifies feature input relative to historical district distribution.
         """
-        if district not in self.district_stats or feature_name not in self.district_stats[district]:
+        from src.satellite.district_registry import get_parent_district, normalize_district_name
+        canonical = normalize_district_name(district)
+        lookup_dist = district if district in self.district_stats else get_parent_district(canonical)
+
+        if lookup_dist not in self.district_stats or feature_name not in self.district_stats[lookup_dist]:
             return {
                 'status': 'Unknown',
                 'status_ta': 'தெரியவில்லை',
@@ -75,7 +87,7 @@ class HistoricalInsightsEngine:
                 'message_ta': 'இந்த மாவட்டத்திற்கான வரலாற்று புள்ளிவிவரங்கள் இல்லை.'
             }
             
-        stats = self.district_stats[district][feature_name]
+        stats = self.district_stats[lookup_dist][feature_name]
         v = float(value)
         
         if v < stats['p10']:

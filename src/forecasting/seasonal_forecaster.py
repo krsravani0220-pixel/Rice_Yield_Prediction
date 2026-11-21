@@ -27,7 +27,10 @@ class DistrictSeasonalForecaster:
         ]
 
     def _get_district_history(self, district, feature, train_max_year=2023):
-        d_df = self.df[(self.df['District'] == district) & (self.df['Year'] <= train_max_year)].sort_values('Year')
+        from src.satellite.district_registry import get_parent_district, normalize_district_name
+        canonical = normalize_district_name(district)
+        lookup_dist = canonical if canonical in self.districts else get_parent_district(canonical)
+        d_df = self.df[(self.df['District'] == lookup_dist) & (self.df['Year'] <= train_max_year)].sort_values('Year')
         clean_df = d_df[['Year', feature]].dropna()
         return clean_df
 
@@ -95,14 +98,22 @@ class DistrictSeasonalForecaster:
         if target_year is None:
             target_year = datetime.now().year
         target_year = int(target_year)
-        d_df = self.df[self.df['District'] == district]
+        
+        from src.satellite.district_registry import get_parent_district, normalize_district_name, get_district_profile
+        canonical = normalize_district_name(district)
+        lookup_dist = canonical if canonical in self.districts else get_parent_district(canonical)
+
+        d_df = self.df[self.df['District'] == lookup_dist]
         if d_df.empty:
-            raise ValueError(f"District '{district}' not found in historical dataset.")
+            raise ValueError(f"District '{district}' not found in historical dataset or parent registry.")
 
         soil_mode = d_df['Soil_Type'].mode().iloc[0] if not d_df['Soil_Type'].mode().empty else d_df['Soil_Type'].iloc[-1]
+        prof = get_district_profile(canonical)
+        if prof and 'soil_type' in prof:
+            soil_mode = prof['soil_type']
 
         base_meta = {
-            'District': str(district),
+            'District': str(canonical),
             'Year': int(target_year),
             'Soil_Type': str(soil_mode)
         }

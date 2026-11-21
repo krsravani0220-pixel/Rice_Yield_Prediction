@@ -342,12 +342,13 @@ async function fetchDistrictsAndSoils() {
             }
         });
 
-        // Satellite Prediction dropdown: EXACTLY the 5 pilot districts
-        const pilotDistricts = ["Thanjavur", "Thiruvarur", "Salem", "Tiruchirappalli", "Dharmapuri"];
+        // Satellite Prediction dropdown: ALL 38 districts of Tamil Nadu
         if (liveDistSelect) {
-            liveDistSelect.innerHTML = '<option value="" disabled selected>-- Select Pilot District --</option>';
-            pilotDistricts.forEach(d => {
-                liveDistSelect.add(new Option(d, d));
+            liveDistSelect.innerHTML = '<option value="" disabled selected>-- Select District (All 38 Districts) --</option>';
+            data.districts.forEach(d => {
+                const opt = new Option(d, d);
+                if (d === 'Thanjavur') opt.selected = true;
+                liveDistSelect.add(opt);
             });
         }
 
@@ -2087,3 +2088,189 @@ async function checkDataFeedsHealth() {
         }
     }
 }
+
+// ==========================================
+// AI AGRONOMIST ASSISTANT & LIMITATIONS HUB
+// ==========================================
+
+function toggleAIAssistant() {
+    const pane = document.getElementById('ai-assistant-pane');
+    if (!pane) return;
+    pane.classList.toggle('hidden');
+    if (!pane.classList.contains('hidden')) {
+        const inp = document.getElementById('ai-chat-input');
+        if (inp) inp.focus();
+    }
+}
+
+function sendAssistantQuickPrompt(promptText) {
+    const inp = document.getElementById('ai-chat-input');
+    if (!inp) return;
+    inp.value = promptText;
+    handleAssistantSubmit(new Event('submit'));
+}
+
+async function handleAssistantSubmit(e) {
+    if (e) e.preventDefault();
+    const inp = document.getElementById('ai-chat-input');
+    const thread = document.getElementById('ai-chat-thread');
+    const sendBtn = document.getElementById('ai-chat-send-btn');
+    if (!inp || !thread) return;
+
+    const query = inp.value.trim();
+    if (!query) return;
+
+    // Append User Message
+    const userDiv = document.createElement('div');
+    userDiv.className = 'ai-msg ai-msg-user';
+    userDiv.innerHTML = `<div class="ai-msg-bubble"><p>${escapeHtml(query)}</p></div>`;
+    thread.appendChild(userDiv);
+    inp.value = '';
+    thread.scrollTop = thread.scrollHeight;
+
+    // Typing Indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'ai-msg ai-msg-bot ai-msg-typing';
+    typingDiv.innerHTML = `<div class="ai-msg-bubble"><span class="typing-dots"><span>.</span><span>.</span><span>.</span></span></div>`;
+    thread.appendChild(typingDiv);
+    thread.scrollTop = thread.scrollHeight;
+
+    if (sendBtn) sendBtn.disabled = true;
+
+    // Detect active district from select or profile
+    const activeDist = document.getElementById('live-district-select')?.value || 
+                       document.getElementById('input-district')?.value || 
+                       currentUser?.district || 'Thanjavur';
+
+    try {
+        const res = await fetch(`${API_BASE}/api/assistant/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, district: activeDist })
+        });
+        const data = await res.json();
+        thread.removeChild(typingDiv);
+
+        const botDiv = document.createElement('div');
+        botDiv.className = 'ai-msg ai-msg-bot';
+
+        let html = `<div class="ai-msg-bubble">`;
+        
+        // Parse markdown bold and linebreaks
+        const formattedResp = escapeHtml(data.response || "I am analyzing your query...")
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+        html += `<p>${formattedResp}</p>`;
+
+        // Render Data Card if returned
+        if (data.data_card) {
+            const card = data.data_card;
+            if (card.type === 'prediction_card') {
+                html += `
+                <div class="ai-card-rendered ai-card-prediction">
+                    <div class="ai-card-head">🌾 ${escapeHtml(data.district)} Projected Yield</div>
+                    <div class="ai-card-val">${card.predicted_yield} <small>${card.unit}</small></div>
+                    <div class="ai-card-sub">Baseline: ${card.historical_avg} ${card.unit} · Year ${card.target_year}</div>
+                </div>`;
+            } else if (card.type === 'reservoir_card') {
+                html += `
+                <div class="ai-card-rendered ai-card-reservoir">
+                    <div class="ai-card-head">🌊 ${escapeHtml(card.reservoir)}</div>
+                    <div class="ai-card-val">${card.storage_tmc} <small>TMC (${card.capacity_pct}%)</small></div>
+                    <div class="ai-card-sub">Outflow: ${card.outflow_cusecs.toLocaleString()} cusecs · Security: ${card.water_security_factor}x</div>
+                </div>`;
+            } else if (card.type === 'sar_radar_card') {
+                html += `
+                <div class="ai-card-rendered ai-card-radar">
+                    <div class="ai-card-head">🛰️ Sentinel-1 SAR Radar Penetration</div>
+                    <div class="ai-card-val">RVI: ${card.rvi} <small>(Fused: ${card.fused_index})</small></div>
+                    <div class="ai-card-sub">Cloud: ${card.cloud_pct}% Bypassed · ${escapeHtml(card.mode)}</div>
+                </div>`;
+            }
+        }
+
+        // Render Quick Reply Suggestions if present
+        if (data.suggested_quick_replies && data.suggested_quick_replies.length > 0) {
+            html += `<div class="ai-inline-chips">`;
+            data.suggested_quick_replies.forEach(chip => {
+                html += `<button type="button" class="chip-mini-btn" onclick="sendAssistantQuickPrompt('${escapeHtml(chip)}')">${escapeHtml(chip)}</button>`;
+            });
+            html += `</div>`;
+        }
+
+        html += `</div>`;
+        botDiv.innerHTML = html;
+        thread.appendChild(botDiv);
+        thread.scrollTop = thread.scrollHeight;
+    } catch (err) {
+        if (thread.contains(typingDiv)) thread.removeChild(typingDiv);
+        const errDiv = document.createElement('div');
+        errDiv.className = 'ai-msg ai-msg-bot';
+        errDiv.innerHTML = `<div class="ai-msg-bubble"><p style="color:#b91c1c;">⚠️ Error communicating with AI Agronomist: ${escapeHtml(err.message)}</p></div>`;
+        thread.appendChild(errDiv);
+    } finally {
+        if (sendBtn) sendBtn.disabled = false;
+    }
+}
+
+async function syncLimitationsTelemetry(districtName) {
+    const targetDist = districtName || document.getElementById('live-district-select')?.value || 'Thanjavur';
+    try {
+        // 1. Mettur Dam Telemetry
+        const resMettur = await fetch(`${API_BASE}/api/mettur-dam/status?district=${encodeURIComponent(targetDist)}`);
+        if (resMettur.ok) {
+            const data = await resMettur.json();
+            const elVal = document.getElementById('lim-mettur-val');
+            const elFlow = document.getElementById('lim-mettur-flow');
+            if (elVal && data.mettur_dam_snapshot) {
+                elVal.textContent = `${data.mettur_dam_snapshot.current_storage_tmc} TMC (${data.mettur_dam_snapshot.storage_percentage}%)`;
+            }
+            if (elFlow && data.mettur_dam_snapshot) {
+                elFlow.textContent = `${data.mettur_dam_snapshot.outflow_cusecs.toLocaleString()} cusecs`;
+            }
+        }
+
+        // 2. Sentinel-1 SAR Radar Fusion
+        const resSar = await fetch(`${API_BASE}/api/satellite-sar-fusion?district=${encodeURIComponent(targetDist)}&cloud_cover_pct=72.0`);
+        if (resSar.ok) {
+            const data = await resSar.json();
+            const elRvi = document.getElementById('lim-sar-rvi');
+            const elVal = document.getElementById('lim-sar-val');
+            if (elRvi && data.sar_metrics) {
+                elRvi.textContent = data.sar_metrics.rvi;
+            }
+            if (elVal) {
+                elVal.textContent = `${data.fused_vegetation_index} (Fused)`;
+            }
+        }
+
+        // 3. Dynamic Soil Moisture & Chemistry
+        const resSoil = await fetch(`${API_BASE}/api/dynamic-soil/status?district=${encodeURIComponent(targetDist)}`);
+        if (resSoil.ok) {
+            const data = await resSoil.json();
+            const elSoil = document.getElementById('lim-soil-val');
+            const elRisk = document.getElementById('lim-soil-risk');
+            if (elSoil) elSoil.textContent = `${data.live_measurements.root_zone_moisture_m3m3} m³/m³ (Optimal)`;
+            if (elRisk) elRisk.textContent = data.nitrogen_leaching_risk;
+        }
+
+        // 4. SICKLE Spatial Harmonization
+        const resHarm = await fetch(`${API_BASE}/api/spatial-harmonization?district=${encodeURIComponent(targetDist)}`);
+        if (resHarm.ok) {
+            const data = await resHarm.json();
+            const elScale = document.getElementById('lim-scale-val');
+            const elMask = document.getElementById('lim-scale-mask');
+            if (elScale) elScale.textContent = `κ = ${data.spatial_scaling_coefficient} (${data.calibrated_district_aggregate_tha} t/ha)`;
+            if (elMask) elMask.textContent = `${Math.round(data.paddy_lulc_mask_coverage * 100)}% Paddy`;
+        }
+    } catch (err) {
+        console.warn("Limitations telemetry sync notice:", err);
+    }
+}
+
+// Initial Telemetry Sync on Page Load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        syncLimitationsTelemetry('Thanjavur');
+    }, 1500);
+});

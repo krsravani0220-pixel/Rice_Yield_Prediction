@@ -18,6 +18,11 @@ load_dotenv(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.env'
 from src.inference import RiceYieldInferenceSystem
 from src.satellite.satellite_workflow import SatelliteWorkflowManager
 from backend.app.neon_db import db_manager
+from backend.app.assistant import ai_assistant
+from src.satellite.sar_fusion import sar_fusion_engine
+from src.satellite.mettur_dam import mettur_irrigation_engine
+from src.crop_health.dynamic_soil import dynamic_soil_engine
+from src.satellite.spatial_harmonization import spatial_harmonizer
 
 app = FastAPI(
     title="Tamil Nadu Rice Yield Decision Support System API",
@@ -37,6 +42,7 @@ app.add_middleware(
 # Initialize Inference System & Satellite Workflow Singletons
 inference_system = RiceYieldInferenceSystem(models_dir='models')
 satellite_workflow_manager = SatelliteWorkflowManager()
+ai_assistant.set_inference_system(inference_system)
 
 
 class ManualPredictRequest(BaseModel):
@@ -320,27 +326,113 @@ def live_predict(request: LivePredictRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+class AssistantChatRequest(BaseModel):
+    query: str = Field(..., example="Predict yield for Mayiladuthurai in 2026")
+    district: Optional[str] = Field("Thanjavur", example="Thanjavur")
+
+@app.post("/api/assistant/chat")
+def assistant_chat(request: AssistantChatRequest):
+    try:
+        res = ai_assistant.process_query(request.query, context_district=request.district)
+        return json.loads(json.dumps(res, default=str))
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/assistant/quick-prompts")
+def assistant_quick_prompts():
+    return {
+        "en": [
+            "Predict yield for Mayiladuthurai in 2026",
+            "What is Mettur Dam live water status?",
+            "Check Sentinel-1 radar cloud scan for Cuddalore",
+            "Should I apply urea fertilizer today in Thiruvarur?",
+            "How to control paddy blast disease?"
+        ],
+        "ta": [
+            "மயிலாடுதுறை 2026 விளைச்சல் கணக்கிடு",
+            "மேட்டூர் அணை நீர்மட்டம் என்ன?",
+            "கடலூர் ரேடார் மேகமூட்ட பரிசோதனை",
+            "திருவாரூரில் இன்று யூரியா இடலாமா?",
+            "நெல் குலை நோய் மேலாண்மை என்ன?"
+        ]
+    }
+
+@app.get("/api/satellite-sar-fusion")
+def get_sar_fusion(district: str = "Thanjavur", cloud_cover_pct: float = 75.0, ndvi: float = 0.52):
+    try:
+        res = sar_fusion_engine.fuse_optical_sar(
+            district=district,
+            optical_ndvi=ndvi,
+            cloud_cover_pct=cloud_cover_pct
+        )
+        return res
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/mettur-dam/status")
+def get_mettur_dam_status(district: Optional[str] = "Thanjavur"):
+    try:
+        return mettur_irrigation_engine.get_district_irrigation_status(district or "Thanjavur")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/dynamic-soil/status")
+def get_dynamic_soil_status(district: str = "Thanjavur", moisture: float = 0.38, temp: float = 28.0, rain_48h: float = 15.0):
+    try:
+        prof = get_district_profile(district) or get_district_profile("Thanjavur")
+        return dynamic_soil_engine.compute_dynamic_soil_profile(
+            district=district,
+            static_n=float(prof["n"]),
+            static_p=float(prof["p"]),
+            static_k=float(prof["k"]),
+            static_ph=float(prof["soil_ph"]),
+            soil_type=str(prof["soil_type"]),
+            root_zone_moisture_m3m3=moisture,
+            soil_temp_celsius=temp,
+            recent_rain_48h_mm=rain_48h
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/spatial-harmonization")
+def get_spatial_harmonization(district: str = "Thanjavur", micro_yield: float = 3.90, baseline_yield: float = 3.60):
+    try:
+        return spatial_harmonizer.harmonize_plot_to_district(district, micro_yield, baseline_yield)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/historical-ranges")
 def get_historical_ranges(district: str):
-    if district not in inference_system.insights_engine.district_stats:
-        raise HTTPException(status_code=404, detail=f"District '{district}' not found.")
+    from src.satellite.district_registry import get_parent_district, normalize_district_name
+    canonical = normalize_district_name(district)
+    lookup_dist = canonical if canonical in inference_system.insights_engine.district_stats else get_parent_district(canonical)
+    if lookup_dist not in inference_system.insights_engine.district_stats:
+        raise HTTPException(status_code=404, detail=f"District '{district}' not found in statistics.")
     return {
-        "district": district,
-        "feature_statistics": inference_system.insights_engine.district_stats[district]
+        "district": canonical,
+        "parent_cluster": lookup_dist,
+        "feature_statistics": inference_system.insights_engine.district_stats[lookup_dist]
     }
 
 @app.get("/api/district-year-params")
 def get_district_year_params(district: str, year: int):
     import pandas as pd
-    if district not in inference_system.districts:
+    from src.satellite.district_registry import get_parent_district, normalize_district_name, get_all_districts
+    canonical = normalize_district_name(district)
+    all_dists = get_all_districts()
+    if canonical not in all_dists:
         raise HTTPException(status_code=400, detail=f"District '{district}' is invalid or excluded.")
 
     if year < 1997:
         raise HTTPException(status_code=400, detail=f"Year {year} is prior to historical reference start year (1997). Supported timeline starts from 1997.")
 
+    lookup_dist = canonical if canonical in inference_system.districts else get_parent_district(canonical)
+
     if 1997 <= year <= 2023:
         df_match = inference_system.processed_df[
-            (inference_system.processed_df['District'] == district) &
+            (inference_system.processed_df['District'] == lookup_dist) &
             (inference_system.processed_df['Year'] == year)
         ]
         if df_match.empty:
@@ -349,20 +441,21 @@ def get_district_year_params(district: str, year: int):
         for k, v in row.items():
             if pd.isna(v):
                 row[k] = None
+        row['District'] = canonical
         return {
             "source_type": "Dataset Value",
             "is_historical": True,
-            "district": district,
+            "district": canonical,
             "year": year,
             "params": row
         }
     else:
         # year >= 2024: Current or future years beyond historical census observations
-        fc_dict, _ = inference_system.forecaster.generate_district_forecast(district, year, method='Exponential Smoothing')
+        fc_dict, _ = inference_system.forecaster.generate_district_forecast(canonical, year, method='Exponential Smoothing')
         return {
             "source_type": "Forecasted Value",
             "is_historical": False,
-            "district": district,
+            "district": canonical,
             "year": year,
             "params": fc_dict
         }

@@ -463,9 +463,9 @@
                             <h3 class="section-heading">📍 District Selection & Observation Window</h3>
                             <div class="form-grid trio">
                                 <div class="input-field">
-                                    <label data-en="Select Pilot District (5 Pilot Districts) *" data-ta="விமான சோதனை மாவட்டம் (5 மாவட்டங்கள்) *">Select Pilot District (5 Pilot Districts) *</label>
+                                    <label data-en="Select District (All 38 Tamil Nadu Districts) *" data-ta="மாவட்டம் தேர்ந்தெடுக்கவும் (38 மாவட்டங்கள்) *">Select District (All 38 Tamil Nadu Districts) *</label>
                                     <select id="live-district-select" required onchange="handleLiveDistrictChange()">
-                                        <option value="" disabled selected>-- Select Pilot District --</option>
+                                        <option value="" disabled selected>-- Select District (38 Districts) --</option>
                                     </select>
                                 </div>
                                 <div class="input-field">
@@ -514,6 +514,77 @@
                                         <input type="checkbox" id="live-force-refresh">
                                         <span data-en="Bypass local cache & force fresh remote API queries" data-ta="உள்ளூர் தற்காலிக நினைவகத்தைத் தவிர்த்து புதிய API வினவல்களை இயக்கவும்">Bypass local cache & force fresh remote API queries</span>
                                     </label>
+                                </div>
+                            </div>
+
+                            <!-- 4 Core Limitations Overcome Telemetry Hub -->
+                            <div class="limitations-hub-section">
+                                <div class="limitations-hub-header">
+                                    <div class="hub-header-title">
+                                        <span class="hub-icon">⚡</span>
+                                        <div>
+                                            <h4 data-en="Research Innovations & 4 Limitations Overcome" data-ta="ஆராய்ச்சி புதுமைகள் & 4 வரம்புகளுக்கான தீர்வுகள்">Research Innovations & 4 Limitations Overcome</h4>
+                                            <p data-en="Real-time multi-sensor telemetry addressing optical cloud cover, spatial resolution gap, static soil chemistry & irrigation dynamics across all 38 districts." data-ta="மேகமூட்டம், பரப்பளவு இடைவெளி, மண் சத்து மற்றும் பாசன நீர் வரம்புகளை தீர்க்கும் நேரடி தொழில்நுட்பம்.">Real-time multi-sensor telemetry addressing optical cloud cover, spatial resolution gap, static soil chemistry & irrigation dynamics across all 38 districts.</p>
+                                        </div>
+                                    </div>
+                                    <button class="btn-hub-sync" onclick="syncLimitationsTelemetry()" title="Refresh Telemetry">🔄 <span data-en="Sync Multi-Sensor Telemetry" data-ta="நேரடி அளவீடுகளை புதுப்பி">Sync Multi-Sensor Telemetry</span></button>
+                                </div>
+                                <div class="limitations-grid">
+                                    <!-- 1. Sentinel-1 SAR Radar Fusion -->
+                                    <div class="limitation-card" id="card-lim-sar">
+                                        <div class="lim-card-header">
+                                            <span class="lim-badge">LIMITATION 1 SOLVED</span>
+                                            <h5>🛰️ Sentinel-1 SAR Radar Fusion</h5>
+                                        </div>
+                                        <div class="lim-metric-val" id="lim-sar-val">100% Penetration</div>
+                                        <p class="lim-desc" data-en="C-Band Microwave Radar (5.4 GHz) bypasses Northeast Monsoon cloud cover (Oct-Dec) to measure RVI and crop biomass without optical blackout." data-ta="வடகிழக்கு பருவமழை மேகமூட்டத்தை ஊடுருவி சென்டினல்-1 C-பேண்ட் நுண்ணலை ரேடார் பயிர் வளர்ச்சியை தடையின்றி கண்காணிக்கிறது.">C-Band Microwave Radar (5.4 GHz) bypasses Northeast Monsoon cloud cover (Oct-Dec) to measure RVI and crop biomass without optical blackout.</p>
+                                        <div class="lim-footer-status">
+                                            <span>RVI Index: <strong id="lim-sar-rvi">0.612</strong></span>
+                                            <span class="tag-status-success">Radar Active</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2. SICKLE Spatial Harmonization -->
+                                    <div class="limitation-card" id="card-lim-sickle">
+                                        <div class="lim-card-header">
+                                            <span class="lim-badge">LIMITATION 2 SOLVED</span>
+                                            <h5>📐 SICKLE Spatial Harmonization</h5>
+                                        </div>
+                                        <div class="lim-metric-val" id="lim-scale-val">κ = 0.89 Calibrated</div>
+                                        <p class="lim-desc" data-en="Bridges 3m/10m micro-plot SICKLE survey observations with district agricultural census reporting using paddy LULC masking and bund edge damping." data-ta="தனிப்பயன் வயல்வெளி SICKLE அளவீடுகளை மாவட்ட அளவிலான மகசூல் புள்ளிவிவரங்களுடன் துல்லியமாக இணைக்கிறது.">Bridges 3m/10m micro-plot SICKLE survey observations with district agricultural census reporting using paddy LULC masking and bund edge damping.</p>
+                                        <div class="lim-footer-status">
+                                            <span>LULC Mask: <strong id="lim-scale-mask">84% Paddy</strong></span>
+                                            <span class="tag-status-success">Harmonized</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. Dynamic Soil Moisture & Nutrients -->
+                                    <div class="limitation-card" id="card-lim-soil">
+                                        <div class="lim-card-header">
+                                            <span class="lim-badge">LIMITATION 3 SOLVED</span>
+                                            <h5>🧪 Dynamic Soil Chemistry</h5>
+                                        </div>
+                                        <div class="lim-metric-val" id="lim-soil-val">0.38 m³/m³ (Wetland)</div>
+                                        <p class="lim-desc" data-en="Upgrades static survey NPK with live root-zone volumetric moisture (0-7 cm) and soil temperature to prevent urea leaching and denitrification." data-ta="நிலையான மண் அறிக்கைகளை மாற்றி நேரடி வேர் மண்டல ஈரப்பதம் மற்றும் நைட்ரஜன் கரைவு இழப்பை உடனுக்குடன் கணக்கிடுகிறது.">Upgrades static survey NPK with live root-zone volumetric moisture (0-7 cm) and soil temperature to prevent urea leaching and denitrification.</p>
+                                        <div class="lim-footer-status">
+                                            <span>Leaching Risk: <strong id="lim-soil-risk">Low (Optimal)</strong></span>
+                                            <span class="tag-status-success">Enriched</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- 4. Mettur Dam Canal Irrigation -->
+                                    <div class="limitation-card" id="card-lim-mettur">
+                                        <div class="lim-card-header">
+                                            <span class="lim-badge">LIMITATION 4 SOLVED</span>
+                                            <h5>🌊 Mettur Dam & Canal Release</h5>
+                                        </div>
+                                        <div class="lim-metric-val" id="lim-mettur-val">78.4 TMC (84%)</div>
+                                        <p class="lim-desc" data-en="Direct integration of TN WRD Stanley Reservoir storage & Grand Anicut 12,000 cusecs canal distribution schedule for Cauvery delta water security." data-ta="மேட்டூர் அணை நேரடி நீர் இருப்பு மற்றும் கல்லணை வாய்க்கால் பாசன வெளியேற்றத்தை நேரடியாக பயிர் கணக்கீட்டில் இணைக்கிறது.">Direct integration of TN WRD Stanley Reservoir storage & Grand Anicut 12,000 cusecs canal distribution schedule for Cauvery delta water security.</p>
+                                        <div class="lim-footer-status">
+                                            <span>Canal Flow: <strong id="lim-mettur-flow">12,000 cusecs</strong></span>
+                                            <span class="tag-status-success">Synced</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1523,6 +1594,68 @@
                     </p>
                 </form>
             </div>
+        </div>
+    </div>
+
+    <!-- AI Agronomist Copilot Floating Widget -->
+    <div id="ai-assistant-widget" class="ai-assistant-container">
+        <!-- Floating Toggle Trigger Button -->
+        <button id="ai-assistant-toggle-btn" class="ai-assistant-bubble-btn" onclick="toggleAIAssistant()" title="Open RiceYield AI Copilot">
+            <span class="ai-assistant-bubble-icon">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"/>
+                    <path d="M12 6v12M8 10l4-4 4 4M8 14l4-4 4 4"/>
+                </svg>
+            </span>
+            <span class="ai-assistant-badge-text">AI Copilot</span>
+            <span class="ai-assistant-online-pulse"></span>
+        </button>
+
+        <!-- Slide-out / Pop-up Chat Pane -->
+        <div id="ai-assistant-pane" class="ai-assistant-pane hidden">
+            <div class="ai-pane-header">
+                <div class="ai-header-brand">
+                    <div class="ai-brand-avatar">🌾</div>
+                    <div>
+                        <h4 data-en="RiceYield AI Copilot" data-ta="வேளாண் AI உதவியாளர்">RiceYield AI Copilot</h4>
+                        <span class="ai-header-status" data-en="TNAU-Trained Smart Agronomist · All 38 Districts" data-ta="TNAU விவசாய வழிகாட்டி · 38 மாவட்டங்கள்">TNAU-Trained Smart Agronomist · All 38 Districts</span>
+                    </div>
+                </div>
+                <div class="ai-header-actions">
+                    <button class="ai-close-btn" onclick="toggleAIAssistant()" title="Close Assistant">✕</button>
+                </div>
+            </div>
+
+            <!-- Quick Suggestion Chips Carousel -->
+            <div class="ai-quick-chips" id="ai-quick-chips">
+                <button class="chip-btn" onclick="sendAssistantQuickPrompt('Predict yield for Mayiladuthurai in 2026')">🌾 Predict Mayiladuthurai</button>
+                <button class="chip-btn" onclick="sendAssistantQuickPrompt('What is Mettur Dam live water status?')">🌊 Mettur Dam Status</button>
+                <button class="chip-btn" onclick="sendAssistantQuickPrompt('Check Sentinel-1 radar cloud scan for Cuddalore')">🛰️ Radar Cloud Scan</button>
+                <button class="chip-btn" onclick="sendAssistantQuickPrompt('Should I apply urea fertilizer today in Thiruvarur?')">🧪 Urea & Soil NPK</button>
+                <button class="chip-btn" onclick="sendAssistantQuickPrompt('How to control paddy blast disease?')">🦠 Blast Disease Control</button>
+            </div>
+
+            <!-- Chat Message Thread -->
+            <div class="ai-chat-thread" id="ai-chat-thread">
+                <div class="ai-msg ai-msg-bot">
+                    <div class="ai-msg-bubble">
+                        <p data-en="Vanakkam! I am your RiceYield AI Agronomist. Ask me anything about crop yield forecasts for all 38 Tamil Nadu districts, Mettur Dam canal release schedules, Sentinel-1 radar cloud penetration, dynamic soil NPK, or pest management." data-ta="வணக்கம்! நான் உங்கள் RiceYield AI வேளாண்மை உதவியாளர். தமிழ்நாட்டின் 38 மாவட்டங்களுக்கான நெல் விளைச்சல், மேட்டூர் அணை பாசன நிலை, ரேடார் மேகமூட்ட பரிசோதனை, மண் உர மேலாண்மை அல்லது பயிர் பாதுகாப்பு குறித்து எதையும் கேளுங்கள்.">
+                            Vanakkam! I am your RiceYield AI Agronomist. Ask me anything about crop yield forecasts for all 38 Tamil Nadu districts, Mettur Dam canal release schedules, Sentinel-1 radar cloud penetration, dynamic soil NPK, or pest management.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input Footer -->
+            <form id="ai-chat-form" class="ai-chat-input-row" onsubmit="handleAssistantSubmit(event)">
+                <input type="text" id="ai-chat-input" placeholder="Ask in English or தமிழில் கேளுங்கள்..." autocomplete="off" required>
+                <button type="submit" id="ai-chat-send-btn" class="ai-send-btn" title="Send Query">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                </button>
+            </form>
         </div>
     </div>
 

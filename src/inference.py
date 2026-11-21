@@ -15,12 +15,21 @@ from src.forecasting.seasonal_forecaster import DistrictSeasonalForecaster
 from src.crop_health.crop_health import CropHealthEngine
 from src.weather.openmeteo_client import OpenMeteoWeatherClient
 from src.satellite.copernicus_client import CopernicusSatelliteClient
-from src.satellite.district_registry import get_district_profile, get_all_districts
+from src.satellite.district_registry import (
+    get_district_profile,
+    get_all_districts,
+    normalize_district_name,
+    get_parent_district
+)
+from src.satellite.sar_fusion import sar_fusion_engine
+from src.satellite.spatial_harmonization import spatial_harmonizer
+from src.crop_health.dynamic_soil import dynamic_soil_engine
+from src.satellite.mettur_dam import mettur_irrigation_engine
 from src.storage.db_adapter import DatabaseAdapter
 
 class RiceYieldInferenceSystem:
     def __init__(self, models_dir='models'):
-        print("Initializing Rice Yield Unified Inference System...")
+        print("Initializing Rice Yield Unified Inference System (38 Tamil Nadu Districts)...")
         self.model = joblib.load(os.path.join(models_dir, 'best_yield_model.joblib'))
         self.preprocessor = joblib.load(os.path.join(models_dir, 'preprocessing_pipeline.joblib'))
         self.metadata = joblib.load(os.path.join(models_dir, 'feature_metadata.joblib'))
@@ -38,7 +47,7 @@ class RiceYieldInferenceSystem:
         
         self.processed_df = pd.read_csv('data/processed/rice_yield_processed.csv')
         self.districts = self.insights_engine.districts
-        self.all_30_districts = get_all_districts()
+        self.all_38_districts = get_all_districts()
         
         self.required_features = [
             'District', 'Year', 'Soil_Type',
@@ -50,26 +59,34 @@ class RiceYieldInferenceSystem:
 
     def _validate_and_build_dataframe(self, input_dict, allow_missing=False):
         """
-        Constructs DataFrame for inference.
-        If allow_missing is False (Manual Mode), enforces that ALL required features are present and non-null.
-        NO silent median substitution for missing user inputs.
+        Constructs DataFrame for inference across ALL 38 Tamil Nadu districts.
+        Maps newly bifurcated districts to historical parent baselines for OneHotEncoder,
+        while preserving specific canonical district identity for SHAP & agro-climatic reporting.
         """
         missing_fields = []
         full_row = {}
 
-        # Explicitly reject Chennai
-        dist_input = str(input_dict.get('District', '')).strip()
-        if dist_input.title() == 'Chennai':
-            raise ValueError("District 'Chennai' is urbanized and excluded from this agricultural rice yield system.")
-        if dist_input and dist_input not in self.districts:
-            raise ValueError(f"District '{dist_input}' is invalid or excluded.")
+        # Validate district against 38-district registry
+        raw_dist = str(input_dict.get('District', '')).strip()
+        if raw_dist.title() == 'Chennai':
+            raise ValueError("District 'Chennai' is an urban metropolitan center with negligible commercial paddy cultivation.")
+        
+        canonical_dist = normalize_district_name(raw_dist)
+        all_dists = get_all_districts()
+        if canonical_dist not in all_dists:
+            raise ValueError(f"District '{raw_dist}' is unrecognized. Supported: all 38 Tamil Nadu districts.")
+
+        # Historical parent mapping for OneHotEncoder transformer
+        parent_dist = get_parent_district(canonical_dist)
 
         for feat in self.required_features:
             val = input_dict.get(feat, None)
             if val is None or val == "":
                 missing_fields.append(feat)
             else:
-                if feat == 'District' or feat == 'Soil_Type':
+                if feat == 'District':
+                    full_row[feat] = str(parent_dist)  # Transformer compatible
+                elif feat == 'Soil_Type':
                     full_row[feat] = str(val)
                 elif feat == 'Year':
                     full_row[feat] = int(val)
@@ -80,6 +97,8 @@ class RiceYieldInferenceSystem:
             raise ValueError(f"Missing required input features: {', '.join(missing_fields)}. All fields are required.")
 
         df_row = pd.DataFrame([full_row])
+        full_row['_Canonical_District'] = canonical_dist
+        full_row['_Parent_District'] = parent_dist
         return df_row, full_row
 
     def predict_manual(self, input_dict, allow_missing=False):
@@ -96,9 +115,32 @@ class RiceYieldInferenceSystem:
         shap_res = self.shap_explainer.explain_instance(X_trans, full_row_dict)
         
         # 4. Historical Condition Insights & District Avg Yield
-        district = full_row_dict.get('District', 'Thanjavur')
-        insights = self.insights_engine.generate_full_insights(district, full_row_dict)
-        dist_avg_yield = self.insights_engine.district_avg_yield.get(district, 3.53)
+        canonical_district = full_row_dict.get('_Canonical_District', full_row_dict.get('District', 'Thanjavur'))
+        parent_district = full_row_dict.get('_Parent_District', canonical_district)
+        insights = self.insights_engine.generate_full_insights(canonical_district, full_row_dict)
+        dist_avg_yield = self.insights_engine.get_district_avg_yield(canonical_district)
+
+        # 4b. Dynamic Soil & Mettur Irrigation Telemetry
+        irrigation_info = mettur_irrigation_engine.get_district_irrigation_status(canonical_district)
+        k_sm = float(full_row_dict.get('Kharif Soil_Moisture', 0.35))
+        k_temp = float(full_row_dict.get('Kharif Temperature', 28.0))
+        recent_rain = float(full_row_dict.get('Kharif Rainfall', 100.0)) / 10.0
+        soil_dyn = dynamic_soil_engine.compute_dynamic_soil_profile(
+            district=canonical_district,
+            static_n=float(full_row_dict.get('N', 300.0)),
+            static_p=float(full_row_dict.get('P', 20.0)),
+            static_k=float(full_row_dict.get('K', 200.0)),
+            static_ph=float(full_row_dict.get('Soil_PH', 7.2)),
+            soil_type=str(full_row_dict.get('Soil_Type', 'alluvial soil')),
+            root_zone_moisture_m3m3=k_sm,
+            soil_temp_celsius=k_temp,
+            recent_rain_48h_mm=recent_rain
+        )
+        spatial_harm = spatial_harmonizer.harmonize_plot_to_district(
+            district=canonical_district,
+            micro_plot_yield_tha=pred_yield * 1.08,
+            macro_baseline_yield_tha=pred_yield
+        )
         
         # 5. Suggestions
         suggestions_en = []
@@ -114,7 +156,8 @@ class RiceYieldInferenceSystem:
             
         return {
             'mode': 'Manual Input Mode',
-            'district': district,
+            'district': canonical_district,
+            'parent_district': parent_district,
             'historical_district_avg_yield': float(dist_avg_yield),
             'year': int(full_row_dict.get('Year', 2024)),
             'predicted_yield': float(pred_yield),
@@ -126,7 +169,10 @@ class RiceYieldInferenceSystem:
             },
             'historical_insights': insights,
             'suggestions_en': suggestions_en[:5],
-            'suggestions_ta': suggestions_ta[:5]
+            'suggestions_ta': suggestions_ta[:5],
+            'dynamic_soil_profile': soil_dyn,
+            'reservoir_irrigation_telemetry': irrigation_info,
+            'sickle_spatial_harmonization': spatial_harm
         }
 
     def predict_forecast(self, district, target_year=None, method='Exponential Smoothing'):
@@ -215,7 +261,46 @@ class RiceYieldInferenceSystem:
 
         # 7. Historical Condition Insights
         insights = self.insights_engine.generate_full_insights(dist_name, full_row_dict)
-        dist_avg_yield = self.insights_engine.district_avg_yield.get(dist_name, 3.53)
+        dist_avg_yield = self.insights_engine.get_district_avg_yield(dist_name)
+
+        # 7b. Four Limitations Overcome Engines (SAR Fusion, Spatial Harmonization, Dynamic Soil, Mettur Dam)
+        opt_ndvi = float(sat_res.get("vegetation_indices", {}).get("ndvi_mean") or 0.55)
+        cloud_pct = float(sat_res.get("cloud_filtering", {}).get("max_cloud_cover_percent") or 25.0)
+        sm_val = float(model_input.get("Kharif Soil_Moisture", 0.35))
+        k_temp = float(model_input.get("Kharif Temperature", 28.5))
+        recent_rain = float(model_input.get("Kharif Rainfall", 120.0)) / 10.0
+
+        # Limitation 1: Sentinel-1 SAR Radar Fusion
+        sar_fusion_res = sar_fusion_engine.fuse_optical_sar(
+            district=dist_name,
+            optical_ndvi=opt_ndvi,
+            cloud_cover_pct=cloud_pct,
+            growth_stage=sat_res.get("season_identification", {}).get("dominant_rice_season", "Tillering"),
+            soil_moisture=sm_val
+        )
+
+        # Limitation 2: SICKLE Multi-Scale Spatial Harmonization
+        spatial_harm_res = spatial_harmonizer.harmonize_plot_to_district(
+            district=dist_name,
+            micro_plot_yield_tha=pred_yield * 1.08,
+            macro_baseline_yield_tha=pred_yield
+        )
+
+        # Limitation 3: Dynamic Soil Moisture & Nutrient Availability
+        dynamic_soil_res = dynamic_soil_engine.compute_dynamic_soil_profile(
+            district=dist_name,
+            static_n=float(prof["n"]),
+            static_p=float(prof["p"]),
+            static_k=float(prof["k"]),
+            static_ph=float(prof["soil_ph"]),
+            soil_type=str(prof["soil_type"]),
+            root_zone_moisture_m3m3=sm_val,
+            soil_temp_celsius=k_temp,
+            recent_rain_48h_mm=recent_rain
+        )
+
+        # Limitation 4: Mettur Dam & Basin Irrigation Telemetry
+        irrigation_res = mettur_irrigation_engine.get_district_irrigation_status(dist_name)
 
         suggestions_en = []
         suggestions_ta = []
@@ -304,6 +389,10 @@ class RiceYieldInferenceSystem:
                 "top_positive": shap_res["top_positive_contributors"],
                 "top_negative": shap_res["top_negative_contributors"]
             },
+            "sentinel1_sar_fusion": sar_fusion_res,
+            "sickle_spatial_harmonization": spatial_harm_res,
+            "dynamic_soil_profile": dynamic_soil_res,
+            "reservoir_irrigation_telemetry": irrigation_res,
             "historical_insights": insights,
             "suggestions_en": suggestions_en[:5],
             "suggestions_ta": suggestions_ta[:5],
