@@ -8,7 +8,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20261121">
+    <!-- Cache Control (Prevent Stale Mobile/Web Cache) -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="styles.css?v=20261121_v4">
 </head>
 <body class="is-unauthenticated">
     <div class="app-layout">
@@ -1597,17 +1601,16 @@
         </div>
     </div>
 
-    <!-- AI Agronomist Copilot Floating Widget -->
-    <!-- Mobile Backdrop Blur Overlay -->
-    <div id="ai-assistant-backdrop" class="ai-assistant-backdrop hidden" onclick="toggleAIAssistant()"></div>
-
+    <!-- AI Agronomist Copilot Floating Widget (Zero Backdrop, Icon-Only) -->
     <div id="ai-assistant-widget" class="ai-assistant-container">
         <!-- Floating Toggle Trigger Button (Icon Only - No Words) -->
         <button id="ai-assistant-toggle-btn" class="ai-assistant-bubble-btn" onclick="toggleAIAssistant()" title="RiceYield AI Agronomist" aria-label="RiceYield AI Agronomist">
             <span class="ai-assistant-bubble-icon">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"/>
-                    <path d="M12 6v12M8 10l4-4 4 4M8 14l4-4 4 4"/>
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" stroke-width="1.8"/>
+                    <path d="M12 18V9"/>
+                    <path d="M12 9a4 4 0 0 0-4-4c0 3.2 4 4 4 4z"/>
+                    <path d="M12 11a4 4 0 0 1 4-4c0 3.2-4 4-4 4z"/>
                 </svg>
             </span>
             <span class="ai-assistant-online-pulse"></span>
@@ -1661,6 +1664,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=20261121"></script>
+    <script src="app.js?v=20261121_v4"></script>
 </body>
 </html>

@@ -125,12 +125,36 @@ class NeonDatabaseManager:
         if self._pool:
             try:
                 raw_conn = self._pool.getconn()
-                if raw_conn.closed != 0:
-                    raw_conn = psycopg2.connect(self.neon_url, sslmode='require')
+                # Test connection vitality before returning to handle Neon serverless idle disconnects
+                try:
+                    with raw_conn.cursor() as cur:
+                        cur.execute("SELECT 1;")
+                except Exception:
+                    try:
+                        self._pool.putconn(raw_conn, close=True)
+                    except Exception:
+                        pass
+                    raw_conn = psycopg2.connect(
+                        self.neon_url,
+                        sslmode='require',
+                        connect_timeout=10,
+                        keepalives=1,
+                        keepalives_idle=30,
+                        keepalives_interval=10,
+                        keepalives_count=5
+                    )
                 return PooledConnectionWrapper(self._pool, raw_conn)
             except Exception:
                 pass
-        return psycopg2.connect(self.neon_url, sslmode='require')
+        return psycopg2.connect(
+            self.neon_url,
+            sslmode='require',
+            connect_timeout=10,
+            keepalives=1,
+            keepalives_idle=30,
+            keepalives_interval=10,
+            keepalives_count=5
+        )
 
     def _get_sqlite_connection(self):
         db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/user_auth_store.db'))
