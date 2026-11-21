@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/auth/:path*",
+      "destination": "/api/auth/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://rice-yield-prediction-ifpz.onrender.com/api/:path*"
+    }
+  ]
+}

@@ -4,10 +4,8 @@ const API_BASE = (() => {
     if (loc.hostname === 'localhost' || loc.hostname === '127.0.0.1') {
         return loc.port === '8000' ? "" : `http://${loc.hostname}:8000`;
     }
-    if (loc.hostname.includes('onrender.com') || loc.port === '8000') {
-        return "";
-    }
-    return "https://rice-yield-prediction-ifpz.onrender.com";
+    // On Vercel and Render deployments, relative URL "" allows local serverless API / rewrites
+    return "";
 })();
 let currentLang = 'en';
 let currentDistrictStats = {};
@@ -1658,19 +1656,26 @@ const NEON_SQL_ENDPOINT = "https://ep-curly-queen-a13l2ioi.ap-southeast-1.aws.ne
 const NEON_CONN_STRING = "postgresql://neondb_owner:npg_EscR6lNWUSy0@ep-curly-queen-a13l2ioi-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require";
 
 async function queryNeonDirect(sql) {
-    const res = await fetch(NEON_SQL_ENDPOINT, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Neon-Connection-String': NEON_CONN_STRING
-        },
-        body: JSON.stringify({ query: sql })
-    });
-    if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || `Database communication error (${res.status})`);
+    try {
+        const res = await fetch(NEON_SQL_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Neon-Connection-String': NEON_CONN_STRING
+            },
+            body: JSON.stringify({ query: sql })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.message || `Database communication error (${res.status})`);
+        }
+        return await res.json();
+    } catch (e) {
+        console.warn("Direct Neon fetch unavailable from browser:", e);
+        throw new Error(currentLang === 'ta' 
+            ? 'தரவுத்தளத்துடன் இணைக்க முடியவில்லை. தயவுசெய்து சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.' 
+            : 'Unable to reach the database server. Please verify your connection or try again.');
     }
-    return await res.json();
 }
 
 function escapeSql(str) {
@@ -1785,7 +1790,13 @@ async function handleSignInSubmit(e) {
 
         setTimeout(loadUserPredictionHistory, 10);
     } catch (err) {
-        showAuthAlert(err.message, "error");
+        let errMsg = err.message || "An unexpected error occurred.";
+        if (errMsg.includes("Failed to fetch") || errMsg.includes("NetworkError")) {
+            errMsg = currentLang === 'ta' 
+                ? 'சேவையகத்தை தொடர்பு கொள்ள முடியவில்லை. தயவுசெய்து உங்கள் இணைய இணைப்பை சரிபார்க்கவும்.' 
+                : 'Unable to reach the authentication server. Please check your internet connection and try again.';
+        }
+        showAuthAlert(errMsg, "error");
     } finally {
         btn.disabled = false;
         btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> <span data-en="Sign In to Neon Cloud" data-ta="உள்நுழைக">${currentLang === 'ta' ? 'உள்நுழைக' : 'Sign In to Neon Cloud'}</span>`;
@@ -1862,7 +1873,13 @@ async function handleSignUpSubmit(e) {
 
         setTimeout(loadUserPredictionHistory, 10);
     } catch (err) {
-        showAuthAlert(err.message, "error");
+        let errMsg = err.message || "An unexpected error occurred.";
+        if (errMsg.includes("Failed to fetch") || errMsg.includes("NetworkError")) {
+            errMsg = currentLang === 'ta' 
+                ? 'சேவையகத்தை தொடர்பு கொள்ள முடியவில்லை. தயவுசெய்து உங்கள் இணைய இணைப்பை சரிபார்க்கவும்.' 
+                : 'Unable to reach the authentication server. Please check your internet connection and try again.';
+        }
+        showAuthAlert(errMsg, "error");
     } finally {
         btn.disabled = false;
         btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> <span data-en="Create Account in Neon Cloud" data-ta="கணக்கை உருவாக்கு">${currentLang === 'ta' ? 'கணக்கை உருவாக்கு' : 'Create Account in Neon Cloud'}</span>`;
