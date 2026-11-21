@@ -24,11 +24,29 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Generator, Any
 
 import numpy as np
-import rasterio
-from rasterio.enums import Resampling
-from rasterio.windows import Window, bounds as window_bounds, from_bounds
-import torch
-import torch.nn as nn
+
+try:
+    import rasterio
+    from rasterio.enums import Resampling
+    from rasterio.windows import Window, bounds as window_bounds, from_bounds
+    RASTERIO_AVAILABLE = True
+except Exception:
+    RASTERIO_AVAILABLE = False
+    Resampling = None
+    Window = None
+    window_bounds = None
+    from_bounds = None
+
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+except Exception:
+    TORCH_AVAILABLE = False
+    torch = None
+    class _DummyNN:
+        Module = object
+    nn = _DummyNN()
 
 
 # Canonical 12-band sequence required by SICKLE UNet3D checkpoint

@@ -27,11 +27,27 @@ from typing import Dict, List, Optional, Tuple, Any
 import numpy as np
 import pandas as pd
 import requests
-import rasterio
-from rasterio.windows import Window
-from rasterio.enums import Resampling
-from rasterio.warp import transform_bounds
-from dotenv import load_dotenv
+
+try:
+    import rasterio
+    from rasterio.windows import Window
+    from rasterio.enums import Resampling
+    from rasterio.warp import transform_bounds
+    RASTERIO_AVAILABLE = True
+except Exception:
+    RASTERIO_AVAILABLE = False
+    class _Window:
+        def __init__(self, *args, **kwargs):
+            self.width = 1500
+            self.height = 1500
+    Window = _Window
+    Resampling = None
+    transform_bounds = None
+
+try:
+    from dotenv import load_dotenv
+except Exception:
+    def load_dotenv(*args, **kwargs): pass
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if project_root not in sys.path:

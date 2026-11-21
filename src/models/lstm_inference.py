@@ -10,8 +10,18 @@ import logging
 from typing import Dict, List, Optional, Any, Tuple
 import numpy as np
 import pandas as pd
-import torch
-import torch.nn as nn
+
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+except Exception:
+    TORCH_AVAILABLE = False
+    torch = None
+    class _DummyNN:
+        Module = object
+    nn = _DummyNN()
+
 import joblib
 
 logger = logging.getLogger("LSTMInference")

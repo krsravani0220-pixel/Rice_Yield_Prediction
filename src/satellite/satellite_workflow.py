@@ -24,7 +24,13 @@ from typing import Dict, List, Optional, Tuple, Any
 
 import numpy as np
 import pandas as pd
-import torch
+
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except Exception:
+    TORCH_AVAILABLE = False
+    torch = None
 
 from src.satellite.copernicus_client import CopernicusSatelliteClient
 from src.satellite.live_raster_fetcher import LiveRasterFetcher

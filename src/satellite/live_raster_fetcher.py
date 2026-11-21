@@ -17,10 +17,18 @@ from typing import Dict, List, Tuple, Optional, Any
 
 import numpy as np
 import requests
-import rasterio
-from rasterio.windows import Window
-from rasterio.enums import Resampling
-from rasterio.env import Env
+
+try:
+    import rasterio
+    from rasterio.windows import Window
+    from rasterio.enums import Resampling
+    from rasterio.env import Env
+    RASTERIO_AVAILABLE = True
+except Exception:
+    RASTERIO_AVAILABLE = False
+    Window = None
+    Resampling = None
+    Env = None
 
 from src.crop_health.s2_sickle_adapter import SICKLE_S2_BANDS
 
