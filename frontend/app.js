@@ -270,8 +270,8 @@ function switchTab(tabId) {
     hideValidationBanner();
 
     const titles = {
-        'dashboard': { en: 'Dashboard', ta: 'முகப்பு', subEn: 'Explainable Agricultural Decision Support & Forecasting', subTa: 'விளக்கக்கூடிய விவசாய முடிவு ஆதரவு மற்றும் முன்கணிப்பு' },
-        'live': { en: 'Live Satellite & Weather Yield Prediction', ta: 'நேரடி செயற்கைக்கோள் & வானிலை நெல் மகசூல் கணிப்பு', subEn: 'Select any of 30 Tamil Nadu districts to fetch live Sentinel-2 satellite passes from Copernicus and ECMWF ERA5-Land reanalysis from Open-Meteo across a 12-month lookback period.', subTa: '12 மாத கால இடைவெளியில் கோப்பர்நிகஸ் சென்டினல்-2 மற்றும் ஓபன்-மீட்டியோ வானிலை தரவுகளைப் பெற்று துல்லியமான நெல் மகசூலைக் கணக்கிடுங்கள்.' },
+        'dashboard': { en: 'Dashboard', ta: 'முகப்பு', subEn: 'Spatio-Temporal Rice Yield Prediction Using Bidirectional Long Short-Term Memory', subTa: 'இருவழி எல்எஸ்டிஎம் (BiLSTM) அடிப்படையிலான விண்வெளி-நேர நெல் மகசூல் முன்கணிப்பு' },
+        'live': { en: 'Live Satellite & Weather Yield Prediction', ta: 'நேரடி செயற்கைக்கோள் & வானிலை நெல் மகசூல் கணிப்பு', subEn: 'Select any of all 38 Tamil Nadu districts to fetch live Sentinel-2 passes, Sentinel-1 SAR radar, and ECMWF ERA5-Land reanalysis for Bidirectional LSTM prediction.', subTa: 'அனைத்து 38 மாவட்டங்களுக்கும் கோப்பர்நிகஸ் செயற்கைக்கோள் மற்றும் ரேடார் தரவுகளைப் பெற்று இருவழி எல்எஸ்டிஎம் மூலம் நெல் மகசூலைக் கணக்கிடுங்கள்.' },
         'manual': { en: 'Rice Yield Prediction', ta: 'நெல் மகசூல் கணக்கீடு', subEn: 'Enter observed agricultural and environmental conditions to estimate annual rice yield.', subTa: 'ஆண்டு நெல் மகசூலைக் கணக்கிட அவதானிக்கப்பட்ட சூழ்நிலைகளை உள்ளிடவும்.' },
         'forecast': { en: 'Forecast Mode', ta: 'முன்கணிப்பு முறை', subEn: 'Estimate future environmental conditions and use them to predict rice yield.', subTa: 'எதிர்கால வானிலையைக் கணித்து நெல் மகசூலை மதிப்பிடவும்.' },
         'health': { en: 'Crop Health Advisor', ta: 'பயிர் ஆரோக்கிய ஆலோசகர்', subEn: 'Enter field observations to receive targeted agricultural guidance.', subTa: 'பூச்சி மற்றும் நோய் மேலாண்மை வழிகாட்டுதலைப் பெற உங்கள் வயல் நிலவரத்தை உள்ளிடவும்.' },

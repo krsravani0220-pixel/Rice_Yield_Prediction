@@ -25,8 +25,8 @@ from src.crop_health.dynamic_soil import dynamic_soil_engine
 from src.satellite.spatial_harmonization import spatial_harmonizer
 
 app = FastAPI(
-    title="Tamil Nadu Rice Yield Decision Support System API",
-    description="Machine Learning Yield Prediction, SHAP Explainability, Historical Insights & Forecasting API",
+    title="Spatio-Temporal Rice Yield Prediction Using Bidirectional Long Short-Term Memory API",
+    description="Spatio-Temporal Bidirectional LSTM Deep Learning Yield Prediction, Multimodal Sentinel-1/2 Remote Sensing, SHAP Explainability & Mettur Dam Hydrological Telemetry API",
     version="1.0.0"
 )
 

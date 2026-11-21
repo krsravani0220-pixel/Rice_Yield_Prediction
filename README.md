@@ -1,5 +1,5 @@
-# Tamil Nadu Rice Yield Decision Support System (RiceYield AI)
-### Comprehensive Multimodal Machine Learning, Satellite-SAR Fusion, Hydrological Telemetry & AI Agronomist Platform for All 38 Districts of Tamil Nadu
+# Spatio-Temporal Rice Yield Prediction Using Bidirectional Long Short-Term Memory (RiceYield AI)
+### Comprehensive Multimodal Deep Learning, Satellite-SAR Fusion, Hydrological Telemetry & AI Agronomist Platform for All 38 Districts of Tamil Nadu
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg?style=flat&logo=fastapi)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-3776AB.svg?style=flat&logo=python)](https://www.python.org/)

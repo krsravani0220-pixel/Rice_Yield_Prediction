@@ -1437,7 +1437,7 @@ def get_pilot_district_live_prediction(
             live_satellite_indices=live_sat_map
         )
         predicted_yield = lstm_inference.predict_yield_from_sequence(seq)
-        model_name = "Bidirectional LSTM with Temporal Attention + Sentinel-2 Level-2A"
+        model_name = "Spatio-Temporal Bidirectional LSTM (BiLSTM) with Multi-Head Attention"
         lstm_telemetry = {
             "model_architecture": "Bidirectional LSTM + Multi-Head Temporal Attention",
             "sequence_length_years": 3,
@@ -1509,7 +1509,7 @@ def get_pilot_district_live_prediction(
 
     # 11. Rigorous Model Metrics Delineation
     model_metrics = {
-        "model_name": "Bidirectional LSTM with Temporal Attention + Sentinel-2 Level-2A",
+        "model_name": "Spatio-Temporal Bidirectional LSTM (BiLSTM) with Multi-Head Temporal Attention",
         "model_architecture": "BiLSTMAttentionYieldModel (2-Layer BiLSTM, 64 Hidden Units, Multi-Head Temporal Attention)",
         "test_mae_tonnes_ha": 0.4056,
         "test_rmse_tonnes_ha": 0.5285,
