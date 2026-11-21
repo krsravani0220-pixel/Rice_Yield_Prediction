@@ -2093,13 +2093,26 @@ async function checkDataFeedsHealth() {
 // AI AGRONOMIST ASSISTANT & LIMITATIONS HUB
 // ==========================================
 
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+}
+
 function toggleAIAssistant() {
     const pane = document.getElementById('ai-assistant-pane');
+    const backdrop = document.getElementById('ai-assistant-backdrop');
     if (!pane) return;
+    const isOpening = pane.classList.contains('hidden');
     pane.classList.toggle('hidden');
-    if (!pane.classList.contains('hidden')) {
+    if (backdrop) {
+        if (isOpening) backdrop.classList.remove('hidden');
+        else backdrop.classList.add('hidden');
+    }
+    if (isOpening) {
         const inp = document.getElementById('ai-chat-input');
-        if (inp) inp.focus();
+        if (inp) setTimeout(() => inp.focus(), 150);
     }
 }
 

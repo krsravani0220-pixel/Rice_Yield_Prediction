@@ -1598,16 +1598,18 @@
     </div>
 
     <!-- AI Agronomist Copilot Floating Widget -->
+    <!-- Mobile Backdrop Blur Overlay -->
+    <div id="ai-assistant-backdrop" class="ai-assistant-backdrop hidden" onclick="toggleAIAssistant()"></div>
+
     <div id="ai-assistant-widget" class="ai-assistant-container">
-        <!-- Floating Toggle Trigger Button -->
-        <button id="ai-assistant-toggle-btn" class="ai-assistant-bubble-btn" onclick="toggleAIAssistant()" title="Open RiceYield AI Copilot">
+        <!-- Floating Toggle Trigger Button (Icon Only - No Words) -->
+        <button id="ai-assistant-toggle-btn" class="ai-assistant-bubble-btn" onclick="toggleAIAssistant()" title="RiceYield AI Agronomist" aria-label="RiceYield AI Agronomist">
             <span class="ai-assistant-bubble-icon">
-                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"/>
                     <path d="M12 6v12M8 10l4-4 4 4M8 14l4-4 4 4"/>
                 </svg>
             </span>
-            <span class="ai-assistant-badge-text">AI Copilot</span>
             <span class="ai-assistant-online-pulse"></span>
         </button>
 
