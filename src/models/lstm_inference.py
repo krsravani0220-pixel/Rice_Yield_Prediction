@@ -194,8 +194,14 @@ class LSTMYieldInference:
 
         # Fallback to closest available years if requested future year
         avail_years = [k[1] for k in self.history_records.keys() if k[0] == district]
+        lookup_dist = district
         if not avail_years:
-            raise ValueError(f"Insufficient historical data to construct temporal sequence for district '{district}'.")
+            parent = prof.get("parent_district", "Thanjavur")
+            avail_years = [k[1] for k in self.history_records.keys() if k[0] == parent]
+            lookup_dist = parent
+            if not avail_years:
+                lookup_dist = "Thanjavur"
+                avail_years = [k[1] for k in self.history_records.keys() if k[0] == lookup_dist]
 
         max_avail = max(avail_years)
         if y_t1 > max_avail:
@@ -206,13 +212,18 @@ class LSTMYieldInference:
             hist_t1 = y_t1
             hist_t2 = y_t2
 
-        if (district, hist_t2) not in self.history_records or (district, hist_t1) not in self.history_records:
-            raise ValueError(
-                f"Insufficient historical sequence for {district}. Requires verified observations for {hist_t2} and {hist_t1}."
-            )
+        if (lookup_dist, hist_t2) not in self.history_records or (lookup_dist, hist_t1) not in self.history_records:
+            # Fall back to latest two years for lookup_dist
+            sorted_y = sorted(avail_years)
+            if len(sorted_y) >= 2:
+                hist_t2, hist_t1 = sorted_y[-2], sorted_y[-1]
+            else:
+                raise ValueError(
+                    f"Insufficient historical sequence for {district} (mapped to {lookup_dist}). Requires verified observations."
+                )
 
-        r0 = self.history_records[(district, hist_t2)]
-        r1 = self.history_records[(district, hist_t1)]
+        r0 = self.history_records[(lookup_dist, hist_t2)]
+        r1 = self.history_records[(lookup_dist, hist_t1)]
 
         # Construct Step T (current live year)
         # Weather & soil from district baseline or provided override

@@ -90,9 +90,11 @@ def _verify_hash(password: str, pw_hash: str) -> bool:
     # Fallback comparison if plain sha256 was used
     return False
 
+DEFAULT_NEON_URL = "postgresql://neondb_owner:npg_EscR6lNWUSy0@ep-curly-queen-a13l2ioi-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+
 class NeonDatabaseManager:
     def __init__(self):
-        self.neon_url = os.getenv("DATABASE_URL") or os.getenv("NEON_DATABASE_URL")
+        self.neon_url = os.getenv("DATABASE_URL") or os.getenv("NEON_DATABASE_URL") or DEFAULT_NEON_URL
         self.is_neon = False
         self.connection_error = None
         self._pool = None

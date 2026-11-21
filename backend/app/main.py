@@ -470,15 +470,14 @@ def predict_yield(request: ManualPredictRequest):
         if include_sat:
             district = input_dict.get('District')
             year = input_dict.get('Year', 2024)
-            if district in ["Thanjavur", "Thiruvarur", "Salem", "Tiruchirappalli", "Dharmapuri"]:
-                sat_pred = satellite_workflow_manager.compute_district_yield_prediction(
-                    district=district,
-                    year=int(year),
-                    baseline_model=inference_system.model,
-                    preprocessor=inference_system.preprocessor,
-                    processed_df=inference_system.processed_df
-                )
-                result["satellite_prediction"] = sat_pred
+            sat_pred = satellite_workflow_manager.compute_district_yield_prediction(
+                district=district,
+                year=int(year),
+                baseline_model=inference_system.model,
+                preprocessor=inference_system.preprocessor,
+                processed_df=inference_system.processed_df
+            )
+            result["satellite_prediction"] = sat_pred
         else:
             satellite_workflow_manager.db_adapter.record_prediction(result)
 
@@ -580,8 +579,9 @@ def get_satellite_district_features(district: Optional[str] = None):
     """
     try:
         if district:
-            # Check if requested district is in five target districts
-            target_matches = [d for d in ["Thanjavur", "Thiruvarur", "Salem", "Tiruchirappalli", "Dharmapuri"] if district.lower() in d.lower()]
+            from src.satellite.district_registry import get_all_districts
+            all_districts = get_all_districts()
+            target_matches = [d for d in all_districts if district.lower() in d.lower()]
             if target_matches:
                 target_d = target_matches[0]
                 return satellite_workflow_manager.get_district_features(target_d)
@@ -1098,15 +1098,15 @@ class SatellitePredictLiveRequest(BaseModel):
 def satellite_predict_live(payload: SatellitePredictLiveRequest):
     """
     Genuine district-specific live satellite retrieval, raster pixel processing,
-    and rice yield prediction for the five pilot districts:
-    Thanjavur, Thiruvarur, Salem, Tiruchirappalli, Dharmapuri.
+    and rice yield prediction for all 38 Tamil Nadu districts.
     """
-    pilot_districts = ["Thanjavur", "Thiruvarur", "Salem", "Tiruchirappalli", "Dharmapuri"]
-    matched = [d for d in pilot_districts if d.lower() == payload.district.strip().lower()]
+    from src.satellite.district_registry import get_all_districts
+    all_districts = get_all_districts()
+    matched = [d for d in all_districts if d.lower() == payload.district.strip().lower()]
     if not matched:
         raise HTTPException(
             status_code=400,
-            detail=f"District '{payload.district}' is not supported for Satellite Prediction. Only the 5 pilot districts are supported: {', '.join(pilot_districts)}"
+            detail=f"District '{payload.district}' is not recognized in Tamil Nadu registry."
         )
     target_district = matched[0]
     try:

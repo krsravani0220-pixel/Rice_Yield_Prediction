@@ -1507,7 +1507,8 @@ function clearAuthSession() {
 
 async function initAuthSession() {
     const token = getAuthToken();
-    if (!token) {
+    if (!token || token.startsWith('fallback_')) {
+        clearAuthSession();
         updateAuthUI();
         return;
     }
@@ -1527,12 +1528,7 @@ async function initAuthSession() {
         }
     } catch (err) {
         console.warn("Could not verify session with backend:", err);
-        const storedUser = localStorage.getItem('riceyield_user_profile');
-        if (storedUser) {
-            currentUser = JSON.parse(storedUser);
-            currentAuthToken = token;
-            updateAuthUI();
-        }
+        clearAuthSession();
     }
 }
 
@@ -1671,39 +1667,21 @@ async function handleSignInSubmit(e) {
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-            // Graceful fallback for 405 or 404
-            if (res.status === 405 || res.status === 404) {
-                console.warn("Backend auth route returned 405/404, activating seamless local user session.");
-                const namePart = email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-                const fallbackUser = {
-                    id: "usr_" + Date.now().toString(36),
-                    full_name: namePart || "Farmer",
-                    email: email,
-                    district: "Thanjavur",
-                    role: "Farmer"
-                };
-                const fallbackToken = "fallback_" + btoa(JSON.stringify(fallbackUser));
-                setAuthSession(fallbackToken, fallbackUser);
-                closeAuthModal();
-                const target = pendingRedirectTab || 'dashboard';
-                pendingRedirectTab = null;
-                switchTab(target);
-                loadUserPredictionHistory();
-                return;
-            }
-            throw new Error(data.detail || "Authentication failed");
+            throw new Error(data.detail || (currentLang === 'ta' ? 'உள்நுழைவு தோல்வியடைந்தது. சரியான விவரங்களை உள்ளிடவும்.' : 'Invalid credentials. Please verify your email and password, or register.'));
         }
 
-        // Instant session activation (Zero delay)
+        // Strict verification: user must exist and be returned by Neon Cloud DB
+        if (!data.token || !data.user) {
+            throw new Error("Invalid response from database server.");
+        }
+
         setAuthSession(data.token, data.user);
         closeAuthModal();
 
-        // Immediately transition view to dashboard or requested protected tab
         const target = pendingRedirectTab || 'dashboard';
         pendingRedirectTab = null;
         switchTab(target);
 
-        // Fetch prediction history asynchronously in the background
         setTimeout(loadUserPredictionHistory, 10);
     } catch (err) {
         showAuthAlert(err.message, "error");
@@ -1734,28 +1712,13 @@ async function handleSignUpSubmit(e) {
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-            if (res.status === 405 || res.status === 404) {
-                console.warn("Backend auth route returned 405/404, activating seamless local user session.");
-                const fallbackUser = {
-                    id: "usr_" + Date.now().toString(36),
-                    full_name: full_name || email.split('@')[0],
-                    email: email,
-                    district: district || "Thanjavur",
-                    role: role || "Farmer"
-                };
-                const fallbackToken = "fallback_" + btoa(JSON.stringify(fallbackUser));
-                setAuthSession(fallbackToken, fallbackUser);
-                closeAuthModal();
-                const target = pendingRedirectTab || 'dashboard';
-                pendingRedirectTab = null;
-                switchTab(target);
-                loadUserPredictionHistory();
-                return;
-            }
-            throw new Error(data.detail || "Registration failed");
+            throw new Error(data.detail || (currentLang === 'ta' ? 'பதிவு தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.' : 'Registration failed. Please check your details or sign in.'));
         }
 
-        // Instant session activation (Zero delay)
+        if (!data.token || !data.user) {
+            throw new Error("Invalid response from database server.");
+        }
+
         setAuthSession(data.token, data.user);
         closeAuthModal();
 
@@ -2106,14 +2069,9 @@ function escapeHtml(str) {
 
 function toggleAIAssistant() {
     const pane = document.getElementById('ai-assistant-pane');
-    const backdrop = document.getElementById('ai-assistant-backdrop');
     if (!pane) return;
     const isOpening = pane.classList.contains('hidden');
     pane.classList.toggle('hidden');
-    if (backdrop) {
-        if (isOpening) backdrop.classList.remove('hidden');
-        else backdrop.classList.add('hidden');
-    }
     if (isOpening) {
         const inp = document.getElementById('ai-chat-input');
         if (inp) setTimeout(() => inp.focus(), 150);

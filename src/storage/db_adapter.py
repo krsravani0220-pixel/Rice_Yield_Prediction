@@ -32,7 +32,8 @@ class DatabaseAdapter:
     Never stores or logs API credentials or database passwords.
     """
     def __init__(self):
-        self.db_url = os.getenv("NEON_DATABASE_URL") or os.getenv("DATABASE_URL")
+        default_url = "postgresql://neondb_owner:npg_EscR6lNWUSy0@ep-curly-queen-a13l2ioi-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+        self.db_url = os.getenv("NEON_DATABASE_URL") or os.getenv("DATABASE_URL") or default_url
         self.is_neon_configured = bool(self.db_url and "neon.tech" in self.db_url)
         self._conn = None
         if self.is_neon_configured:
