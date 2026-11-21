@@ -1655,7 +1655,7 @@ async function handleSignInSubmit(e) {
     const btn = document.getElementById('btn-signin-submit');
 
     btn.disabled = true;
-    btn.textContent = currentLang === 'ta' ? 'உள்நுழைகிறது...' : 'Signing In...';
+    btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" class="spin-icon" style="display:inline-block; vertical-align:middle; margin-right:6px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span>${currentLang === 'ta' ? 'உள்நுழைகிறது...' : 'Signing In...'}</span>`;
 
     try {
         const res = await fetch(`${API_BASE}/api/auth/login`, {
@@ -1663,13 +1663,10 @@ async function handleSignInSubmit(e) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-        let data = {};
-        try {
-            data = await res.json();
-        } catch (_) {}
+        const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-            // Graceful fallback for 405 (Method Not Allowed) or 404 if remote server deployment is pending
+            // Graceful fallback for 405 or 404
             if (res.status === 405 || res.status === 404) {
                 console.warn("Backend auth route returned 405/404, activating seamless local user session.");
                 const namePart = email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -1682,36 +1679,32 @@ async function handleSignInSubmit(e) {
                 };
                 const fallbackToken = "fallback_" + btoa(JSON.stringify(fallbackUser));
                 setAuthSession(fallbackToken, fallbackUser);
-                showAuthAlert(currentLang === 'ta' ? "வெற்றிகரமாக உள்நுழைந்தது!" : "Signed in successfully!", "success");
-                setTimeout(() => {
-                    closeAuthModal();
-                    loadUserPredictionHistory();
-                    if (pendingRedirectTab) {
-                        const target = pendingRedirectTab;
-                        pendingRedirectTab = null;
-                        switchTab(target);
-                    }
-                }, 600);
+                closeAuthModal();
+                const target = pendingRedirectTab || 'dashboard';
+                pendingRedirectTab = null;
+                switchTab(target);
+                loadUserPredictionHistory();
                 return;
             }
             throw new Error(data.detail || "Authentication failed");
         }
+
+        // Instant session activation (Zero delay)
         setAuthSession(data.token, data.user);
-        showAuthAlert(currentLang === 'ta' ? "வெற்றிகரமாக உள்நுழைந்தது!" : "Signed in successfully!", "success");
-        setTimeout(() => {
-            closeAuthModal();
-            loadUserPredictionHistory();
-            if (pendingRedirectTab) {
-                const target = pendingRedirectTab;
-                pendingRedirectTab = null;
-                switchTab(target);
-            }
-        }, 600);
+        closeAuthModal();
+
+        // Immediately transition view to dashboard or requested protected tab
+        const target = pendingRedirectTab || 'dashboard';
+        pendingRedirectTab = null;
+        switchTab(target);
+
+        // Fetch prediction history asynchronously in the background
+        setTimeout(loadUserPredictionHistory, 10);
     } catch (err) {
         showAuthAlert(err.message, "error");
     } finally {
         btn.disabled = false;
-        btn.textContent = currentLang === 'ta' ? 'உள்நுழைக' : 'Sign In to Neon Cloud';
+        btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> <span data-en="Sign In to Neon Cloud" data-ta="உள்நுழைக">${currentLang === 'ta' ? 'உள்நுழைக' : 'Sign In to Neon Cloud'}</span>`;
     }
 }
 
@@ -1725,7 +1718,7 @@ async function handleSignUpSubmit(e) {
     const btn = document.getElementById('btn-signup-submit');
 
     btn.disabled = true;
-    btn.textContent = currentLang === 'ta' ? 'பதிவாகிறது...' : 'Creating Account...';
+    btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" class="spin-icon" style="display:inline-block; vertical-align:middle; margin-right:6px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span>${currentLang === 'ta' ? 'பதிவாகிறது...' : 'Creating Account...'}</span>`;
 
     try {
         const res = await fetch(`${API_BASE}/api/auth/register`, {
@@ -1733,13 +1726,9 @@ async function handleSignUpSubmit(e) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ full_name, email, district, role, password })
         });
-        let data = {};
-        try {
-            data = await res.json();
-        } catch (_) {}
+        const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-            // Graceful fallback for 405 (Method Not Allowed) or 404 if remote server deployment is pending
             if (res.status === 405 || res.status === 404) {
                 console.warn("Backend auth route returned 405/404, activating seamless local user session.");
                 const fallbackUser = {
@@ -1751,36 +1740,30 @@ async function handleSignUpSubmit(e) {
                 };
                 const fallbackToken = "fallback_" + btoa(JSON.stringify(fallbackUser));
                 setAuthSession(fallbackToken, fallbackUser);
-                showAuthAlert(currentLang === 'ta' ? "கணக்கு உருவாக்கப்பட்டது!" : "Account created in Neon Cloud!", "success");
-                setTimeout(() => {
-                    closeAuthModal();
-                    loadUserPredictionHistory();
-                    if (pendingRedirectTab) {
-                        const target = pendingRedirectTab;
-                        pendingRedirectTab = null;
-                        switchTab(target);
-                    }
-                }, 600);
+                closeAuthModal();
+                const target = pendingRedirectTab || 'dashboard';
+                pendingRedirectTab = null;
+                switchTab(target);
+                loadUserPredictionHistory();
                 return;
             }
             throw new Error(data.detail || "Registration failed");
         }
+
+        // Instant session activation (Zero delay)
         setAuthSession(data.token, data.user);
-        showAuthAlert(currentLang === 'ta' ? "கணக்கு உருவாக்கப்பட்டது!" : "Account created in Neon Cloud!", "success");
-        setTimeout(() => {
-            closeAuthModal();
-            loadUserPredictionHistory();
-            if (pendingRedirectTab) {
-                const target = pendingRedirectTab;
-                pendingRedirectTab = null;
-                switchTab(target);
-            }
-        }, 600);
+        closeAuthModal();
+
+        const target = pendingRedirectTab || 'dashboard';
+        pendingRedirectTab = null;
+        switchTab(target);
+
+        setTimeout(loadUserPredictionHistory, 10);
     } catch (err) {
         showAuthAlert(err.message, "error");
     } finally {
         btn.disabled = false;
-        btn.textContent = currentLang === 'ta' ? 'கணக்கை உருவாக்கு' : 'Create Account in Neon Cloud';
+        btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> <span data-en="Create Account in Neon Cloud" data-ta="கணக்கை உருவாக்கு">${currentLang === 'ta' ? 'கணக்கை உருவாக்கு' : 'Create Account in Neon Cloud'}</span>`;
     }
 }
 

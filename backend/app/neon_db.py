@@ -29,6 +29,7 @@ except ImportError:
 # Try importing psycopg2 for Neon PostgreSQL
 try:
     import psycopg2
+    from psycopg2 import pool
     from psycopg2.extras import RealDictCursor
     PSYCOPG2_AVAILABLE = True
 except ImportError:
@@ -41,9 +42,33 @@ JWT_SECRET = os.getenv("JWT_SECRET", "tamilnadu-rice-yield-dss-neon-secret-key-2
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24 * 7  # 7 days
 
+class PooledConnectionWrapper:
+    """Wraps pooled PostgreSQL connection so conn.close() returns connection to pool instead of terminating TCP socket."""
+    def __init__(self, pool_obj, conn):
+        self._pool = pool_obj
+        self._conn = conn
+        self._closed = False
+
+    def close(self):
+        if not self._closed and self._pool:
+            try:
+                self._pool.putconn(self._conn)
+            except Exception:
+                pass
+            self._closed = True
+
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
+    def __enter__(self):
+        return self._conn.__enter__()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return self._conn.__exit__(exc_type, exc_val, exc_tb)
+
 def _secure_hash(password: str) -> str:
     if BCRYPT_AVAILABLE:
-        salt = bcrypt.gensalt()
+        salt = bcrypt.gensalt(rounds=10)
         return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
     salt = os.urandom(16).hex()
     hashed = hashlib.sha256((salt + password).encode('utf-8')).hexdigest()
@@ -70,16 +95,17 @@ class NeonDatabaseManager:
         self.neon_url = os.getenv("DATABASE_URL") or os.getenv("NEON_DATABASE_URL")
         self.is_neon = False
         self.connection_error = None
+        self._pool = None
+        self._user_cache = {}  # In-memory high-speed cache: email -> {user, ts}
         self._init_connection()
 
     def _init_connection(self):
         if self.neon_url and PSYCOPG2_AVAILABLE:
             try:
-                # Test connection to Neon PostgreSQL
-                conn = psycopg2.connect(self.neon_url, sslmode='require')
-                conn.close()
+                # Initialize persistent ThreadedConnectionPool (min 2, max 15)
+                self._pool = pool.ThreadedConnectionPool(2, 15, self.neon_url)
                 self.is_neon = True
-                print(" Successfully connected to Neon Cloud PostgreSQL!")
+                print(" Successfully connected to Neon Cloud PostgreSQL with persistent Connection Pool!")
                 self._create_tables_postgres()
                 self._ensure_profile_columns()
                 return
@@ -94,6 +120,14 @@ class NeonDatabaseManager:
         print(" Using local database fallback for user storage (Set DATABASE_URL to link Neon.tech).")
 
     def _get_pg_connection(self):
+        if self._pool:
+            try:
+                raw_conn = self._pool.getconn()
+                if raw_conn.closed != 0:
+                    raw_conn = psycopg2.connect(self.neon_url, sslmode='require')
+                return PooledConnectionWrapper(self._pool, raw_conn)
+            except Exception:
+                pass
         return psycopg2.connect(self.neon_url, sslmode='require')
 
     def _get_sqlite_connection(self):
@@ -291,6 +325,31 @@ class NeonDatabaseManager:
             finally:
                 conn.close()
 
+    def _async_update_last_login(self, user_id: int, api_key: str):
+        def _bg():
+            try:
+                if self.is_neon:
+                    conn = self._get_pg_connection()
+                    try:
+                        with conn.cursor() as cur:
+                            cur.execute("UPDATE users SET last_login_at = CURRENT_TIMESTAMP, api_key = %s WHERE id = %s", (api_key, user_id))
+                        conn.commit()
+                    finally:
+                        conn.close()
+                else:
+                    now_ts = datetime.datetime.utcnow().isoformat()
+                    conn = self._get_sqlite_connection()
+                    try:
+                        cur = conn.cursor()
+                        cur.execute("UPDATE users SET last_login_at = ?, api_key = ? WHERE id = ?", (now_ts, api_key, user_id))
+                        conn.commit()
+                    finally:
+                        conn.close()
+            except Exception:
+                pass
+        import threading
+        threading.Thread(target=_bg, daemon=True).start()
+
     def authenticate_user(self, email: str, password: str) -> Dict[str, Any]:
         email = email.strip().lower()
         now_ts = datetime.datetime.utcnow().isoformat()
@@ -315,9 +374,8 @@ class NeonDatabaseManager:
                     if not user_dict.get('api_key'):
                         user_dict['api_key'] = f"ry_live_{secrets.token_hex(16)}"
                     
-                    cur.execute("UPDATE users SET last_login_at = CURRENT_TIMESTAMP, api_key = %s WHERE id = %s", 
-                                (user_dict['api_key'], user_dict['id']))
-                conn.commit()
+                    # Fire-and-forget background update of last_login_at & api_key
+                    self._async_update_last_login(user_dict['id'], user_dict['api_key'])
                 return user_dict
             finally:
                 conn.close()
