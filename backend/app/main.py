@@ -143,7 +143,8 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, A
 
 # --- Neon Cloud Authentication & User Persistence Endpoints ---
 
-@app.api_route("/api/auth/register", methods=["GET", "POST"])
+@app.api_route("/api/auth/register", methods=["GET", "POST", "OPTIONS"])
+@app.api_route("/api/auth/register/", methods=["GET", "POST", "OPTIONS"])
 def register_user_route(request_data: Optional[RegisterRequest] = None, raw_request: Request = None):
     if raw_request and raw_request.method == "GET":
         return {
@@ -173,7 +174,8 @@ def register_user_route(request_data: Optional[RegisterRequest] = None, raw_requ
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
-@app.api_route("/api/auth/login", methods=["GET", "POST"])
+@app.api_route("/api/auth/login", methods=["GET", "POST", "OPTIONS"])
+@app.api_route("/api/auth/login/", methods=["GET", "POST", "OPTIONS"])
 def login_user_route(request_data: Optional[LoginRequest] = None, raw_request: Request = None):
     if raw_request and raw_request.method == "GET":
         return {
@@ -196,7 +198,8 @@ def login_user_route(request_data: Optional[LoginRequest] = None, raw_request: R
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
 
-@app.get("/api/auth/me")
+@app.api_route("/api/auth/me", methods=["GET", "OPTIONS"])
+@app.api_route("/api/auth/me/", methods=["GET", "OPTIONS"])
 def get_current_user_profile(user_payload: Dict[str, Any] = Depends(get_current_user)):
     return {
         "status": "authenticated",
@@ -330,7 +333,8 @@ class AssistantChatRequest(BaseModel):
     query: str = Field(..., example="Predict yield for Mayiladuthurai in 2026")
     district: Optional[str] = Field("Thanjavur", example="Thanjavur")
 
-@app.post("/api/assistant/chat")
+@app.api_route("/api/assistant/chat", methods=["POST", "OPTIONS"])
+@app.api_route("/api/assistant/chat/", methods=["POST", "OPTIONS"])
 def assistant_chat(request: AssistantChatRequest):
     try:
         res = ai_assistant.process_query(request.query, context_district=request.district)
@@ -1128,6 +1132,11 @@ def satellite_predict_live(payload: SatellitePredictLiveRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# Catch-all for undefined /api routes so they never fall through to StaticFiles (which returns 405 Method Not Allowed)
+@app.api_route("/api/{rest_of_path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
+def api_catch_all(rest_of_path: str, request: Request):
+    raise HTTPException(status_code=404, detail=f"API endpoint '/api/{rest_of_path}' with method {request.method} not found.")
 
 # Mount Static Files (both /static and root / for static assets)
 from fastapi.staticfiles import StaticFiles

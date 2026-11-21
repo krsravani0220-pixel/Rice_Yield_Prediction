@@ -1,10 +1,14 @@
-const API_BASE = (typeof window !== 'undefined')
-    ? (window.location.port === '3000' || (window.location.port && window.location.port !== '8000' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-        ? `http://${window.location.hostname}:8000`
-        : (window.location.origin.includes(':8000') || window.location.origin.includes('onrender.com')
-            ? ""
-            : "https://rice-yield-prediction-ifpz.onrender.com"))
-    : "http://127.0.0.1:8000";
+const API_BASE = (() => {
+    if (typeof window === 'undefined') return "http://127.0.0.1:8000";
+    const loc = window.location;
+    if (loc.port === '8000' || loc.origin.includes(':8000') || loc.origin.includes('onrender.com')) {
+        return "";
+    }
+    if (loc.hostname === 'localhost' || loc.hostname === '127.0.0.1') {
+        return `http://${loc.hostname}:8000`;
+    }
+    return "https://rice-yield-prediction-ifpz.onrender.com";
+})();
 let currentLang = 'en';
 let currentDistrictStats = {};
 let lastManualResult = null;
