@@ -282,6 +282,9 @@ function switchTab(tabId) {
     if (tabId === 'profile') {
         loadUserProfile();
     }
+    if (tabId === 'live') {
+        checkDataFeedsHealth();
+    }
 }
 
 // Show/Hide Validation Banner
@@ -2043,5 +2046,61 @@ async function handleProfileSave(e) {
     } finally {
         btn.disabled = false;
         btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> <span>${currentLang === 'ta' ? 'மாற்றங்களைச் சேமிக்கவும்' : 'Save Profile Changes'}</span>`;
+    }
+}
+
+// ==========================================================================
+// Live Upstream Data Feeds Health Check & Provenance Verification
+// ==========================================================================
+
+async function checkDataFeedsHealth() {
+    const btn = document.getElementById('btn-check-data-health');
+    const elOpenMeteo = document.getElementById('latency-openmeteo');
+    const elSentinel = document.getElementById('latency-sentinel');
+    const elNeon = document.getElementById('latency-neondb');
+    const elSickle = document.getElementById('latency-sickle');
+
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="spin-icon"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span>${currentLang === 'ta' ? 'சரிபார்க்கிறது...' : 'Checking...'}</span>`;
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/api/data-sources/live-audit`);
+        if (res.ok) {
+            const data = await res.json();
+            const s = data.sources || {};
+
+            if (s.open_meteo && elOpenMeteo) {
+                const isOp = s.open_meteo.status === 'OPERATIONAL';
+                elOpenMeteo.textContent = isOp ? `${s.open_meteo.latency_ms} ms` : s.open_meteo.status;
+                elOpenMeteo.style.color = isOp ? '#15803d' : '#b45309';
+                elOpenMeteo.style.background = isOp ? '#dcfce7' : '#fef3c7';
+            }
+            if (s.sentinel2_stac && elSentinel) {
+                const isOp = s.sentinel2_stac.status === 'OPERATIONAL';
+                elSentinel.textContent = isOp ? `${s.sentinel2_stac.latency_ms} ms` : s.sentinel2_stac.status;
+                elSentinel.style.color = isOp ? '#15803d' : '#b45309';
+                elSentinel.style.background = isOp ? '#dcfce7' : '#fef3c7';
+            }
+            if (s.neon_db && elNeon) {
+                const isOp = s.neon_db.status === 'OPERATIONAL';
+                elNeon.textContent = isOp ? `Connected (${s.neon_db.latency_ms} ms)` : s.neon_db.status;
+                elNeon.style.color = isOp ? '#15803d' : '#b45309';
+                elNeon.style.background = isOp ? '#dcfce7' : '#fef3c7';
+            }
+            if (s.sickle_dataset && elSickle) {
+                elSickle.textContent = s.sickle_dataset.status === 'LOADED' ? 'Loaded' : 'Active (Sim)';
+                elSickle.style.color = '#15803d';
+                elSickle.style.background = '#dcfce7';
+            }
+        }
+    } catch (err) {
+        console.warn("Live feeds audit check error:", err);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> <span>${currentLang === 'ta' ? 'மூலங்களை சரிபார்க்கவும்' : 'Cross-Check Feeds'}</span>`;
+        }
     }
 }

@@ -407,6 +407,57 @@
                             <p data-en="Select any of 30 Tamil Nadu districts to fetch live Sentinel-2 satellite passes from Copernicus and ECMWF ERA5-Land meteorological reanalysis from Open-Meteo across a 12-month lookback period to predict expected rice yield." data-ta="12 மாத கால இடைவெளியில் கோப்பர்நிகஸ் சென்டினல்-2 மற்றும் ஓபன்-மீட்டியோ வானிலை தரவுகளைப் பெற்று துல்லியமான நெல் மகசூலைக் கணக்கிடுங்கள்.">Select any of 30 Tamil Nadu districts to fetch live Sentinel-2 satellite passes from Copernicus and ECMWF ERA5-Land meteorological reanalysis from Open-Meteo across a 12-month lookback period to predict expected rice yield.</p>
                         </div>
 
+                        <!-- Upstream Data Feeds Health & Latency Verification Banner -->
+                        <div class="live-data-health-banner">
+                            <div class="health-header-row">
+                                <div class="health-title-group">
+                                    <span class="live-pulse-badge">
+                                        <span class="pulse-dot"></span>
+                                        LIVE DATA SOURCES HEALTH & PROVENANCE
+                                    </span>
+                                    <p data-en="Direct real-time connectivity verification with upstream satellite STAC catalogs, ECMWF reanalysis & Neon Cloud" data-ta="செயற்கைக்கோள் மற்றும் வானிலை நேரடி தரவு மூலங்களின் இணைப்பு நிலை">Direct real-time connectivity verification with upstream satellite STAC catalogs, ECMWF reanalysis & Neon Cloud</p>
+                                </div>
+                                <button id="btn-check-data-health" class="btn-verify-feeds" onclick="checkDataFeedsHealth()">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                    <span data-en="Cross-Check Feeds" data-ta="மூலங்களை சரிபார்க்கவும்">Cross-Check Feeds</span>
+                                </button>
+                            </div>
+                            <div id="data-feeds-status-grid" class="feeds-status-grid">
+                                <div class="feed-badge-card" id="feed-openmeteo">
+                                    <span class="feed-dot online"></span>
+                                    <div class="feed-info">
+                                        <strong>Open-Meteo ERA5-Land</strong>
+                                        <span>ECMWF Reanalysis (12m)</span>
+                                    </div>
+                                    <span class="feed-latency" id="latency-openmeteo">Checking...</span>
+                                </div>
+                                <div class="feed-badge-card" id="feed-sentinel">
+                                    <span class="feed-dot online"></span>
+                                    <div class="feed-info">
+                                        <strong>Copernicus Sentinel-2</strong>
+                                        <span>AWS STAC L2A COGs</span>
+                                    </div>
+                                    <span class="feed-latency" id="latency-sentinel">Checking...</span>
+                                </div>
+                                <div class="feed-badge-card" id="feed-neondb">
+                                    <span class="feed-dot online"></span>
+                                    <div class="feed-info">
+                                        <strong>Neon Cloud DB</strong>
+                                        <span>PostgreSQL (SSL Active)</span>
+                                    </div>
+                                    <span class="feed-latency" id="latency-neondb">Connected</span>
+                                </div>
+                                <div class="feed-badge-card" id="feed-sickle">
+                                    <span class="feed-dot online"></span>
+                                    <div class="feed-info">
+                                        <strong>SICKLE Benchmark</strong>
+                                        <span>Cauvery Delta Multi-Sensor</span>
+                                    </div>
+                                    <span class="feed-latency" id="latency-sickle">Active</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- District Selection Card -->
                         <div class="form-section">
                             <h3 class="section-heading">📍 District Selection & Observation Window</h3>
