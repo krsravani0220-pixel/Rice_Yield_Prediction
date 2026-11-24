@@ -16,7 +16,7 @@ const DISTRICT_BASELINES = {
   "Villupuram": 3.75, "Virudhunagar": 3.62
 };
 
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
@@ -26,7 +26,11 @@ export default function handler(req, res) {
     return res.status(200).end();
   }
 
-  const body = req.body || {};
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch(e) {}
+  }
+  body = body || {};
   const district = (body.district || "Thanjavur").trim();
   const targetYear = parseInt(body.target_year) || 2026;
   const baseYield = DISTRICT_BASELINES[district] || 3.88;

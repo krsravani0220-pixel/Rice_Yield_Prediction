@@ -45,7 +45,7 @@ const DISTRICT_PROFILES = {
   "Virudhunagar": { zone: "Southern Semi-Arid Zone", tile: "T43QQA", baselineYield: 3.62, soilType: "black soil", soilPh: 8.0, n: 285.0, p: 18.0, k: 195.0, mettur: false, area: 24700.0 }
 };
 
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
@@ -55,7 +55,11 @@ export default function handler(req, res) {
     return res.status(200).end();
   }
 
-  const body = req.body || {};
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch(e) {}
+  }
+  body = body || {};
   const district = (body.district || "Thanjavur").trim();
   const refDate = body.reference_date || new Date().toISOString().slice(0, 10);
   const p = DISTRICT_PROFILES[district] || DISTRICT_PROFILES["Thanjavur"];

@@ -44,7 +44,7 @@ const DISTRICT_BASELINES = {
   "Virudhunagar": { soilType: "black soil", soilPh: 8.0, n: 285.0, p: 18.0, k: 195.0, fertilizer: 165.0, pesticide: 2.1, area: 24700.0 }
 };
 
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');

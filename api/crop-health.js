@@ -3,7 +3,7 @@
  * Returns TNAU-compliant targeted crop health advisories in English and Tamil.
  */
 
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
@@ -13,7 +13,11 @@ export default function handler(req, res) {
     return res.status(200).end();
   }
 
-  const body = req.body || {};
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch(e) {}
+  }
+  body = body || {};
   const stage = body.growth_stage || "Tillering";
   const pest = body.pest_obs || "none";
   const disease = body.disease_obs || "none";

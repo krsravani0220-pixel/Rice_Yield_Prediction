@@ -28,7 +28,7 @@ const BASELINE_RANGES = {
   "Area": { min: 5000.0, p10: 15000.0, p25: 28000.0, p50: 65000.0, p75: 120000.0, p90: 160000.0, max: 220000.0, mean: 78000.0 }
 };
 
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
