@@ -23,7 +23,7 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 class CopernicusSatelliteClient:
     """
     Client for Copernicus Data Space Ecosystem (CDSE) Sentinel-2 Level-2A data.
-    Provides automated observation retrieval across all 30 Tamil Nadu districts,
+    Provides automated observation retrieval across all 38 Tamil Nadu districts,
     cloud filtering, pagination, season identification, and local JSON caching.
     """
     TOKEN_URL = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"

@@ -5,7 +5,7 @@ Connects Copernicus Sentinel-2 Level-2A satellite imagery to the pretrained
 SICKLE [S2]_unet3d rice classification model.
 
 Project: Spatio-Temporal Rice Yield Prediction Using LSTM
-Target Region: Tamil Nadu (30 Districts)
+Target Region: Tamil Nadu (All 38 Districts)
 
 Key Capabilities:
 1. Automated Sentinel-2 SAFE product discovery and band indexing (12 required bands + SCL).

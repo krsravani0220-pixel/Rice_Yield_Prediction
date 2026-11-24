@@ -1077,6 +1077,78 @@ html, body {
     border-radius: 4px;
 }
 
+.full-span-method {
+    grid-column: 1 / -1;
+}
+
+.tri-model-verification-badge {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+}
+
+.tri-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1e293b;
+    background: #ffffff;
+    border: 1px solid #94a3b8;
+    border-radius: 9999px;
+    padding: 5px 12px;
+}
+
+.tri-pill.active {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+}
+
+.tri-check {
+    color: #16a34a;
+    font-weight: 800;
+}
+
+.tri-status-pill {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 9999px;
+    padding: 4px 10px;
+}
+
+.consensus-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+.consensus-label {
+    font-size: 0.78rem;
+    color: #065f46;
+    font-weight: 600;
+}
+
+.consensus-val {
+    font-size: 0.88rem;
+    color: #047857;
+    font-weight: 800;
+}
+
 .passive-method-tag {
     font-size: 0.7rem;
     background-color: #e2e8f0;

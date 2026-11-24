@@ -15,7 +15,7 @@ def main():
     data = json.loads(resp.read().decode('utf-8'))
     districts = data.get('districts', [])
     print(f"Total districts from /api/districts: {len(districts)}")
-    assert len(districts) == 30, f"Expected 30 districts, got {len(districts)}"
+    assert len(districts) == 38, f"Expected 38 districts, got {len(districts)}"
 
     # 2. Check frontend index.html elements
     with open('frontend/index.html', 'r', encoding='utf-8') as f:

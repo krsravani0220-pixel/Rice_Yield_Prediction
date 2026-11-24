@@ -817,7 +817,7 @@ def get_satellite_pipeline_status():
 def get_satellite_pipeline_coverage():
     """
     Returns data availability, catalogue counts, processed scenes, and model support
-    across all 30 districts of Tamil Nadu.
+    across all 38 districts of Tamil Nadu.
     """
     from src.satellite.district_registry import get_all_districts, get_district_profile
     districts = get_all_districts()
@@ -917,7 +917,7 @@ def trigger_satellite_pipeline(payload: SatellitePipelineRunRequest, background_
     return {
         "status": "accepted",
         "message": "Copernicus Sentinel-2 Training Pipeline execution started in background.",
-        "districts": payload.districts or "All 30 Tamil Nadu Districts",
+        "districts": payload.districts or "All 38 Tamil Nadu Districts",
         "years": payload.years or "2015-2023",
         "poll_status_endpoint": "/api/satellite-pipeline/status"
     }

@@ -5,7 +5,7 @@ Orchestrates Copernicus CDSE Sentinel-2 Level-2A satellite data discovery,
 cloud-masked spectral feature extraction across agricultural seasons,
 and dataset generation for Tamil Nadu Rice Yield Prediction (2015-2023).
 
-Target Region: All 30 Tamil Nadu Districts
+Target Region: All 38 Tamil Nadu Districts
 Temporal Overlap: 2015-2023 (Sentinel-2 Operational Era overlapping historical yield census)
 """
 

@@ -21,7 +21,7 @@ def run_acceptance_tests():
     dist_res = client.get("/api/districts")
     assert dist_res.status_code == 200, f"Expected 200, got {dist_res.status_code}"
     dist_data = dist_res.json()
-    assert len(dist_data["districts"]) == 30, f"Expected 30 districts, found {len(dist_data['districts'])}"
+    assert len(dist_data["districts"]) == 38, f"Expected 38 districts, found {len(dist_data['districts'])}"
     print(f" PASS: Found all {len(dist_data['districts'])} Tamil Nadu districts in dropdown registry.")
 
     # 2. Test 5 Mandated Districts + 1 Edge Case (Chennai)

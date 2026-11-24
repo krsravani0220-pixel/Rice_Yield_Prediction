@@ -3,7 +3,7 @@ Copernicus Sentinel-2 Training Pipeline Comprehensive Acceptance Test Suite
 ===========================================================================
 Validates:
   1. Pilot districts (Thanjavur, Thiruvarur, Salem, Tiruchirappalli, Dharmapuri)
-  2. All 30 Tamil Nadu districts coverage
+  2. All 38 Tamil Nadu districts coverage
   3. Chennai edge case (urban tract with missing agricultural yield labels)
   4. Copernicus CDSE catalogue discovery, cloud masking, and caching
   5. Multi-spectral seasonal feature extraction (NDVI, NDRE, EVI, NDWI across Kharif, Rabi, Zaid)
@@ -54,8 +54,8 @@ class TestCopernicusPipelineAcceptance(unittest.TestCase):
     # 1. District Registry & Pilot Districts Coverage
     # --------------------------------------------------------------------------
     def test_01_all_30_districts_registry(self):
-        """Verifies that all 30 Tamil Nadu districts are registered with coordinates and tiles."""
-        self.assertEqual(len(self.all_districts), 30, f"Expected 30 districts, found {len(self.all_districts)}")
+        """Verifies that all 38 Tamil Nadu districts are registered with coordinates and tiles."""
+        self.assertEqual(len(self.all_districts), 38, f"Expected 38 districts, found {len(self.all_districts)}")
         for dist in self.all_districts:
             prof = get_district_profile(dist)
             self.assertIsNotNone(prof, f"Profile missing for {dist}")
