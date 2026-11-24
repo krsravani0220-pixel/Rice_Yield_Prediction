@@ -12,7 +12,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="styles.css?v=20261124_v1">
+    <link rel="stylesheet" href="styles.css?v=20261124_v2">
 </head>
 <body class="is-unauthenticated">
     <div class="app-layout">
@@ -1844,6 +1844,7 @@
 
             <!-- Quick Suggestion Chips Carousel -->
             <div class="ai-quick-chips" id="ai-quick-chips">
+                <button class="chip-btn" onclick="sendAssistantQuickPrompt('Live weather report and rain forecast for ' + (document.getElementById('live-district-select')?.value || 'Thanjavur'))">🌦️ Live Weather Report</button>
                 <button class="chip-btn" onclick="sendAssistantQuickPrompt('Predict yield for Mayiladuthurai in 2026')">🌾 Predict Mayiladuthurai</button>
                 <button class="chip-btn" onclick="sendAssistantQuickPrompt('What is Mettur Dam live water status?')">🌊 Mettur Dam Status</button>
                 <button class="chip-btn" onclick="sendAssistantQuickPrompt('Check Sentinel-1 radar cloud scan for Cuddalore')">🛰️ Radar Cloud Scan</button>
@@ -1875,6 +1876,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=20261124_v1"></script>
+    <script src="app.js?v=20261124_v2"></script>
 </body>
 </html>

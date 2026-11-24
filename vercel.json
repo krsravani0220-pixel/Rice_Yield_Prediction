@@ -6,6 +6,10 @@
       "destination": "/api/auth/:path*"
     },
     {
+      "source": "/api/assistant/chat",
+      "destination": "/api/assistant/chat"
+    },
+    {
       "source": "/api/districts",
       "destination": "/api/districts"
     },
