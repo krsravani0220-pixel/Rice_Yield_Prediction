@@ -6,6 +6,38 @@
       "destination": "/api/auth/:path*"
     },
     {
+      "source": "/api/districts",
+      "destination": "/api/districts"
+    },
+    {
+      "source": "/api/historical-ranges",
+      "destination": "/api/historical-ranges"
+    },
+    {
+      "source": "/api/district-year-params",
+      "destination": "/api/district-year-params"
+    },
+    {
+      "source": "/api/predict-yield",
+      "destination": "/api/predict-yield"
+    },
+    {
+      "source": "/api/forecast",
+      "destination": "/api/forecast"
+    },
+    {
+      "source": "/api/crop-health",
+      "destination": "/api/crop-health"
+    },
+    {
+      "source": "/api/satellite-predict-live",
+      "destination": "/api/satellite-predict-live"
+    },
+    {
+      "source": "/api/data-sources/live-audit",
+      "destination": "/api/data-sources/live-audit"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://rice-yield-prediction-ifpz.onrender.com/api/:path*"
     }
